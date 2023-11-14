@@ -1,13 +1,12 @@
 <template>
   <div class="bkgd">
     <div class="view">
-      <login v-if="option==0"></login>
-      <register v-else></register>
-      <button @click="changeOption" class="yuanshen"></button>
+      <login v-if="option == 0" @option="changeOption"></login>
+      <register v-else @option="changeOption"></register>
     </div>
-    <div class="bkgdItem1"></div>
-    <div class="bkgdItem2"></div>
-    <div class="bkgdItem3"></div>
+    <div class="bkgdItem bkgdItem1"></div>
+    <div class="bkgdItem bkgdItem2"></div>
+    <div class="bkgdItem bkgdItem3"></div>
   </div>
 </template>
 
@@ -32,14 +31,13 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .bkgd {
   position: relative;
   width: 100vw;
   height: 100vh;
   padding: 10vh 0;
   background-image: linear-gradient(45deg, #fbc2eb, #a6c1ee);
-  background-size: cover;
   overflow: hidden;
 }
 
@@ -52,37 +50,31 @@ export default {
   backdrop-filter: blur(15px);
   padding: 7.5vh 3vw;
   border-radius: 5%;
-  z-index: 1;
+  z-index: 114514;
+}
+
+.bkgdItem {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 7.5%;
+  width: var(--bkgdItem-size);
+  height: var(--bkgdItem-size);
 }
 
 .bkgdItem1 {
-  position: absolute;
-  width: 17vw;
-  height: 17vw;
-  background-color: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
   transform: translateX(-3vw) translateY(3vh) rotateZ(40deg);
-  border-radius: 7.5%;
+  --bkgdItem-size: 17vw;
 }
 
 .bkgdItem2 {
-  position: absolute;
-  width: 22vw;
-  height: 22vw;
-  background-color: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
   transform: translateX(82vw) translateY(6vh) rotateZ(-17deg);
-  border-radius: 7.5%;
+  --bkgdItem-size: 21vw;
 }
 
 .bkgdItem3 {
-  position: absolute;
-  width: 19vw;
-  height: 19vw;
-  background-color: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
   transform: translateX(11vw) translateY(72vh) rotateZ(43deg);
-  border-radius: 7.5%;
+  --bkgdItem-size: 19vw;
 }
 
 .yuanshen {
