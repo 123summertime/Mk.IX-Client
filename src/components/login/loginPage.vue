@@ -11,8 +11,13 @@
 </template>
 
 <script>
+import axios from 'axios'
+
+import router from './../../router/index.js'
+
 import login from './login.vue'
 import register from './register.vue';
+
 export default {
   data() {
     return {
@@ -23,6 +28,24 @@ export default {
     changeOption() {
       this.option = !this.option
     }
+  },
+  async mounted() {
+    // const adress = localStorage.getItem("adress")
+    // const token = localStorage.getItem("token")
+
+    // if (adress && token) {
+    //   const URL = `http://${adress}/profile`
+
+    //   axios.get(URL, {
+    //     headers: { 'Authorization': `Bearer ${token}` }
+    //   }).then(res => {
+    //     // 刷新token
+    //     if (res["data"]["refeshToken"] != "") {
+    //       localStorage.setItem("token", res["data"]["refeshToken"])
+    //     }
+    //     router.push('/chat')
+    //   }).catch(err => { console.log(err) })
+    // }
   },
   components: {
     login,

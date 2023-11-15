@@ -1,19 +1,18 @@
 <template>
     <div class="title">注 册</div>
     <div class="form">
-        <span class="subTitle">服务器IP/域名</span>
+        <span class="subTitle">IP/域名:端口</span>
         <el-input v-model="adress" maxlength="50" prefix-icon="Place" clearable />
         <span class="subTitle">昵称</span>
         <el-input v-model="account" minlength="6" maxlength="20" prefix-icon="User" clearable />
         <span class="subTitle">密码</span>
         <el-input v-model="password" type="password" minlength="6" maxlength="20" prefix-icon="Lock" clearable />
-        <span class="subTitle">头像</span>
     </div>
     <div class="tools">
         <div @click="this.$emit('option')">去登录</div>
     </div>
     <div class="submit">
-        <button>注 册</button>
+        <button @click="">注 册</button>
         <div class="anim"></div>
     </div>
 </template>

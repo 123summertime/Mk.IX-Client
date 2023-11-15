@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import login from '../components/login/loginPage.vue'
-import other from '../components/others.vue'
+import chat from '../components/chat/chat.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,9 +15,9 @@ const router = createRouter({
       component: login
     },
     {
-      path: '/other',
-      name: 'other',
-      component: other
+      path: '/chat',
+      name: 'chat',
+      component: chat
     }
   ]
 })

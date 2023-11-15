@@ -1,7 +1,7 @@
 <template>
   <div class="title">登 录</div>
   <div class="form">
-    <span class="subTitle">服务器IP/域名</span>
+    <span class="subTitle">IP/域名:端口</span>
     <el-input v-model="adress" maxlength="50" prefix-icon="Place" clearable />
     <span class="subTitle">账号(uuid)</span>
     <el-input v-model="account" minlength="6" maxlength="20" prefix-icon="User" clearable />
@@ -9,15 +9,17 @@
     <el-input v-model="password" type="password" minlength="6" maxlength="20" prefix-icon="Lock" clearable />
   </div>
   <div class="tools">
+    <div></div>
     <div @click="this.$emit('option')">去注册</div>
   </div>
   <div class="submit">
-    <button>登 录</button>
+    <button @click="login" :disabled="clicked">登 录</button>
     <div class="anim"></div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   emits: ["option"],
   data() {
@@ -25,10 +27,25 @@ export default {
       adress: "",
       account: "",
       password: "",
+      clicked: false,
     }
   },
   methods: {
-    
+    async login() {
+      this.clicked = true
+      const URL = `http://${this.adress}/token`
+      const formData = `grant_type=password&username=${this.account}&password=${this.password}`
+
+      return axios.post(URL, formData, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      }).then(response => {
+        localStorage.setItem("adress", this.adress)
+        localStorage.setItem("account", this.account)
+        localStorage.setItem("token", response.data["access_token"])
+      }).catch(error => {
+          this.clicked = false
+      })
+    }
   }
 }
 </script>
