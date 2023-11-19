@@ -1,15 +1,15 @@
 <template>
   <div class="title">登 录</div>
-  <div class="form">
+  <div>
     <span class="subTitle">IP/域名:端口</span>
     <el-input v-model="adress" maxlength="50" prefix-icon="Place" clearable />
     <span class="subTitle">账号(uuid)</span>
-    <el-input v-model="account" minlength="6" maxlength="20" prefix-icon="User" clearable />
+    <el-input v-model="account" minlength="3" maxlength="20" prefix-icon="User" clearable />
     <span class="subTitle">密码</span>
     <el-input v-model="password" type="password" minlength="6" maxlength="20" prefix-icon="Lock" clearable />
   </div>
   <div class="tools">
-    <div></div>
+    <span :class="errorPassword ? 'err' : 'def'">账号或密码不正确!</span>
     <div @click="this.$emit('option')">去注册</div>
   </div>
   <div class="submit">
@@ -20,6 +20,9 @@
 
 <script>
 import axios from 'axios'
+
+import router from './../../router/index.js'
+
 export default {
   emits: ["option"],
   data() {
@@ -28,24 +31,31 @@ export default {
       account: "",
       password: "",
       clicked: false,
+      errorPassword: false,
     }
   },
   methods: {
     async login() {
       this.clicked = true
-      const URL = `http://${this.adress}/token`
+      const URL = `http://${this.adress}/token?isBot=0`
       const formData = `grant_type=password&username=${this.account}&password=${this.password}`
 
-      return axios.post(URL, formData, {
+      axios.post(URL, formData, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       }).then(response => {
         localStorage.setItem("adress", this.adress)
         localStorage.setItem("account", this.account)
-        localStorage.setItem("token", response.data["access_token"])
+        localStorage.setItem("token", response["data"]["access_token"])
+        router.push('/chat')
       }).catch(error => {
-          this.clicked = false
+        this.errorPassword = true
+        this.clicked = false
       })
     }
+  },
+  mounted() {
+    this.adress = localStorage.getItem("adress") ?? ""
+    this.account = localStorage.getItem("account") ?? ""
   }
 }
 </script>
@@ -113,17 +123,25 @@ export default {
 
 .tools {
   display: flex;
-  flex-direction: row-reverse;
+  justify-content: space-between;
   width: 100%;
+  margin-top: 0.5rem;
 }
 
 .tools div {
-  margin-top: 0.5rem;
   cursor: pointer;
 }
 
 .tools div:hover {
   color: var(--el-color-danger);
+}
+
+.err {
+  color: var(--el-color-danger);
+}
+
+.def {
+  color: transparent;
 }
 
 /* 覆盖原样式 */

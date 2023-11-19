@@ -30,22 +30,22 @@ export default {
     }
   },
   async mounted() {
-    // const adress = localStorage.getItem("adress")
-    // const token = localStorage.getItem("token")
+    const adress = localStorage.getItem("adress") ?? ""
+    const token = localStorage.getItem("token") ?? ""
 
-    // if (adress && token) {
-    //   const URL = `http://${adress}/profile`
-
-    //   axios.get(URL, {
-    //     headers: { 'Authorization': `Bearer ${token}` }
-    //   }).then(res => {
-    //     // 刷新token
-    //     if (res["data"]["refeshToken"] != "") {
-    //       localStorage.setItem("token", res["data"]["refeshToken"])
-    //     }
-    //     router.push('/chat')
-    //   }).catch(err => { console.log(err) })
-    // }
+    if (adress && token) {
+      const URL = `http://${adress}/profile`
+      axios.get(URL, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).then(res => {
+        // 刷新token
+        if (res["data"]["refreshToken"] != "") {
+          console.log("run")
+          localStorage.setItem("token", res["data"]["refreshToken"])
+        }
+        router.push('/chat')
+      }).catch(err => { })
+    }
   },
   components: {
     login,
@@ -73,7 +73,12 @@ export default {
   backdrop-filter: blur(15px);
   padding: 7.5vh 3vw;
   border-radius: 5%;
+  overflow: scroll;
   z-index: 114514;
+}
+
+.view::-webkit-scrollbar {
+  	display: none;
 }
 
 .bkgdItem {
