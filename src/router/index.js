@@ -37,7 +37,6 @@ router.beforeEach((to, from, next) => {
   const adress = localStorage.getItem("adress") ?? ""
   const token = localStorage.getItem("token") ?? ""
   const URL = `http://${adress}/check`
-  // TODO: /profile -> /check and add bot option
 
   axios.get(URL, {
     headers: { 'Authorization': `Bearer ${token}` }

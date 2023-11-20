@@ -34,7 +34,7 @@ export default {
     const token = localStorage.getItem("token") ?? ""
 
     if (adress && token) {
-      const URL = `http://${adress}/profile`
+      const URL = `http://${adress}/check`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${token}` }
       }).then(res => {
@@ -74,7 +74,7 @@ export default {
   padding: 7.5vh 3vw;
   border-radius: 5%;
   overflow: scroll;
-  z-index: 114514;
+  z-index: 10;
 }
 
 .view::-webkit-scrollbar {

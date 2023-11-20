@@ -8,16 +8,16 @@
     <span class="subTitle">密码</span>
     <el-input v-model="password" type="password" minlength="6" maxlength="20" prefix-icon="Lock" clearable />
   </div>
-  <div class="tools">
-    <div @click="this.$emit('option')">去登录</div>
-  </div>
   <div class="submit">
     <button @click="register" :disabled="clicked">注 册</button>
     <div class="anim"></div>
   </div>
+  <div class="tools">
+    <div @click="this.$emit('option')">去登录</div>
+  </div>
 
-  <el-dialog v-model="success" title="注册成功">
-    <span>您的uuid为<span class="uuid">{{ uuid }}</span></span>
+  <el-dialog v-model="success" append-to-body title="注册成功">
+    <div>您的uuid为<span class="uuid">{{ uuid }}</span></div>
     <template #footer>
       <span class="dialog-footer">
         <el-button type="primary" @click="this.$emit('option')">去登录</el-button>
@@ -25,14 +25,15 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="fail" title="注册失败">
-    <span>请重试</span>
+  <el-dialog v-model="fail" append-to-body title="注册失败">
+    <div>请重试</div>
     <template #footer>
       <span class="dialog-footer">
         <el-button type="primary" @click="fail = false">重试</el-button>
       </span>
     </template>
   </el-dialog>
+  
 </template>
   
 <script>
@@ -92,7 +93,7 @@ export default {
   width: 100%;
   height: 2rem;
   border-radius: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   overflow: hidden;
 }
 
