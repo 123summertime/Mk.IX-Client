@@ -14,9 +14,10 @@
 import axios from 'axios'
 
 import router from './../../router/index.js'
+import store from '../../store'
 
 import login from './login.vue'
-import register from './register.vue';
+import register from './register.vue'
 
 export default {
   data() {
@@ -40,11 +41,10 @@ export default {
       }).then(res => {
         // 刷新token
         if (res["data"]["refreshToken"] != "") {
-          console.log("run")
           localStorage.setItem("token", res["data"]["refreshToken"])
         }
         router.push('/chat')
-      }).catch(err => { })
+      }).catch(err => { console.log(err) })
     }
   },
   components: {
