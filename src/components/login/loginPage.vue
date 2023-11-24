@@ -14,7 +14,6 @@
 import axios from 'axios'
 
 import router from './../../router/index.js'
-import store from '../../store'
 
 import login from './login.vue'
 import register from './register.vue'

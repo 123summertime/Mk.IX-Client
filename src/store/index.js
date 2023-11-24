@@ -1,18 +1,26 @@
 import { createStore } from 'vuex'
 
 export default createStore({
-  state: {
-    avatar: "",
-    username: "",
-  },
-  mutations: {
-    loginSuccess(state, avatar, username) {
-        state.avatar = avatar
-        state.username = username
+  actions: {
+    async wsConnect(context, info) {
+      let ws = new WebSocket("ws://localhost:8000/ws?userID=" + info["uuid"] + "&groupID=" + info["groupID"])
+      context.commit('newConnection', {
+        "groupID": info["groupID"], 
+        "ws": ws,
+      })
+      ws.onmessage = function (event) {
+        console.log(event)
+      }
     }
   },
-  actions: {
+
+  mutations: {
+    newConnection(state, connect) {
+      state.wsConnections[connect["groupID"]] = connect["ws"]
+    }
   },
-  modules: {
-  }
+
+  state: {
+    wsConnections: {}
+  },
 })

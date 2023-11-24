@@ -1,15 +1,26 @@
 <template>
   <el-container class="root">
+
     <el-header class="head">
       <div class="userInfo">
         <img :src=avatar>
         <span>{{ username }}</span>
       </div>
-
+      <div class="toolList">
+        <el-button type="danger" plain @click="logout">退出登录</el-button>
+      </div>
     </el-header>
+
     <el-container>
-      <el-aside class="aside">Aside</el-aside>
-      <el-main class="main">Main</el-main>
+
+      <el-aside class="aside">
+        <groupItem v-for="item in gorupList" :avatar="item['avatar']" :name="item['name']" class="groupItem" @click="currGroup = item['group']"></groupItem>
+      </el-aside>
+
+      <el-main class="main">
+        <chatItem :groupID="currGroup"></chatItem>
+      </el-main>
+
     </el-container>
   </el-container>
 </template>
@@ -17,36 +28,81 @@
 <script>
 import axios from 'axios'
 
+import store from '../../store'
+import router from '../../router/index.js'
+
+import groupItem from './groupItem.vue'
+import chatItem from './chatItem.vue'
+
 export default {
   data() {
     return {
       avatar: "data:image/png;base64,",
+      uuid: "",
       username: "",
+      currGroup: "",
+      gorupList: [],
     }
   },
+
   methods: {
 
+    async getGroupInfo(groupID) {
+      const URL = `http://${localStorage.getItem('adress')}/getInfo?group=${groupID}`
+      axios.get(URL, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        this.gorupList.push(res["data"]["info"])
+      }).catch(err => { console.log(err) })
+    },
+
+    async makeConnection(groupID) {
+      this.$store.dispatch('wsConnect', {
+        "groupID" : groupID,
+        "uuid": this.uuid
+      })
+    },
+
+    logout() {
+      localStorage.removeItem('token')
+      router.push('/login')
+    },
+
   },
+
   async mounted() {
     const URL = `http://${localStorage.getItem('adress')}/profile`
     axios.get(URL, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     }).then(res => {
       const data = res["data"]
+      const groups = data["groups"]
       this.avatar += data["avatar"]
+      this.uuid = data["uuid"]
       this.username = data["userName"]
+      groups.forEach(id => {
+        this.getGroupInfo(id)
+        this.makeConnection(id)
+      })
     }).catch(err => { console.log(err) })
+  },
+  
+  components: {
+    groupItem,
+    chatItem
   }
 }
 </script>
 
-<style>
+<style scoped>
 .root {
   width: 100vw;
   height: 100vh;
 }
 
 .head {
+  display: flex;
+  justify-content: space-between;
   width: 100vw;
   height: 4rem;
   padding: 0.5rem 2vw;
@@ -83,4 +139,16 @@ export default {
   margin-left: 1rem;
 }
 
+.toolList {
+  display: flex;
+  justify-content: space-between;
+  margin: auto 0;
+}
+
+.groupItem {
+  width: 100%;
+  height: 5rem;
+  background-color: darkkhaki;
+  padding: 0.5rem;
+}
 </style>
