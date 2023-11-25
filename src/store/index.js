@@ -3,13 +3,16 @@ import { createStore } from 'vuex'
 export default createStore({
   actions: {
     async wsConnect(context, info) {
-      let ws = new WebSocket("ws://localhost:8000/ws?userID=" + info["uuid"] + "&groupID=" + info["groupID"])
+      const URL = `ws://${localStorage.getItem('adress')}/ws?userID=${info["uuid"]}&groupID=${info["groupID"]}&token=${localStorage.getItem('token')}`
+      const ws = new WebSocket(URL)
+
       context.commit('newConnection', {
         "groupID": info["groupID"], 
         "ws": ws,
       })
       ws.onmessage = function (event) {
-        console.log(event)
+        const data = JSON.parse(event["data"])
+        this.$emit(data["group"], data)
       }
     }
   },
@@ -17,6 +20,7 @@ export default createStore({
   mutations: {
     newConnection(state, connect) {
       state.wsConnections[connect["groupID"]] = connect["ws"]
+      state[connect["groupID"]] = ""
     }
   },
 
