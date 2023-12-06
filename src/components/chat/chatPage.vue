@@ -14,7 +14,8 @@
     <el-container>
 
       <el-aside class="aside">
-        <groupItem v-for="item in gorupList" :avatar="item['avatar']" :name="item['name']" class="groupItem" @click="currGroup = item['group']"></groupItem>
+        <groupItem v-for="item in groupList" :avatar="item['avatar']" :group="item['group']" :name="item['name']"
+          class="groupItem" @click="currGroup = item['group']"></groupItem>
       </el-aside>
 
       <el-main class="main">
@@ -28,7 +29,8 @@
 <script>
 import axios from 'axios'
 
-import store from '../../store'
+import { infoDB } from '../../assets/dbCRUD.js'
+import { queryInfo } from '../../assets/queryDB.js'
 import router from '../../router/index.js'
 
 import groupItem from './groupItem.vue'
@@ -41,24 +43,20 @@ export default {
       uuid: "",
       username: "",
       currGroup: "",
-      gorupList: [],
+      groupList: [], // schema: [{group, avatar, name}]
     }
   },
 
   methods: {
 
-    async getGroupInfo(groupID) {
-      const URL = `http://${localStorage.getItem('adress')}/getInfo?group=${groupID}`
-      axios.get(URL, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      }).then(res => {
-        this.gorupList.push(res["data"]["info"])
-      }).catch(err => { console.log(err) })
+    async getGroupInfo(lastUpdate, group) {
+      const groupInfo = await queryInfo("Group", lastUpdate, group)
+      this.groupList.push(groupInfo)
     },
 
     async makeConnection(groupID) {
       this.$store.dispatch('wsConnect', {
-        "groupID" : groupID,
+        "groupID": groupID,
         "uuid": this.uuid
       })
     },
@@ -74,19 +72,19 @@ export default {
     const URL = `http://${localStorage.getItem('adress')}/profile`
     axios.get(URL, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    }).then(res => {
+    }).then(async res => {
       const data = res["data"]
-      const groups = data["groups"]
-      this.avatar += data["avatar"]
+      const userInfo = await queryInfo("Account", data["lastUpdate"], data["uuid"])
       this.uuid = data["uuid"]
       this.username = data["userName"]
-      groups.forEach(id => {
-        this.getGroupInfo(id)
-        this.makeConnection(id)
+      this.avatar += userInfo["avatar"]
+      data["groups"].forEach(id => {
+        this.getGroupInfo(id["lastUpdate"], id["group"])
+        this.makeConnection(id["group"])
       })
     }).catch(err => { console.log(err) })
   },
-  
+
   components: {
     groupItem,
     chatItem

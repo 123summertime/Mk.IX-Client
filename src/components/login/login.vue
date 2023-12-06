@@ -35,7 +35,6 @@
 import axios from 'axios'
 
 import router from './../../router/index.js'
-import store from '../../store'
 
 export default {
   emits: ["option"],

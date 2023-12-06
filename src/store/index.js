@@ -12,7 +12,11 @@ export default createStore({
       })
       ws.onmessage = function (event) {
         const data = JSON.parse(event["data"])
-        this.$emit(data["group"], data)
+        console.log(data)
+        context.commit('getNewMessage', {
+          "groupID": data["group"],
+          "payload": event["data"]
+        })
       }
     }
   },
@@ -21,10 +25,13 @@ export default createStore({
     newConnection(state, connect) {
       state.wsConnections[connect["groupID"]] = connect["ws"]
       state[connect["groupID"]] = ""
+    },
+    getNewMessage(state, payload) {
+      state[payload["groupID"]] = payload["payload"]
     }
   },
 
   state: {
-    wsConnections: {}
+    wsConnections: {},
   },
 })
