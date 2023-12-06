@@ -19,7 +19,7 @@
       </el-aside>
 
       <el-main class="main">
-        <chatItem :groupID="currGroup"></chatItem>
+        <chatItem v-for="item in groupList" v-show="currGroup === item['group']" :avatar="item['avatar']" :group="item['group']" :name="item['name']" class="mainChat"></chatItem>
       </el-main>
 
     </el-container>
@@ -29,7 +29,6 @@
 <script>
 import axios from 'axios'
 
-import { infoDB } from '../../assets/dbCRUD.js'
 import { queryInfo } from '../../assets/queryDB.js'
 import router from '../../router/index.js'
 
@@ -114,6 +113,7 @@ export default {
 }
 
 .main {
+  position: relative;
   padding: 0;
   background-color: coral;
 }
@@ -148,5 +148,13 @@ export default {
   height: 5rem;
   background-color: darkkhaki;
   padding: 0.5rem;
+}
+
+.mainChat {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>

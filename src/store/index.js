@@ -12,7 +12,6 @@ export default createStore({
       })
       ws.onmessage = function (event) {
         const data = JSON.parse(event["data"])
-        console.log(data)
         context.commit('getNewMessage', {
           "groupID": data["group"],
           "payload": event["data"]

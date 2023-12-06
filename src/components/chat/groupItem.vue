@@ -23,19 +23,19 @@ export default {
 	},
 
 	computed: {
-    newMessage() {
-      return this.$store.state[this.group]
-    }
-  },
+		newMessage() {
+			return this.$store.state[this.group]
+		}
+	},
 
 	watch: {
-    newMessage: {
-      handler(newVal) {
-		const message = JSON.parse(newVal)
-        this.lastMessage = message["payload"]
-      }
-    }
-  },
+		newMessage: {
+			handler(newVal) {
+				const message = JSON.parse(newVal)
+				this.lastMessage = message["payload"]
+			}
+		}
+	},
 
 }
 </script>
