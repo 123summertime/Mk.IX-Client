@@ -1,9 +1,7 @@
 <template>
   <div>
-    <div>
-      <message v-for="msg in messageList" :time="msg['time']" :type="msg['type']" :avatar="msg['avatar']"
-        :uuid="msg['uuid']" :userName="msg['userName']" :payload="msg['payload']"></message>
-    </div>
+    <message v-for="msg in messageList" :time="msg['time']" :type="msg['type']" :avatar="msg['avatar']"
+      :uuid="msg['uuid']" :userName="msg['userName']" :payload="msg['payload']"></message>
   </div>
 </template>
 
@@ -13,8 +11,8 @@ import message from './message.vue'
 export default {
   props: {
     avatar: String,
-		group: String,
-		name: String,
+    group: String,
+    name: String,
   },
   data() {
     return {
@@ -55,5 +53,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

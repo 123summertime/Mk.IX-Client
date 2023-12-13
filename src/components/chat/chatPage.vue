@@ -22,6 +22,7 @@
       <el-main class="main">
         <chatItem v-for="item in groupList" v-show="currGroupID === item['group']" 
         :avatar="item['avatar']" :group="item['group']" :name="item['name']" class="mainChat"></chatItem>
+        <inputBox class="inputBox"></inputBox>
       </el-main>
     </el-container>
     
@@ -36,6 +37,7 @@ import router from '../../router/index.js'
 
 import groupItem from './groupItem.vue'
 import chatItem from './chatItem.vue'
+import inputBox from './inputbox.vue'
 
 export default {
   data() {
@@ -45,7 +47,7 @@ export default {
       username: "",
       currGroupID: "",
       currGroupName: "",
-      groupList: [], // schema: [{group, avatar, name}]
+      groupList: [], // [{group, avatar, name}]
     }
   },
 
@@ -92,7 +94,8 @@ export default {
 
   components: {
     groupItem,
-    chatItem
+    chatItem,
+    inputBox,
   }
 }
 </script>
@@ -119,12 +122,10 @@ export default {
 
 .main {
   position: relative;
+  width: 80vh;
+  height: 100%;
   padding: 0;
   background-color: coral;
-}
-
-.main::-webkit-scrollbar {
-  display: none;
 }
 
 .userInfo {
@@ -176,7 +177,21 @@ export default {
   left: 0;
   top: 0;
   width: 100%;
-  height: 100%;
+  height: 75%;
   padding: 1rem;
+  overflow: scroll;
+}
+
+.mainChat::-webkit-scrollbar {
+  display: none;
+}
+
+.inputBox {
+  position: absolute;
+  left: 0;
+  top: 75%;
+  width: 100%;
+  height: 25%;
+  overflow: hidden;
 }
 </style>
