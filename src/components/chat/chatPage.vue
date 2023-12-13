@@ -4,25 +4,27 @@
     <el-header class="head">
       <div class="userInfo">
         <img :src=avatar>
-        <span>{{ username }}</span>
+        <p>{{ username }}</p>
       </div>
-      <div class="toolList">
+      <div class="groupToolBar" v-show="currGroupID">
+         <p>{{ currGroupName }}</p>
+      </div>
+      <!-- <div class="toolList">
         <el-button type="danger" plain @click="logout">退出登录</el-button>
-      </div>
+      </div> -->
     </el-header>
 
     <el-container>
-
       <el-aside class="aside">
         <groupItem v-for="item in groupList" :avatar="item['avatar']" :group="item['group']" :name="item['name']"
-          class="groupItem" @click="currGroup = item['group']"></groupItem>
+          class="groupItem" @click="currGroupChange(item['group'], item['name'])"></groupItem>
       </el-aside>
-
       <el-main class="main">
-        <chatItem v-for="item in groupList" v-show="currGroup === item['group']" :avatar="item['avatar']" :group="item['group']" :name="item['name']" class="mainChat"></chatItem>
+        <chatItem v-for="item in groupList" v-show="currGroupID === item['group']" 
+        :avatar="item['avatar']" :group="item['group']" :name="item['name']" class="mainChat"></chatItem>
       </el-main>
-
     </el-container>
+    
   </el-container>
 </template>
 
@@ -41,13 +43,13 @@ export default {
       avatar: "data:image/png;base64,",
       uuid: "",
       username: "",
-      currGroup: "",
+      currGroupID: "",
+      currGroupName: "",
       groupList: [], // schema: [{group, avatar, name}]
     }
   },
 
   methods: {
-
     async getGroupInfo(lastUpdate, group) {
       const groupInfo = await queryInfo("Group", lastUpdate, group)
       this.groupList.push(groupInfo)
@@ -60,11 +62,15 @@ export default {
       })
     },
 
+    currGroupChange(id, name) {
+      this.currGroupID = id
+      this.currGroupName = name
+    },
+
     logout() {
       localStorage.removeItem('token')
       router.push('/login')
     },
-
   },
 
   async mounted() {
@@ -99,11 +105,10 @@ export default {
 
 .head {
   display: flex;
-  justify-content: space-between;
   width: 100vw;
-  height: 4rem;
-  padding: 0.5rem 2vw;
+  height: 64px;
   background-color: aquamarine;
+  padding: 8px 0;
 }
 
 .aside {
@@ -118,23 +123,39 @@ export default {
   background-color: coral;
 }
 
+.main::-webkit-scrollbar {
+  display: none;
+}
+
 .userInfo {
-  width: 30vw;
+  display: flex;
+  justify-content: space-around;
+  width: 20vw;
+  height: 48px;
+  padding: 0 8px;
 }
 
 .userInfo img {
-  display: inline-block;
-  width: 3rem;
-  height: 3rem;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
 }
 
-.userInfo span {
-  display: inline-block;
-  height: 3rem;
-  font-size: 1rem;
-  line-height: 3rem;
-  margin-left: 1rem;
+.userInfo p {
+  width: 75%;
+  height: 48px;
+  font-size: 1.2rem;
+  line-height: 48px;
+}
+
+.groupToolBar {
+  width: 80vw;
+  height: 48px;
+}
+
+.groupToolBar p {
+  font-size: 1.2rem;
+  line-height: 48px;
 }
 
 .toolList {
@@ -156,5 +177,6 @@ export default {
   top: 0;
   width: 100%;
   height: 100%;
+  padding: 1rem;
 }
 </style>

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <div>{{ name }}</div>
     <div>
       <message v-for="msg in messageList" :time="msg['time']" :type="msg['type']" :avatar="msg['avatar']"
         :uuid="msg['uuid']" :userName="msg['userName']" :payload="msg['payload']"></message>
@@ -9,7 +8,6 @@
 </template>
 
 <script>
-import { queryInfo } from '../../assets/queryDB.js'
 import message from './message.vue'
 
 export default {
@@ -43,13 +41,7 @@ export default {
     newMessage: {
       immediate: false,
       async handler(newVal) {
-        const data = JSON.parse(newVal)
-        const fullData = await queryInfo("Account", data["senderKey"], data["senderID"])
-        fullData["time"] = data["time"]
-        fullData["type"] = data["type"]
-        fullData["payload"] = data["payload"]
-        console.log(fullData)
-        this.messageList.push(fullData)
+        this.messageList.push(newVal)
       }
     }
   },
@@ -63,4 +55,5 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+</style>

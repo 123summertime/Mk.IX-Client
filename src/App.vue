@@ -28,4 +28,9 @@ img {
 a {
   text-decoration: none;
 }
+
+html {
+  min-width: 750px;
+  min-height: 300px;
+}
 </style>

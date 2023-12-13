@@ -1,3 +1,5 @@
+import {queryInfo} from '../assets/queryDB.js'
+
 import { createStore } from 'vuex'
 
 export default createStore({
@@ -10,11 +12,15 @@ export default createStore({
         "groupID": info["groupID"], 
         "ws": ws,
       })
-      ws.onmessage = function (event) {
+      ws.onmessage = async function (event) {
         const data = JSON.parse(event["data"])
+        const fullData = await queryInfo("Account", data["senderKey"], data["senderID"])
+        fullData["time"] = data["time"]
+        fullData["type"] = data["type"]
+        fullData["payload"] = data["payload"]
         context.commit('getNewMessage', {
           "groupID": data["group"],
-          "payload": event["data"]
+          "payload": fullData
         })
       }
     }
