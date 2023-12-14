@@ -21,12 +21,7 @@ export default {
   },
 
   methods: {
-    wsSend() {
-      this.$store.state.wsConnections[this.group].send(JSON.stringify({
-        "group": this.group,
-        "payload": "启动",
-      }))
-    }
+    
   },
 
   computed: {

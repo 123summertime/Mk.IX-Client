@@ -22,7 +22,7 @@
       <el-main class="main">
         <chatItem v-for="item in groupList" v-show="currGroupID === item['group']" 
         :avatar="item['avatar']" :group="item['group']" :name="item['name']" class="mainChat"></chatItem>
-        <inputBox class="inputBox"></inputBox>
+        <inputBox :currGroup="currGroupID" class="inputBox"></inputBox>
       </el-main>
     </el-container>
     
@@ -147,6 +147,10 @@ export default {
   height: 48px;
   font-size: 1.2rem;
   line-height: 48px;
+  margin-left: 6px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .groupToolBar {
@@ -169,7 +173,7 @@ export default {
   width: 100%;
   height: 5rem;
   background-color: darkkhaki;
-  padding: 0.5rem;
+  padding: 8px;
 }
 
 .mainChat {

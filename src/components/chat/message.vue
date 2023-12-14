@@ -44,15 +44,17 @@ img {
 }
 
 .userName {
-  margin-bottom: 6px;
+  width: 0;
 }
 
 .payload {
   word-wrap: break-word;
+  white-space: pre-wrap;
   background-color: orangered;
   border-radius: 12px;
   padding: 0.8rem 1rem;
-  line-height: 1.2rem;
+  margin-top: 6px;
+  line-height: 1.5rem;
   font-size: 1.2rem;
 }
 </style>

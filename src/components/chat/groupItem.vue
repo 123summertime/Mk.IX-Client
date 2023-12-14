@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="mainGroupItem">
     <img :src="'data:image/png;base64,' + avatar" class="avatar">
     <div class="group">
       <p class="groupName">{{ name }}</p>
@@ -40,7 +40,7 @@ export default {
 </script>
 
 <style scoped>
-.main {
+.mainGroupItem {
   display: flex;
   justify-content: space-around;
 }
@@ -58,14 +58,16 @@ export default {
   justify-content: space-around;
   width: 75%;
   padding: 6px 0;
+  margin-left: 6px;
+  overflow: hidden;
 }
 
 .groupName {
   width: 100%;
+  font-size: 1.2rem;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  font-size: 1.2rem;
 }
 
 .currMessage {
