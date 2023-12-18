@@ -44,12 +44,12 @@ export default {
   data() {
     return {
       adress: "",
+      uuid: "",
       username: "",
       password: "",
       clicked: false,
       success: false,
       fail: false,
-      uuid: "",
     }
   },
   methods: {

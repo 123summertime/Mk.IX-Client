@@ -21,14 +21,14 @@
   </div>
 
   <el-dialog v-model="success" append-to-body title="Bot登录成功">
-    <div>token:<div class="token">{{ token }}</div></div>
+    <div>token:<div class="token">{{ token }}</div>
+    </div>
     <template #footer>
       <span class="dialog-footer">
         <el-button type="primary" @click="success = false">关闭</el-button>
       </span>
     </template>
   </el-dialog>
-  
 </template>
 
 <script>
@@ -53,7 +53,7 @@ export default {
   methods: {
     async login() {
       this.clicked = true
-      const URL = `http://${this.adress}/token?isBot=${this.asBot ? '1': '0'}`
+      const URL = `http://${this.adress}/token?isBot=${this.asBot ? '1' : '0'}`
       const formData = `grant_type=password&username=${this.account}&password=${this.password}`
 
       axios.post(URL, formData, {

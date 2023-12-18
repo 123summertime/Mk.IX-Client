@@ -1,32 +1,38 @@
 <template>
-  <el-container class="root">
+  <div class="chatPageRoot">
 
-    <el-header class="head">
+    <div class="leftSide" ref="leftSide">
       <div class="userInfo">
         <img :src=avatar>
         <p>{{ username }}</p>
       </div>
-      <div class="groupToolBar" v-show="currGroupID">
-         <p>{{ currGroupName }}</p>
-      </div>
-      <!-- <div class="toolList">
-        <el-button type="danger" plain @click="logout">退出登录</el-button>
-      </div> -->
-    </el-header>
-
-    <el-container>
-      <el-aside class="aside">
+      <div class="groupItems">
         <groupItem v-for="item in groupList" :avatar="item['avatar']" :group="item['group']" :name="item['name']"
-          class="groupItem" @click="currGroupChange(item['group'], item['name'])"></groupItem>
-      </el-aside>
-      <el-main class="main">
-        <chatItem v-for="item in groupList" v-show="currGroupID === item['group']" 
-        :avatar="item['avatar']" :group="item['group']" :name="item['name']" class="mainChat"></chatItem>
+        class="groupItem" @click="currGroupChange(item['group'], item['name'])"></groupItem>
+      </div>
+    </div>
+
+    <div class="splitter" ref="splitter">
+      <splitter @splitter="groupSplitter"></splitter>
+    </div>
+
+    <div class="rightSide">
+
+      <div class="head">
+        <div class="groupToolBar" v-show="currGroupID">
+          <p>{{ currGroupName }}</p>
+        </div>
+      </div>
+
+      <div class="main">
+        <chatItem v-for="item in groupList" v-show="currGroupID === item['group']" :avatar="item['avatar']"
+          :group="item['group']" :name="item['name']" class="mainChat"></chatItem>
         <inputBox :currGroup="currGroupID" class="inputBox"></inputBox>
-      </el-main>
-    </el-container>
-    
-  </el-container>
+      </div>
+
+    </div>
+
+  </div>
 </template>
 
 <script>
@@ -38,6 +44,7 @@ import router from '../../router/index.js'
 import groupItem from './groupItem.vue'
 import chatItem from './chatItem.vue'
 import inputBox from './inputbox.vue'
+import splitter from './splitter.vue'
 
 export default {
   data() {
@@ -69,6 +76,14 @@ export default {
       this.currGroupName = name
     },
 
+    groupSplitter(pos) {
+      const posX = pos["x"]
+      if (posX / window.innerWidth < 0.5) {
+        this.$refs.splitter.style.left = posX - 8 + "px"
+        this.$refs.leftSide.style.width = posX + "px"
+      }    
+    },
+
     logout() {
       localStorage.removeItem('token')
       router.push('/login')
@@ -85,6 +100,10 @@ export default {
       this.uuid = data["uuid"]
       this.username = data["userName"]
       this.avatar += userInfo["avatar"]
+      this.$store.dispatch('loginAs', {
+        "account": this.uuid,
+        "userName": this.username,
+      })
       data["groups"].forEach(id => {
         this.getGroupInfo(id["lastUpdate"], id["group"])
         this.makeConnection(id["group"])
@@ -96,44 +115,30 @@ export default {
     groupItem,
     chatItem,
     inputBox,
+    splitter,
   }
 }
 </script>
 
 <style scoped>
-.root {
+.chatPageRoot {
+  display: flex;
   width: 100vw;
   height: 100vh;
 }
 
-.head {
-  display: flex;
-  width: 100vw;
-  height: 64px;
-  background-color: aquamarine;
-  padding: 8px 0;
-}
-
-.aside {
+/* leftSide */
+.leftSide {
   width: 20vw;
   height: 100%;
   background-color: bisque;
 }
 
-.main {
-  position: relative;
-  width: 80vh;
-  height: 100%;
-  padding: 0;
-  background-color: coral;
-}
-
 .userInfo {
   display: flex;
-  justify-content: space-around;
-  width: 20vw;
-  height: 48px;
-  padding: 0 8px;
+  width: 100%;
+  height: 64px;
+  padding: 8px 16px;
 }
 
 .userInfo img {
@@ -143,18 +148,51 @@ export default {
 }
 
 .userInfo p {
-  width: 75%;
   height: 48px;
   font-size: 1.2rem;
   line-height: 48px;
-  margin-left: 6px;
+  margin-left: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
 }
 
+/* splitter */
+.splitter {
+  position: fixed;
+  left: calc(20vw - 8px);
+  width: 16px;
+  height: 100vh;
+  z-index: 100;
+}
+
+.splitter:hover {
+  cursor: ew-resize;
+}
+
+
+/* rightSide */
+.rightSide {
+  flex-grow: 1;
+}
+
+.head {
+  display: flex;
+  width: 100%;
+  height: 64px;
+  background-color: aquamarine;
+  padding: 8px 0;
+}
+
+.main {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: coral;
+}
+
 .groupToolBar {
-  width: 80vw;
+  width: 100%;
   height: 48px;
 }
 
@@ -173,7 +211,6 @@ export default {
   width: 100%;
   height: 5rem;
   background-color: darkkhaki;
-  padding: 8px;
 }
 
 .mainChat {

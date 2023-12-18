@@ -1,11 +1,13 @@
 <template>
-  <div class="main">
+  <div :class="messageFrom() ? 'message bySelf' : 'message'">
     <div class="avatar">
       <img :src="'data:image/png;base64,' + avatar">
     </div>
-    <div class="message">
+    <div class="container">
       <p class="userName">{{ userName }}</p>
-      <p class="payload">{{ payload }}</p>
+      <div>
+        <p class="payload">{{ payload }}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -20,6 +22,11 @@ export default {
     userName: String,
     payload: String,
   },
+  methods: {
+    messageFrom() {
+      return this.uuid === this.$store.state["account"]
+    }
+  }
 }
 </script>
 
@@ -32,15 +39,19 @@ img {
   transform: translateY(8px);
 }
 
-.main {
+.message {
   display: flex;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
-.message {
+.bySelf {
+  direction: rtl;
+}
+
+.container {
   display: inline-block;
   max-width: 60%;
-  margin-left: 0.5rem;
+  margin: 0 8px;
 }
 
 .userName {
@@ -51,10 +62,11 @@ img {
   word-wrap: break-word;
   white-space: pre-wrap;
   background-color: orangered;
+  font-size: 1.2rem;
+  line-height: 1.5rem;
   border-radius: 12px;
   padding: 0.8rem 1rem;
   margin-top: 6px;
-  line-height: 1.5rem;
-  font-size: 1.2rem;
+  direction: ltr;
 }
 </style>

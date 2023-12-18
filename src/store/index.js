@@ -23,6 +23,10 @@ export default createStore({
           "payload": fullData
         })
       }
+    },
+
+    loginAs(context, info) {
+      context.commit('loginAs', info)
     }
   },
 
@@ -33,10 +37,16 @@ export default createStore({
     },
     getNewMessage(state, payload) {
       state[payload["groupID"]] = payload["payload"]
+    },
+    loginAs(state, info) {
+      state["account"] = info["account"]
+      state["userName"] = info["userName"]
     }
   },
 
   state: {
+    account: "",
+    userName: "",
     wsConnections: {},
   },
 })

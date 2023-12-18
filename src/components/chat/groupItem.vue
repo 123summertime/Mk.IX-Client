@@ -1,7 +1,7 @@
 <template>
-  <div class="mainGroupItem">
-    <img :src="'data:image/png;base64,' + avatar" class="avatar">
-    <div class="group">
+  <div class="groupInfoRoot">
+    <img :src="'data:image/png;base64,' + avatar" class="groupAvatar">
+    <div class="groupInfo">
       <p class="groupName">{{ name }}</p>
       <p class="currMessage">{{ lastMessage }}</p>
     </div>
@@ -40,25 +40,24 @@ export default {
 </script>
 
 <style scoped>
-.mainGroupItem {
+.groupInfoRoot {
   display: flex;
-  justify-content: space-around;
+  padding: 8px 16px;
 }
 
-.avatar {
+.groupAvatar {
   width: 3rem;
   height: 3rem;
   border-radius: 50%;
   margin: auto 0;
 }
 
-.group {
+.groupInfo {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  width: 75%;
   padding: 6px 0;
-  margin-left: 6px;
+  margin-left: 12px;
   overflow: hidden;
 }
 
