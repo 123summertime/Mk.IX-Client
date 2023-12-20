@@ -8,26 +8,27 @@
       </div>
       <div class="groupItems">
         <groupItem v-for="item in groupList" :avatar="item['avatar']" :group="item['group']" :name="item['name']"
-        class="groupItem" @click="currGroupChange(item['group'], item['name'])"></groupItem>
+          class="groupItem" @click="currGroupChange(item['group'], item['name'])"></groupItem>
       </div>
     </div>
 
-    <div class="splitter" ref="splitter">
-      <splitter @splitter="groupSplitter"></splitter>
-    </div>
+    <splitter @splitter="groupSplitter" class="groupSplitter" ref="groupSplitter"></splitter>
 
     <div class="rightSide">
 
-      <div class="head">
+      <div class="header">
         <div class="groupToolBar" v-show="currGroupID">
           <p>{{ currGroupName }}</p>
         </div>
       </div>
 
-      <div class="main">
-        <chatItem v-for="item in groupList" v-show="currGroupID === item['group']" :avatar="item['avatar']"
-          :group="item['group']" :name="item['name']" class="mainChat"></chatItem>
-        <inputBox :currGroup="currGroupID" class="inputBox"></inputBox>
+      <div class="center">
+        <div class="conversationView">
+          <chatItem v-for="item in groupList" v-show="currGroupID === item['group']" :avatar="item['avatar']"
+            :group="item['group']" :name="item['name']" class="conversation"></chatItem>
+        </div>
+        <splitter @splitter="inputSplitter" class="inputSplitter" ref="inputSplitter"></splitter>
+        <inputBox :currGroup="currGroupID" class="inputBox" ref="inputBox"></inputBox>
       </div>
 
     </div>
@@ -78,10 +79,22 @@ export default {
 
     groupSplitter(pos) {
       const posX = pos["x"]
-      if (posX / window.innerWidth < 0.5) {
-        this.$refs.splitter.style.left = posX - 8 + "px"
+      const rate = posX / window.innerWidth
+      if (rate < 0.5) {
+        this.$refs.groupSplitter.$el.style.left = posX - 8 + "px"
         this.$refs.leftSide.style.width = posX + "px"
-      }    
+        localStorage.setItem('groupWidth', posX)
+      }
+    },
+
+    inputSplitter(pos) {
+      const posY = pos["y"]
+      const rate = posY / window.innerHeight 
+      if (rate > 0.5 && rate < 0.8) {
+        this.$refs.inputSplitter.$el.style.bottom = window.innerHeight - posY - 8 + "px"
+        this.$refs.inputBox.$el.style.height = window.innerHeight - posY + "px"
+        localStorage.setItem('inputTop', posY)
+      }
     },
 
     logout() {
@@ -122,6 +135,7 @@ export default {
 
 <style scoped>
 .chatPageRoot {
+  position: relative;
   display: flex;
   width: 100vw;
   height: 100vh;
@@ -157,38 +171,34 @@ export default {
   overflow: hidden;
 }
 
-/* splitter */
-.splitter {
-  position: fixed;
-  left: calc(20vw - 8px);
-  width: 16px;
-  height: 100vh;
-  z-index: 100;
+.groupItems {
+  width: 100%;
+  height: calc(100% - 64px);
+  overflow: scroll;
 }
 
-.splitter:hover {
-  cursor: ew-resize;
+.groupItems::-webkit-scrollbar {
+  display: none;
 }
 
+.groupItem {
+  width: 100%;
+  height: 80px;
+  background-color: darkkhaki;
+}
 
 /* rightSide */
 .rightSide {
+  height: 100%;
   flex-grow: 1;
 }
 
-.head {
+.header {
   display: flex;
   width: 100%;
   height: 64px;
   background-color: aquamarine;
-  padding: 8px 0;
-}
-
-.main {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background-color: coral;
+  padding: 8px 16px;
 }
 
 .groupToolBar {
@@ -201,38 +211,60 @@ export default {
   line-height: 48px;
 }
 
-.toolList {
+.center {
+  position: relative;
   display: flex;
-  justify-content: space-between;
-  margin: auto 0;
-}
-
-.groupItem {
+  flex-direction: column;
   width: 100%;
-  height: 5rem;
-  background-color: darkkhaki;
+  height: calc(100% - 64px);
+  background-color: coral;
 }
 
-.mainChat {
+.conversationView {
+  position: relative;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.conversation {
   position: absolute;
-  left: 0;
-  top: 0;
   width: 100%;
-  height: 75%;
-  padding: 1rem;
+  height: 100%;
+  padding: 8px;
   overflow: scroll;
 }
 
-.mainChat::-webkit-scrollbar {
+.conversation::-webkit-scrollbar {
   display: none;
 }
 
 .inputBox {
-  position: absolute;
-  left: 0;
-  top: 75%;
   width: 100%;
   height: 25%;
-  overflow: hidden;
+}
+
+/* splitter */
+.groupSplitter {
+  position: absolute;
+  left: calc(20vw - 8px);
+  width: 16px;
+  height: 100%;
+  z-index: 100;
+}
+
+.groupSplitter:hover {
+  cursor: ew-resize;
+}
+
+.inputSplitter {
+  position: absolute;
+  bottom: calc(25% - 8px);
+  width: 100%;
+  height: 16px;
+  z-index: 100;
+}
+
+.inputSplitter:hover {
+  cursor: ns-resize;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="splitterRoot" draggable="true" @drag="dragging" @dragend="dragEnd"></div>
+  <div class="splitterRoot" draggable="true" @drag="dragging"></div>
 </template>
 
 <script>
@@ -19,10 +19,6 @@ export default {
         this.currY = event.clientY
         this.posSender()
       }
-    },
-
-    dragEnd(event) {
-      
     },
 
     posSender() {
