@@ -60,6 +60,27 @@ export default {
   },
 
   methods: {
+    async initialization() {
+      const URL = `http://${localStorage.getItem('adress')}/profile`
+      axios.get(URL, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(async res => {
+        const data = res["data"]
+        const userInfo = await queryInfo("Account", data["lastUpdate"], data["uuid"])
+        this.uuid = data["uuid"]
+        this.username = data["userName"]
+        this.avatar += userInfo["avatar"]
+        this.$store.dispatch('loginAs', {
+          "account": this.uuid,
+          "userName": this.username,
+        })
+        data["groups"].forEach(id => {
+          this.getGroupInfo(id["lastUpdate"], id["group"])
+          this.makeConnection(id["group"])
+        })
+      }).catch(err => { console.log(err) })
+    },
+
     async getGroupInfo(lastUpdate, group) {
       const groupInfo = await queryInfo("Group", lastUpdate, group)
       this.groupList.push(groupInfo)
@@ -70,6 +91,17 @@ export default {
         "groupID": groupID,
         "uuid": this.uuid
       })
+    },
+
+    readLayoutSettings() {
+      const groupWidth = localStorage.getItem('groupWidth')
+      const inputTop = localStorage.getItem('inputTop')
+      if (groupWidth) {
+        this.groupSplitter({"x": groupWidth})
+      }
+      if (inputTop) {
+        this.inputSplitter({"y": inputTop})
+      }
     },
 
     currGroupChange(id, name) {
@@ -89,7 +121,7 @@ export default {
 
     inputSplitter(pos) {
       const posY = pos["y"]
-      const rate = posY / window.innerHeight 
+      const rate = posY / window.innerHeight
       if (rate > 0.5 && rate < 0.8) {
         this.$refs.inputSplitter.$el.style.bottom = window.innerHeight - posY - 8 + "px"
         this.$refs.inputBox.$el.style.height = window.innerHeight - posY + "px"
@@ -104,24 +136,8 @@ export default {
   },
 
   async mounted() {
-    const URL = `http://${localStorage.getItem('adress')}/profile`
-    axios.get(URL, {
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    }).then(async res => {
-      const data = res["data"]
-      const userInfo = await queryInfo("Account", data["lastUpdate"], data["uuid"])
-      this.uuid = data["uuid"]
-      this.username = data["userName"]
-      this.avatar += userInfo["avatar"]
-      this.$store.dispatch('loginAs', {
-        "account": this.uuid,
-        "userName": this.username,
-      })
-      data["groups"].forEach(id => {
-        this.getGroupInfo(id["lastUpdate"], id["group"])
-        this.makeConnection(id["group"])
-      })
-    }).catch(err => { console.log(err) })
+    this.initialization()
+    this.readLayoutSettings()
   },
 
   components: {

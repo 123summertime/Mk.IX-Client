@@ -1,10 +1,9 @@
 <template>
-  <div>
-    <div class="bar"></div>
-    <div class="input">
-      <textarea v-model=message></textarea>
+  <div class="inputBoxRoot">
+    <div class="bar">
       <el-button type="primary" @click="sending" :disabled="message ? false : true" class="send">发送</el-button>
     </div>
+    <textarea v-model=message @keydown="onKeyDown"></textarea>
   </div>
 </template>
 
@@ -18,22 +17,31 @@ export default {
     return {
       message: "",
     }
-  }, 
+  },
 
   methods: {
     sending() {
       this.$store.state.wsConnections[this.currGroup].send(JSON.stringify({
         "group": this.currGroup,
+        "type": "text",
         "payload": this.message,
       }))
       this.message = ""
-    }
+    },
+
+    onKeyDown(event) {
+      if (!this.message) { return }
+      if (event.shiftKey && event.key === 'Enter') {
+        event.preventDefault()
+        this.sending()
+      }
+    },
   }
 }
 </script>
 
 <style scoped>
-.inputBox {
+.inputBoxRoot {
   display: flex;
   flex-direction: column;
   background-color: lightsalmon;
@@ -45,32 +53,19 @@ export default {
   background-color: brown;
 }
 
-.input {
-  position: relative;
-  flex-grow: 1;
-  width: 100%;
-  padding: 16px;
-}
-
 textarea {
   width: 100%;
-  height: 100%;
+  flex-grow: 1;
+  padding: 16px;
   font-size: 1.2rem;
   font-family: Microsoft Yahei;
   resize: none;
-  border:none;
-	outline: none;
+  border: none;
+  outline: none;
   background-color: transparent;
 }
 
 textarea::-webkit-scrollbar {
   display: none;
-}
-
-.send{
-  position: absolute;
-  right: 50px;
-  bottom: 16px;
-  width: 100px;
 }
 </style>
