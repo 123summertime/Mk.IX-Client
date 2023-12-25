@@ -5,6 +5,10 @@
       <p class="groupName">{{ name }}</p>
       <p class="currMessage">{{ lastMessage }}</p>
     </div>
+    <div class="information">
+      <div class="unread" v-show="unreadCount">{{ unreadCount }}</div>
+      <div class="time" v-show="lastMessageTime">{{ lastMessageTime }}</div>
+    </div>
   </div>
 </template>
 
@@ -19,7 +23,39 @@ export default {
   data() {
     return {
       lastMessage: "base",
+      unreadCount: 0,
       lastMessageTime: 0,
+    }
+  },
+
+  methods: {
+    computeLastMessageTime(timeStamp) {
+      const time = new Date(Number(timeStamp) * 1000)
+      const year = time.getFullYear()
+      const month = time.getMonth() + 1
+      const date = time.getDate()
+      const day = time.getDay()
+      let hours = time.getHours()
+      let minutes = time.getMinutes()
+      const current = Math.round(new Date() / 1000)
+      const delta = current - timeStamp
+      if (delta < 86400) {
+        console.log(hours, minutes)
+        hours = (hours < 10) ? "0" + hours : hours
+        minutes = (minutes < 10) ? "0" + minutes : minutes
+        return hours + ":" + minutes
+      }
+      if (delta < 2 * 86400) {
+        return "昨天"
+      }
+      if (delta < 7 * 86400) {
+        const days = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期天"]     
+        return days[day]
+      }
+      if (delta < 365 * 86400) {
+        return month + "月" + date + "日"
+      }
+      return year + "年" + month + "月" + date + "日"
     }
   },
 
@@ -34,10 +70,10 @@ export default {
       immediate: true,
       handler(newVal) {
         if (newVal) {
-          this.$nextTick(function() {
-            this.$refs.groupInfoRoot.style.order = 2147483647 - (newVal["time"].substring(0, 10))
-            this.lastMessage = newVal["userName"] + ":" + newVal["payload"]
-          })
+          const short = newVal["time"].substring(0, 10)
+          this.$refs.groupInfoRoot.style.order = 2147483647 - short
+          this.lastMessage = newVal["userName"] + ":" + newVal["payload"]
+          this.lastMessageTime = this.computeLastMessageTime(short)
         }
       }
     }
