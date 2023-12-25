@@ -7,8 +7,12 @@
         <p>{{ username }}</p>
       </div>
       <div class="groupItems">
-        <groupItem v-for="item in groupList" :avatar="item['avatar']" :group="item['group']" :name="item['name']"
-          class="groupItem" @click="currGroupChange(item['group'], item['name'])"></groupItem>
+        <groupItem v-for="item in groupList"
+          :avatar="item['avatar']"
+          :group="item['group']"
+          :name="item['name']"
+          @click="currGroupChange(item['group'], item['name'])"
+          class="groupItem"></groupItem>
       </div>
     </div>
 
@@ -22,14 +26,21 @@
         </div>
       </div>
 
-      <div class="center">
+      <div class="center" v-if="currGroupID">
         <div class="conversationView">
-          <chatItem v-for="item in groupList" v-show="currGroupID === item['group']" :avatar="item['avatar']"
-            :group="item['group']" :name="item['name']" class="conversation"></chatItem>
+          <chatItem v-for="item in groupList"
+            :avatar="item['avatar']"
+            :owner="item['owner']"
+            :admin="item['admin']"
+            :group="item['group']"
+            :name="item['name']"
+            v-show="currGroupID === item['group']"
+            class="conversation"></chatItem>
         </div>
         <splitter @splitter="inputSplitter" class="inputSplitter" ref="inputSplitter"></splitter>
         <inputBox :currGroup="currGroupID" class="inputBox" ref="inputBox"></inputBox>
       </div>
+      <div class="center" v-else></div>
 
     </div>
 
@@ -55,7 +66,7 @@ export default {
       username: "",
       currGroupID: "",
       currGroupName: "",
-      groupList: [], // [{group, avatar, name}]
+      groupList: [], // [{group:String, avatar:String, name:String, owner:Object, admin:Map}]
     }
   },
 
@@ -81,9 +92,32 @@ export default {
       }).catch(err => { console.log(err) })
     },
 
-    async getGroupInfo(lastUpdate, group) {
-      const groupInfo = await queryInfo("Group", lastUpdate, group)
-      this.groupList.push(groupInfo)
+    async getGroupInfo(lastUpdate, groupID) {
+      const groupInfo = await queryInfo("Group", lastUpdate, groupID)
+      const adminInfo = await this.getAdminsInfo(groupID)
+
+
+      const ownerMap = new Map()
+      ownerMap.set(adminInfo["owner"]["uuid"], adminInfo["owner"]["lastUpdate"])
+      adminInfo["owner"] = ownerMap
+
+      const adminMap = new Map()
+      adminInfo["admin"].forEach(i => {
+        adminMap.set(i["uuid"], i["lastUpdate"])
+      })
+      adminInfo["admin"] = adminMap
+
+      this.groupList.push({ ...groupInfo, ...adminInfo })
+    },
+
+    async getAdminsInfo(groupID) {
+      const URL = `http://${localStorage.getItem('adress')}/getAdminInfo?group=${groupID}`
+      try {
+        const res = await axios.get(URL)
+        return res["data"]
+      } catch (err) {
+        console.log(err)
+      }
     },
 
     async makeConnection(groupID) {
@@ -97,10 +131,10 @@ export default {
       const groupWidth = localStorage.getItem('groupWidth')
       const inputTop = localStorage.getItem('inputTop')
       if (groupWidth) {
-        this.groupSplitter({"x": groupWidth})
+        this.groupSplitter({ "x": groupWidth })
       }
       if (inputTop) {
-        this.inputSplitter({"y": inputTop})
+        this.inputSplitter({ "y": inputTop })
       }
     },
 
@@ -188,6 +222,8 @@ export default {
 }
 
 .groupItems {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: calc(100% - 64px);
   overflow: scroll;
@@ -201,6 +237,7 @@ export default {
   width: 100%;
   height: 80px;
   background-color: darkkhaki;
+  order: 2147483647;
 }
 
 /* rightSide */

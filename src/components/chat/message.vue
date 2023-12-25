@@ -4,7 +4,12 @@
       <img :src="'data:image/png;base64,' + avatar">
     </div>
     <div class="container">
-      <p class="userName">{{ userName }}</p>
+      <div class="above">
+        <div class="position">
+          <p class="nameplate" ref="Nameplate">{{ nameplate }}</p>
+          <p class="userName">{{ userName }}</p>
+        </div>
+      </div>
       <div>
         <p class="payload">{{ payload }}</p>
       </div>
@@ -21,12 +26,40 @@ export default {
     uuid: String,
     userName: String,
     payload: String,
+    owner: Object,
+    admin: Map,
   },
+
+  data() {
+    return {
+      nameplate: ""
+    }
+  },
+
   methods: {
     messageFrom() {
       return this.uuid === this.$store.state["account"]
-    }
+    },
+
+    getNameplate() {
+      if (this.owner.has(this.uuid)) {
+        this.$refs.Nameplate.style.backgroundColor = "gold"
+        this.nameplate = "群主"
+        return
+      }
+      if (this.admin.has(this.uuid)) {
+        this.$refs.Nameplate.style.backgroundColor = "aqua"
+        this.nameplate = "管理员"
+        return
+      }
+      this.$refs.Nameplate.style.display = "none"
+    },
+  },
+
+  mounted() {
+    this.getNameplate()
   }
+
 }
 </script>
 
@@ -54,8 +87,29 @@ img {
   margin: 0 8px;
 }
 
-.userName {
+.above {
+  position: relative;
   width: 0;
+  height: 24px;
+}
+
+.position {
+  position: absolute;
+  display: flex;
+  height: 100%;
+  white-space: nowrap;
+  direction: ltr;
+}
+
+.nameplate {
+  line-height: 24px;
+  margin-right: 6px;
+  padding: 0 6px;
+  border-radius: 10px;
+}
+
+.userName {
+  line-height: 30px;
 }
 
 .payload {

@@ -1,5 +1,5 @@
 <template>
-  <div class="groupInfoRoot">
+  <div class="groupInfoRoot" ref="groupInfoRoot">
     <img :src="'data:image/png;base64,' + avatar" class="groupAvatar">
     <div class="groupInfo">
       <p class="groupName">{{ name }}</p>
@@ -19,6 +19,7 @@ export default {
   data() {
     return {
       lastMessage: "base",
+      lastMessageTime: 0,
     }
   },
 
@@ -31,6 +32,7 @@ export default {
   watch: {
     newMessage: {
       handler(newVal) {
+        this.$refs.groupInfoRoot.style.order = 2147483647 - (newVal["time"].substring(0, 10))
         this.lastMessage = newVal["userName"] + ":" + newVal["payload"]
       }
     }

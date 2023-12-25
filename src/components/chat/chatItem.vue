@@ -1,7 +1,8 @@
 <template>
   <div>
     <message v-for="msg in messageList" :time="msg['time']" :type="msg['type']" :avatar="msg['avatar']"
-      :uuid="msg['uuid']" :userName="msg['userName']" :payload="msg['payload']"></message>
+      :uuid="msg['uuid']" :userName="msg['userName']" :payload="msg['payload']" :owner="owner"
+      :admin="admin"></message>
   </div>
 </template>
 
@@ -13,6 +14,8 @@ export default {
     avatar: String,
     group: String,
     name: String,
+    owner: Object,
+    admin: Map,
   },
   data() {
     return {
@@ -21,7 +24,7 @@ export default {
   },
 
   methods: {
-    
+
   },
 
   computed: {
