@@ -1,7 +1,13 @@
 <template>
   <div>
-    <message v-for="msg in messageList" :time="msg['time']" :type="msg['type']" :avatar="msg['avatar']"
-      :uuid="msg['uuid']" :userName="msg['userName']" :payload="msg['payload']" :owner="owner"
+    <message v-for="msg in messageList"
+      :time="msg['time']"
+      :type="msg['type']"
+      :avatar="msg['avatar']"
+      :uuid="msg['uuid']"
+      :userName="msg['userName']"
+      :payload="msg['payload']"
+      :owner="owner"
       :admin="admin"></message>
   </div>
 </template>
@@ -24,7 +30,12 @@ export default {
   },
 
   methods: {
-
+    async makeConnection() {
+      this.$store.dispatch('wsConnect', {
+        "groupID": this.group,
+        "uuid": this.$store.state["account"]
+      })
+    },
   },
 
   computed: {
@@ -35,15 +46,16 @@ export default {
 
   watch: {
     newMessage: {
-      immediate: false,
       async handler(newVal) {
-        this.messageList.push(newVal)
+        if (newVal) {
+          this.messageList.push(newVal)
+        }
       }
     }
   },
 
-  mounted() {
-
+  async mounted() {
+    await this.makeConnection()
   },
   components: {
     message

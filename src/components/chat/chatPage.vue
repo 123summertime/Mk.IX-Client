@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <div class="center" v-if="currGroupID">
+      <div class="center" v-show="currGroupID">
         <div class="conversationView">
           <chatItem v-for="item in groupList"
             :avatar="item['avatar']"
@@ -40,7 +40,7 @@
         <splitter @splitter="inputSplitter" class="inputSplitter" ref="inputSplitter"></splitter>
         <inputBox :currGroup="currGroupID" class="inputBox" ref="inputBox"></inputBox>
       </div>
-      <div class="center" v-else></div>
+      <div class="center" v-show="!currGroupID"></div>
 
     </div>
 
@@ -66,7 +66,7 @@ export default {
       username: "",
       currGroupID: "",
       currGroupName: "",
-      groupList: [], // [{group:String, avatar:String, name:String, owner:Object, admin:Map}]
+      groupList: [], // [{group:String, avatar:String, name:String, owner:Map, admin:Map}]
     }
   },
 
@@ -87,7 +87,6 @@ export default {
         })
         data["groups"].forEach(id => {
           this.getGroupInfo(id["lastUpdate"], id["group"])
-          this.makeConnection(id["group"])
         })
       }).catch(err => { console.log(err) })
     },
@@ -118,13 +117,6 @@ export default {
       } catch (err) {
         console.log(err)
       }
-    },
-
-    async makeConnection(groupID) {
-      this.$store.dispatch('wsConnect', {
-        "groupID": groupID,
-        "uuid": this.uuid
-      })
     },
 
     readLayoutSettings() {
@@ -321,3 +313,13 @@ export default {
   cursor: ns-resize;
 }
 </style>
+
+
+<!-- 
+chatPage
+  |- groupItem
+  |- splitter
+  |- inputBox
+  |- chatItem
+        |- message
+ -->

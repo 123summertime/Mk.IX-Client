@@ -31,9 +31,14 @@ export default {
 
   watch: {
     newMessage: {
+      immediate: true,
       handler(newVal) {
-        this.$refs.groupInfoRoot.style.order = 2147483647 - (newVal["time"].substring(0, 10))
-        this.lastMessage = newVal["userName"] + ":" + newVal["payload"]
+        if (newVal) {
+          this.$nextTick(function() {
+            this.$refs.groupInfoRoot.style.order = 2147483647 - (newVal["time"].substring(0, 10))
+            this.lastMessage = newVal["userName"] + ":" + newVal["payload"]
+          })
+        }
       }
     }
   },
