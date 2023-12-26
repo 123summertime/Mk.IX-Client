@@ -4,11 +4,9 @@
       <img :src="'data:image/png;base64,' + avatar">
     </div>
     <div class="container">
-      <div class="above">
-        <div class="position">
-          <p class="nameplate" ref="Nameplate">{{ nameplate }}</p>
-          <p class="userName">{{ userName }}</p>
-        </div>
+      <div class="position">
+        <p class="nameplate" ref="Nameplate">{{ nameplate }}</p>
+        <p class="userName">{{ userName }}</p>
       </div>
       <div>
         <p class="payload">{{ payload }}</p>
@@ -82,21 +80,16 @@ img {
 }
 
 .container {
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   max-width: 60%;
   margin: 0 8px;
 }
 
-.above {
-  position: relative;
-  width: 0;
-  height: 24px;
-}
-
 .position {
-  position: absolute;
   display: flex;
-  height: 100%;
+  height: 24px;
   white-space: nowrap;
   direction: ltr;
 }

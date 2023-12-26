@@ -1,13 +1,13 @@
 <template>
   <div class="groupInfoRoot" ref="groupInfoRoot">
-    <img :src="'data:image/png;base64,' + avatar" class="groupAvatar">
+    <img class="groupAvatar" :src="'data:image/png;base64,' + avatar">
     <div class="groupInfo">
       <p class="groupName">{{ name }}</p>
       <p class="currMessage">{{ lastMessage }}</p>
     </div>
     <div class="information">
-      <div class="unread" v-show="unreadCount">{{ unreadCount }}</div>
-      <div class="time" v-show="lastMessageTime">{{ lastMessageTime }}</div>
+      <div :class="lastMessageTime ? 'time' : 'time hidden'">{{ lastMessageTime }}</div>
+      <div :class="unreadCount ? 'unread' : 'unread hidden'">{{ unreadCount <= 99 ? unreadCount : "99+"}}</div>   
     </div>
   </div>
 </template>
@@ -18,13 +18,14 @@ export default {
     avatar: String,
     group: String,
     name: String,
+    active: Boolean,
   },
 
   data() {
     return {
-      lastMessage: "base",
+      lastMessage: " ",
       unreadCount: 0,
-      lastMessageTime: 0,
+      lastMessageTime: "",
     }
   },
 
@@ -40,7 +41,6 @@ export default {
       const current = Math.round(new Date() / 1000)
       const delta = current - timeStamp
       if (delta < 86400) {
-        console.log(hours, minutes)
         hours = (hours < 10) ? "0" + hours : hours
         minutes = (minutes < 10) ? "0" + minutes : minutes
         return hours + ":" + minutes
@@ -74,6 +74,18 @@ export default {
           this.$refs.groupInfoRoot.style.order = 2147483647 - short
           this.lastMessage = newVal["userName"] + ":" + newVal["payload"]
           this.lastMessageTime = this.computeLastMessageTime(short)
+          if (!this.active) {
+            this.unreadCount += 1
+          }
+        }
+      }
+    },
+
+    active: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.unreadCount = 0
         }
       }
     }
@@ -99,6 +111,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  flex-grow: 1;
   padding: 6px 0;
   margin-left: 12px;
   overflow: hidden;
@@ -110,6 +123,29 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.information {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items:flex-end;
+  padding: 6px 0;
+}
+
+.time {
+  white-space: nowrap;
+  font-size: 0.75rem;
+}
+
+.unread {
+  padding: 0 6px;
+  border-radius: 8px;
+  background-color: coral;
+}
+
+.hidden {
+  visibility: hidden;
 }
 
 .currMessage {

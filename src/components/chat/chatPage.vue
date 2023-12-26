@@ -11,6 +11,7 @@
           :avatar="item['avatar']"
           :group="item['group']"
           :name="item['name']"
+          :active="item['group'] === currGroupID"
           @click="currGroupChange(item['group'], item['name'])"
           class="groupItem"></groupItem>
       </div>
