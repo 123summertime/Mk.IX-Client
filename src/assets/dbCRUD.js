@@ -1,6 +1,4 @@
-import { info } from '../db/db.js'
-
-class dbCRUD {
+export class dbCRUD {
     constructor(DB_Instance) {
         this.DB = DB_Instance
     }
@@ -9,8 +7,8 @@ class dbCRUD {
         this.DB[table].add(kv)
     }
 
-    delete(table, v) {
-        this.DB[table].delete(v)
+    delete(table, k) {
+        this.DB[table].delete(k)
     }
 
     update(table, kv) {
@@ -20,6 +18,8 @@ class dbCRUD {
     async query(table, kv) {
         return this.DB[table].get(kv)
     }
-}
 
-export const infoDB = new dbCRUD(info)
+    async queryRange(table, start, limit) {
+        return this.DB.table(table).offset(start).limit(limit).toArray()
+    }
+}
