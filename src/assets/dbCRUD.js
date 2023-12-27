@@ -20,6 +20,6 @@ export class dbCRUD {
     }
 
     async queryRange(table, start, limit) {
-        return this.DB.table(table).offset(start).limit(limit).toArray()
+        return this.DB.table(table).reverse().offset(start).limit(limit).toArray()
     }
 }

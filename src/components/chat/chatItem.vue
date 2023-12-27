@@ -70,14 +70,11 @@ export default {
     newMessage: {
       async handler(newVal) {
         if (newVal) {
-          this.messageList.push(newVal)
-          const storage = {
-            time: newVal["time"],
-            type: newVal["type"],
-            senderID: newVal["senderID"],
-            snederKey: newVal["senderKey"],
-            payload: newVal["payload"],
-          }
+          // 排除某些属性
+          const {senderID: _1, senderKey: _2, group: _3, ...message} = newVal
+          const {avatar: _a, userName: _b, group: _c, senderID: _d, ...storage} = newVal
+          this.messageList.push(message)
+          console.log(this.messageList)
           this.putHistory(storage)
         }
       }
@@ -87,13 +84,14 @@ export default {
   async mounted() {
     await this.buildOrGetDB()
     const history = await this.getHistory(0, 5)
-    console.log(history)
     history.forEach(async (msg) => {
-      const x = await queryInfo("Account", msg["senderKey"], msg["senderID"])
-      this.messageList.push({...x, ...msg}) 
+      const info = await queryInfo("Account", msg["senderKey"], msg["uuid"])
+      const {senderID: _1, senderKey: _2, group: _3, ...message} = {...info, ...msg}  // 排除某些属性
+      this.messageList.push(message) 
     })
     await this.makeConnection()
   },
+
   components: {
     message
   }
