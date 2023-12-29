@@ -40,6 +40,7 @@ export default {
     },
 
     getNameplate() {
+      console.log(this.payload ,this.uuid)
       if (this.owner.has(this.uuid)) {
         this.$refs.Nameplate.style.backgroundColor = "gold"
         this.nameplate = "群主"
@@ -55,6 +56,7 @@ export default {
   },
 
   mounted() {
+    console.log(this.uuid, this.payload)
     this.getNameplate()
   }
 

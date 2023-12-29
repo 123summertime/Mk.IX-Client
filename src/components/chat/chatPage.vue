@@ -35,6 +35,7 @@
             :admin="item['admin']"
             :group="item['group']"
             :name="item['name']"
+            :active="item['group'] === currGroupID"
             v-show="currGroupID === item['group']"
             class="conversation"></chatItem>
         </div>
@@ -50,7 +51,6 @@
 
 <script>
 import axios from 'axios'
-import Dexie from 'dexie'
 
 import { queryInfo } from '../../assets/queryDB.js'
 import router from '../../router/index.js'

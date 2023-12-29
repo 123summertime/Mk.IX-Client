@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <message v-for="msg in messageList"
+  <div ref="messageView">
+    <message v-for="msg in messageList" :key="msg['time']"
       :time="msg['time']"
       :type="msg['type']"
       :avatar="msg['avatar']"
@@ -27,10 +27,12 @@ export default {
     name: String,
     owner: Object,
     admin: Map,
+    active: Boolean,
   },
   data() {
     return {
       page: 0,
+      step: 10,
       messageList: []
     }
   },
@@ -71,24 +73,36 @@ export default {
       async handler(newVal) {
         if (newVal) {
           // 排除某些属性
-          const {senderID: _1, senderKey: _2, group: _3, ...message} = newVal
-          const {avatar: _a, userName: _b, group: _c, senderID: _d, ...storage} = newVal
+          const { senderID: _1, senderKey: _2, group: _3, ...message } = newVal
+          const { avatar: _a, userName: _b, group: _c, senderID: _d, ...storage } = newVal
           this.messageList.push(message)
-          console.log(this.messageList)
           this.putHistory(storage)
+          this.$nextTick(function () {
+            this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+          })
         }
+      }
+    },
+
+    active: {
+      handler() {
+        this.$nextTick(function () {
+          this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+        })
       }
     }
   },
 
   async mounted() {
     await this.buildOrGetDB()
-    const history = await this.getHistory(0, 5)
-    history.forEach(async (msg) => {
+    const history = await this.getHistory(0, 10)
+    const loadHistory = history.map(async (msg) => {
       const info = await queryInfo("Account", msg["senderKey"], msg["uuid"])
-      const {senderID: _1, senderKey: _2, group: _3, ...message} = {...info, ...msg}  // 排除某些属性
-      this.messageList.push(message) 
+      const { senderID: _1, senderKey: _2, group: _3, ...message } = { ...info, ...msg }  // 排除某些属性
+      this.messageList.unshift(message)
     })
+    await Promise.all(loadHistory)
+    console.log(this.messageList)
     await this.makeConnection()
   },
 
