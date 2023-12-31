@@ -1,5 +1,5 @@
 <template>
-  <div ref="messageView">
+  <div @scroll="onScroll" ref="messageView">
     <message v-for="msg in messageList" :key="msg['time']"
       :time="msg['time']"
       :type="msg['type']"
@@ -46,12 +46,20 @@ export default {
       this.DB = new dbCRUD(db)
     },
 
-    async getHistory(start, limit) {
-      return await this.DB.queryRange('History', start, limit)
+    async getHistory() {
+      const history = await this.DB.queryRange('History', this.page * this.step, this.step)
+      history.forEach(async (msg) => {
+        const info = await queryInfo("Account", msg["senderKey"], msg["uuid"])
+        const { senderID: _1, senderKey: _2, group: _3, ...message } = { ...info, ...msg }  // 排除某些属性
+        this.messageList.unshift(message)
+      })
+      this.page += 1
     },
 
-    putHistory(message) {
-      this.DB.add('History', message)
+    async onScroll() {
+      if (this.$refs.messageView.scrollTop <= 30) {
+        this.getHistory()
+      }
     },
 
     async makeConnection() {
@@ -60,6 +68,11 @@ export default {
         "uuid": this.$store.state["account"]
       })
     },
+
+    putHistory(message) {
+      this.DB.add('History', message)
+    },
+
   },
 
   computed: {
@@ -77,9 +90,9 @@ export default {
           const { avatar: _a, userName: _b, group: _c, senderID: _d, ...storage } = newVal
           this.messageList.push(message)
           this.putHistory(storage)
-          this.$nextTick(function () {
-            this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
-          })
+          // this.$nextTick(function () {
+          //   this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+          // })
         }
       }
     },
@@ -90,19 +103,12 @@ export default {
           this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
         })
       }
-    }
+    },
   },
 
   async mounted() {
     await this.buildOrGetDB()
-    const history = await this.getHistory(0, 10)
-    const loadHistory = history.map(async (msg) => {
-      const info = await queryInfo("Account", msg["senderKey"], msg["uuid"])
-      const { senderID: _1, senderKey: _2, group: _3, ...message } = { ...info, ...msg }  // 排除某些属性
-      this.messageList.unshift(message)
-    })
-    await Promise.all(loadHistory)
-    console.log(this.messageList)
+    await this.getHistory()
     await this.makeConnection()
   },
 

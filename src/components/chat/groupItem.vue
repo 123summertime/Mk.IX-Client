@@ -40,6 +40,7 @@ export default {
       let minutes = time.getMinutes()
       const current = Math.round(new Date() / 1000)
       const delta = current - timeStamp
+      // 1d === 86400s
       if (delta < 86400) {
         hours = (hours < 10) ? "0" + hours : hours
         minutes = (minutes < 10) ? "0" + minutes : minutes
@@ -72,7 +73,7 @@ export default {
         if (newVal) {
           const short = newVal["time"].substring(0, 10)
           this.$refs.groupInfoRoot.style.order = 2147483647 - short
-          this.lastMessage = newVal["userName"] + ":" + newVal["payload"]
+          this.lastMessage = newVal["userName"] + ": " + newVal["payload"]
           this.lastMessageTime = this.computeLastMessageTime(short)
           if (!this.active) {
             this.unreadCount += 1

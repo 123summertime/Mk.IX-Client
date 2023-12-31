@@ -4,12 +4,13 @@
       <img :src="'data:image/png;base64,' + avatar">
     </div>
     <div class="container">
-      <div class="position">
+      <div class="upper">
         <p class="nameplate" ref="Nameplate">{{ nameplate }}</p>
         <p class="userName">{{ userName }}</p>
       </div>
-      <div>
+      <div class="lower">
         <p class="payload">{{ payload }}</p>
+        <p class="time">{{ formatedTime }}</p>
       </div>
     </div>
   </div>
@@ -30,7 +31,8 @@ export default {
 
   data() {
     return {
-      nameplate: ""
+      nameplate: "",
+      formatedTime: "112233",
     }
   },
 
@@ -40,7 +42,6 @@ export default {
     },
 
     getNameplate() {
-      console.log(this.payload ,this.uuid)
       if (this.owner.has(this.uuid)) {
         this.$refs.Nameplate.style.backgroundColor = "gold"
         this.nameplate = "群主"
@@ -56,7 +57,6 @@ export default {
   },
 
   mounted() {
-    console.log(this.uuid, this.payload)
     this.getNameplate()
   }
 
@@ -85,11 +85,11 @@ img {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  max-width: 60%;
+  max-width: 61.8%;
   margin: 0 8px;
 }
 
-.position {
+.upper {
   display: flex;
   height: 24px;
   white-space: nowrap;
@@ -107,7 +107,14 @@ img {
   line-height: 30px;
 }
 
+.lower {
+  display: flex;
+  align-items: flex-end;
+  max-width: 100%;
+}
+
 .payload {
+  max-width: 100%;
   word-wrap: break-word;
   white-space: pre-wrap;
   background-color: orangered;
@@ -117,5 +124,10 @@ img {
   padding: 0.8rem 1rem;
   margin-top: 6px;
   direction: ltr;
+}
+
+.time {
+  font-size: 0.75rem;
+  margin: 0 8px;
 }
 </style>
