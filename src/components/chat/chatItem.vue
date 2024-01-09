@@ -48,11 +48,11 @@ export default {
 
     async getHistory() {
       const history = await this.DB.queryRange('History', this.page * this.step, this.step)
-      history.forEach(async (msg) => {
+      for (const msg of history) {
         const info = await queryInfo("Account", msg["senderKey"], msg["uuid"])
         const { senderID: _1, senderKey: _2, group: _3, ...message } = { ...info, ...msg }  // 排除某些属性
         this.messageList.unshift(message)
-      })
+      }
       this.page += 1
     },
 
@@ -90,9 +90,12 @@ export default {
           const { avatar: _a, userName: _b, group: _c, senderID: _d, ...storage } = newVal
           this.messageList.push(message)
           this.putHistory(storage)
-          // this.$nextTick(function () {
-          //   this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
-          // })
+
+          if (newVal["uuid"] != this.$store.state["account"]) {
+            this.$nextTick(function () {
+              this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+            })
+          }
         }
       }
     },

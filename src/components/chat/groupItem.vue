@@ -7,12 +7,17 @@
     </div>
     <div class="information">
       <div :class="lastMessageTime ? 'time' : 'time hidden'">{{ lastMessageTime }}</div>
-      <div :class="unreadCount ? 'unread' : 'unread hidden'">{{ unreadCount <= 99 ? unreadCount : "99+"}}</div>   
+      <div :class="unreadCount ? 'unread' : 'unread hidden'">{{ unreadCount <= 99 ? unreadCount : "99+" }}</div>
+      </div>
     </div>
-  </div>
 </template>
 
 <script>
+import Dexie from 'dexie'
+
+import { dbCRUD } from '../../assets/dbCRUD.js'
+import { queryInfo } from '../../assets/queryDB.js'
+
 export default {
   props: {
     avatar: String,
@@ -23,13 +28,29 @@ export default {
 
   data() {
     return {
-      lastMessage: " ",
       unreadCount: 0,
+      lastMessage: " ",
       lastMessageTime: "",
     }
   },
 
   methods: {
+    async buildOrGetDB() {
+      const db = new Dexie(this.group)
+      db.version(1).stores({
+        History: "&time",
+      })
+      this.DB = new dbCRUD(db)
+    },
+
+    async getLastHistory() {
+      const history = await this.DB.queryRange('History', 0, 1)
+      if (history.length) {
+        const info = await queryInfo("Account", history[0]["senderKey"], history[0]["uuid"])
+        this.computeInfo({...info, ...history[0] })
+      }
+    },
+
     computeLastMessageTime(timeStamp) {
       const time = new Date(Number(timeStamp) * 1000)
       const year = time.getFullYear()
@@ -40,6 +61,7 @@ export default {
       let minutes = time.getMinutes()
       const current = Math.round(new Date() / 1000)
       const delta = current - timeStamp
+
       // 1d === 86400s
       if (delta < 86400) {
         hours = (hours < 10) ? "0" + hours : hours
@@ -49,14 +71,24 @@ export default {
       if (delta < 2 * 86400) {
         return "昨天"
       }
+      if (delta < 3 * 86400) {
+        return "前天"
+      }
       if (delta < 7 * 86400) {
-        const days = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期天"]     
+        const days = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期天"]
         return days[day]
       }
       if (delta < 365 * 86400) {
-        return month + "月" + date + "日"
+        return month + "/" + date
       }
-      return year + "年" + month + "月" + date + "日"
+      return year + "/" + month + "/" + date
+    },
+
+    computeInfo(message) {
+      const short = message["time"].substring(0, 10)
+      this.$refs.groupInfoRoot.style.order = 2147483647 - short
+      this.lastMessage = message["userName"] + ": " + message["payload"]
+      this.lastMessageTime = this.computeLastMessageTime(short)
     }
   },
 
@@ -71,10 +103,7 @@ export default {
       immediate: true,
       handler(newVal) {
         if (newVal) {
-          const short = newVal["time"].substring(0, 10)
-          this.$refs.groupInfoRoot.style.order = 2147483647 - short
-          this.lastMessage = newVal["userName"] + ": " + newVal["payload"]
-          this.lastMessageTime = this.computeLastMessageTime(short)
+          this.computeInfo(newVal)
           if (!this.active) {
             this.unreadCount += 1
           }
@@ -92,6 +121,10 @@ export default {
     }
   },
 
+  async mounted() {
+    await this.buildOrGetDB()
+    await this.getLastHistory()
+  }
 }
 </script>
 
@@ -130,7 +163,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  align-items:flex-end;
+  align-items: flex-end;
   padding: 6px 0;
 }
 
