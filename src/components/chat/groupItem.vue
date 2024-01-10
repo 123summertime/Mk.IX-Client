@@ -56,27 +56,24 @@ export default {
       const year = time.getFullYear()
       const month = time.getMonth() + 1
       const date = time.getDate()
-      const day = time.getDay()
       let hours = time.getHours()
       let minutes = time.getMinutes()
       const current = Math.round(new Date() / 1000)
       const delta = current - timeStamp
 
+      hours = (hours < 10) ? "0" + hours : hours
+      minutes = (minutes < 10) ? "0" + minutes : minutes
+      const T = hours + ":" + minutes
+
       // 1d === 86400s
       if (delta < 86400) {
-        hours = (hours < 10) ? "0" + hours : hours
-        minutes = (minutes < 10) ? "0" + minutes : minutes
-        return hours + ":" + minutes
+        return T
       }
       if (delta < 2 * 86400) {
-        return "昨天"
+        return "昨天 " + T
       }
       if (delta < 3 * 86400) {
-        return "前天"
-      }
-      if (delta < 7 * 86400) {
-        const days = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期天"]
-        return days[day]
+        return "前天 " + T
       }
       if (delta < 365 * 86400) {
         return month + "/" + date
