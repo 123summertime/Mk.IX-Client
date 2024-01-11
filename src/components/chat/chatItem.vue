@@ -90,8 +90,8 @@ export default {
           const { avatar: _a, userName: _b, group: _c, senderID: _d, ...storage } = newVal
           this.messageList.push(message)
           this.putHistory(storage)
-
-          if (newVal["uuid"] != this.$store.state["account"]) {
+          
+          if (newVal["uuid"] === this.$store.state["account"]) {
             this.$nextTick(function () {
               this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
             })

@@ -1,7 +1,7 @@
 <template>
   <div class="inputBoxRoot">
     <div class="bar">
-      <el-button type="primary" @click="sending" :disabled="message ? false : true" class="send">发送</el-button>
+      <el-button type="primary" @click="sending('text', message)" :disabled="message ? false : true" class="send">发送</el-button>
     </div>
     <textarea v-model=message @keydown="onKeyDown" v-on:paste="pasteImg"></textarea>
   </div>
@@ -20,60 +20,56 @@ export default {
   },
 
   methods: {
-    sending() {
+    sending(type, payload) {
       this.$store.state.wsConnections[this.currGroup].send(JSON.stringify({
         "group": this.currGroup,
-        "type": "text",
-        "payload": this.message,
+        "type": type,
+        "payload": payload,
       }))
-      this.message = ""
+
+      if (type == "text") {
+        this.message = ""
+      }
     },
 
     onKeyDown(event) {
       if (!this.message) { return }
       if (event.shiftKey && event.key === 'Enter') {
         event.preventDefault()
-        this.sending()
+        this.sending("text", this.message)
       }
     },
 
     pasteImg(event) {
-      var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+      let items = (event.clipboardData || event.originalEvent.clipboardData).items;
 
-      for (var i = 0; i < items.length; i++) {
+      for (let i = 0; i < items.length; i++) {
         if (items[i].type.indexOf('image') !== -1) {
-          var blob = items[i].getAsFile();
-          var reader = new FileReader();
-          reader.onload = function (event) {
-            var img = new Image();
-            img.src = event.target.result;
+          let blob = items[i].getAsFile()
+          let reader = new FileReader()
+          reader.onload = (event) => {
+            let img = new Image()
+            img.src = event.target.result
 
-            img.onload = function () {
-              // Create a canvas element
-              var canvas = document.createElement('canvas');
-              var ctx = canvas.getContext('2d');
+            img.onload = () => {
+              let canvas = document.createElement('canvas')
+              let ctx = canvas.getContext('2d')
+              canvas.width = img.width
+              canvas.height = img.height
+              ctx.drawImage(img, 0, 0)
 
-              // Set canvas dimensions to the image dimensions
-              canvas.width = img.width;
-              canvas.height = img.height;
+              canvas.toBlob((webpBlob) => {
+                let readerWebP = new FileReader()
+                readerWebP.onload = (eventWebP) => {
+                  let base64WebP = eventWebP.target.result
+                  this.sending("image", base64WebP)
+                }
+                readerWebP.readAsDataURL(webpBlob)
+              }, 'image/webp')
+            }
+          }
 
-              // Draw the image on the canvas
-              ctx.drawImage(img, 0, 0);
-
-              // Convert the canvas content to WebP format
-              canvas.toBlob(function (webpBlob) {
-                // Convert the WebP blob to Base64
-                var readerWebP = new FileReader();
-                readerWebP.onload = function (eventWebP) {
-                  var base64WebP = eventWebP.target.result;
-                  console.log(base64WebP); // Base64 representation of the WebP image
-                };
-                readerWebP.readAsDataURL(webpBlob);
-              }, 'image/webp');
-            };
-          };
-
-          reader.readAsDataURL(blob);
+          reader.readAsDataURL(blob)
         }
       }
     }

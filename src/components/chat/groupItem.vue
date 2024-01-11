@@ -81,10 +81,17 @@ export default {
       return year + "/" + month + "/" + date
     },
 
+    cvtPayload(payload) {
+      if (payload.substring(0, 10) === 'data:image') {
+        return "[图片]"
+      }
+      return payload
+    },
+
     computeInfo(message) {
       const short = message["time"].substring(0, 10)
       this.$refs.groupInfoRoot.style.order = 2147483647 - short
-      this.lastMessage = message["userName"] + ": " + message["payload"]
+      this.lastMessage = message["userName"] + ": " + this.cvtPayload(message["payload"])
       this.lastMessageTime = this.computeLastMessageTime(short)
     }
   },

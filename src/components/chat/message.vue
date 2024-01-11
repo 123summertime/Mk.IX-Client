@@ -9,7 +9,8 @@
         <p class="userName">{{ userName }}</p>
       </div>
       <div class="lower">
-        <p class="payload">{{ payload }}</p>
+        <p class="payload textType" v-if="type=='text'">{{ payload }}</p>
+        <img class="payload imgType" v-if="type=='image'" :src="payload">
         <p class="time">{{ formatedTime }}</p>
       </div>
     </div>
@@ -97,7 +98,7 @@ export default {
 </script>
 
 <style scoped>
-img {
+.avatar img {
   display: inline-block;
   width: 3rem;
   height: 3rem;
@@ -151,13 +152,20 @@ img {
   word-wrap: break-word;
   white-space: pre-wrap;
   background-color: orangered;
-  font-size: 1.2rem;
-  line-height: 1.5rem;
   border-radius: 12px;
   padding: 0.8rem 1rem;
   margin-top: 6px;
   direction: ltr;
 }
+
+.textType {
+  font-size: 1.2rem;
+  line-height: 1.5rem;
+}
+
+/* .imgType {
+
+} */
 
 .time {
   font-size: 0.75rem;
