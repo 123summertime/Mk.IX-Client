@@ -6,14 +6,18 @@
     </div>
     <textarea v-model=message @keydown="onKeyDown" v-on:paste="pasteImg"></textarea>
 
-    <el-dialog v-model="visible" title="发送确认" width="30%">
-      <img class="previewImg" :src="msgPayload"/>
+    <el-dialog v-model="visible" title="发送确认" width="30%" :show-close=false>
+      <img class="previewImg" :src="msgPayload" />
       <template #footer>
-        <span class="dialog-footer">
-          <span>{{ msgName }}</span>
-          <span>{{ msgSize + "KB"}}</span>
-          <el-button type="primary" @click="confirmed">确认</el-button>
-          <el-button @click="canceled">取消</el-button>
+        <span class="footer">
+          <div class="imgInfo">
+            <div class="msgName">{{ msgName }}</div> 
+            <div class="msgSize">{{ msgSize + "KB" }}</div>
+          </div>
+          <div class="buttons">
+            <el-button type="primary" @click="confirmed">确认</el-button>
+            <el-button @click="canceled">取消</el-button>
+          </div>
         </span>
       </template>
     </el-dialog>
@@ -142,7 +146,45 @@ textarea::-webkit-scrollbar {
 }
 
 .previewImg {
-  width: 100%;
-  margin: auto;
+  display: block;
+  max-width: 100%;
+  max-height: 40vh;
+  margin: 0 auto;
+}
+
+.footer,
+.imgInfo,
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  line-height: 32px;
+}
+
+.footer {
+  max-width: 100%;
+}
+
+.imgInfo {
+  display: flex;
+  justify-content: left;
+  flex-grow: 1;
+  margin-right: 16px;
+  text-align: left;
+  overflow: hidden;
+}
+
+.msgName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msgSize {
+  flex-grow: 1;
+  margin-left: 16px;
+}
+
+.buttons button:nth-child(2) {
+  margin-left: 16px;
 }
 </style>

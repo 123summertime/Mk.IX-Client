@@ -163,9 +163,9 @@ export default {
   line-height: 1.5rem;
 }
 
-/* .imgType {
-
-} */
+.imgType {
+  max-height: 50vh;
+}
 
 .time {
   font-size: 0.75rem;
