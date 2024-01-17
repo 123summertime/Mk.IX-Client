@@ -81,17 +81,20 @@ export default {
       return year + "/" + month + "/" + date
     },
 
-    cvtPayload(payload) {
-      if (payload.substring(0, 10) === 'data:image') {
-        return "[图片]"
+    cvtPayload(type, payload) {
+      if (type === "text") {
+        return payload
       }
-      return payload
+      if (type === "image") {
+        return "[图片]"
+      } 
+      return "[文件]"
     },
 
     computeInfo(message) {
       const short = message["time"].substring(0, 10)
       this.$refs.groupInfoRoot.style.order = 2147483647 - short
-      this.lastMessage = message["userName"] + ": " + this.cvtPayload(message["payload"])
+      this.lastMessage = message["userName"] + ": " + this.cvtPayload(message["type"] ,message["payload"])
       this.lastMessageTime = this.computeLastMessageTime(short)
     }
   },

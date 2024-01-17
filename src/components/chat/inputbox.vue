@@ -12,13 +12,15 @@
     </div>
     <textarea v-model=message @keydown="onKeyDown" v-on:paste="pasteImg"></textarea>
 
+    <!-- 确认遮罩层 -->
     <el-dialog v-model="visible" title="发送确认" width="30%" :show-close=false>
-      <img class="previewImg" :src="msgPayload" />
+      <img class="previewImg" :src="msgPayload" v-if="msgType === 'image'" />
+      <p class="previewFile" v-else>{{ msgName.split(".").slice(-1)[0] + "文件" }}</p>
       <template #footer>
         <span class="footer">
-          <div class="imgInfo">
+          <div class="fileInfo">
             <div class="msgName">{{ msgName }}</div>
-            <div class="msgSize">{{ msgSize + "KB" }}</div>
+            <div class="msgSize">{{ fileSize }}</div>
           </div>
           <div class="buttons">
             <el-button type="primary" @click="confirmed">确认</el-button>
@@ -75,12 +77,21 @@ export default {
       if (file) {
         this.msgName = file.name
         const reader = new FileReader()
-        
+
         reader.onload = () => {
           const base64 = reader.result
-          const MIME = file.type.toLowerCase().split('/')[0]
-          if (MIME === "image") {
+          this.msgType = file.type.toLowerCase().split('/')[0]
+          if (this.msgType === "text") {
+            this.msgType = "textFile"
+          }
+
+          if (this.msgType === "image") {
             this.toWebpBase64(base64)
+            this.beforeSending()
+          } else {
+            this.msgPayload = base64
+            this.msgSize = file.size
+            this.beforeSending()
           }
         }
         reader.readAsDataURL(file)
@@ -99,11 +110,10 @@ export default {
         ctx.drawImage(img, 0, 0)
 
         canvas.toBlob((webpBlob) => {
-          this.msgSize = (webpBlob.size / 1000).toFixed(2)
+          this.msgSize = webpBlob.size
           let readerWebP = new FileReader()
           readerWebP.onload = (eventWebP) => {
             this.msgPayload = eventWebP.target.result
-            this.beforeSending()
           }
           readerWebP.readAsDataURL(webpBlob)
         }, 'image/webp')
@@ -116,11 +126,12 @@ export default {
       for (let i = 0; i < items.length; i++) {
         if (items[i].type.indexOf('image') !== -1) {
           let blob = items[i].getAsFile()
-          let reader = new FileReader()
           this.msgName = blob.name
-
+          
+          let reader = new FileReader()
           reader.onload = (event) => {
             this.toWebpBase64(event.target.result)
+            this.beforeSending()
           }
 
           reader.readAsDataURL(blob)
@@ -129,17 +140,36 @@ export default {
     },
 
     beforeSending() {
+      this.msgPayload = btoa(JSON.stringify({
+        "fileName": this.msgName,
+        "fileSize": this.fileSize,
+        "content": this.msgPayload
+      }))
       this.visible = true
     },
 
     confirmed() {
       this.visible = false
-      this.sending("image", this.msgPayload)
+      this.sending(this.msgType, this.msgPayload)
     },
 
     canceled() {
       this.visible = false
     },
+  },
+
+  computed: {
+    fileSize() {
+      const mb = 2 ** 20
+      const kb = 2 ** 10
+      if (this.msgSize >= mb) {
+        return (this.msgSize / mb).toFixed(2) + "MB"
+      }
+      if (this.msgSize >= kb) {
+        return (this.msgSize / kb).toFixed(2) + "KB"
+      }
+      return this.msgSize + "B"
+    }
   }
 }
 </script>
@@ -201,6 +231,15 @@ textarea::-webkit-scrollbar {
   margin: 0 auto;
 }
 
+.previewFile {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  margin: 0 auto;
+}
+
 .footer,
 .imgInfo,
 .buttons {
@@ -213,7 +252,7 @@ textarea::-webkit-scrollbar {
   max-width: 100%;
 }
 
-.imgInfo {
+.fileInfo {
   display: flex;
   justify-content: left;
   flex-grow: 1;

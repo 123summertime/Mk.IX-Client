@@ -9,8 +9,15 @@
         <p class="userName">{{ userName }}</p>
       </div>
       <div class="lower">
-        <p class="payload textType" v-if="type=='text'">{{ payload }}</p>
-        <img class="payload imgType" v-if="type=='image'" :src="payload">
+        <p class="payload textType" v-if="type == 'text'">{{ content }}</p>
+        <img class="payload imgType" v-else-if="type == 'image'" :src="content">
+        <div class="payload fileType" @click="downloading" v-else>
+          <div class="fileTypeInner">
+            <p> {{ fileName }}</p>
+            <p> {{ fileSize }}</p>
+          </div>
+          <Folder class="fileTypeIcon" />
+        </div>
         <p class="time">{{ formatedTime }}</p>
       </div>
     </div>
@@ -32,6 +39,9 @@ export default {
 
   data() {
     return {
+      fileName: "",
+      fileSize: "",
+      content: "",
       nameplate: "",
       formatedTime: "",
     }
@@ -54,6 +64,45 @@ export default {
         return
       }
       this.$refs.Nameplate.style.display = "none"
+    },
+
+    // 文本类型:payload就是信息内容 文件类型:payload是包含文件名,文件大小和文件内容的base64字符串
+    getContent() {
+      if (this.type === "text") {
+        this.content = this.payload
+      } else {
+        try {
+          const c = JSON.parse(atob(this.payload))
+          this.fileSize = c["fileSize"]
+          this.fileName = c["fileName"]
+          this.content = c["content"]
+        } catch (err) {
+          this.content = this.payload
+        }
+      }
+    },
+
+    base64ToBlob(base64) {
+      const bytes = atob(base64.split(',')[1])
+      const byteNumbers = new Array(bytes.length);
+      for (var i = 0; i < bytes.length; i++) {
+        byteNumbers[i] = bytes.charCodeAt(i)
+      }
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: "application/octet-stream" })
+      return blob
+    },
+
+    downloadFile(blob, fileName) {
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName
+      link.click()
+    },
+
+    downloading() {
+      const blob = this.base64ToBlob(this.content)
+      this.downloadFile(blob, this.fileName)
     },
 
     computeMessageTime(timeStamp) {
@@ -91,6 +140,7 @@ export default {
 
   mounted() {
     this.getNameplate()
+    this.getContent()
     this.formatedTime = this.computeMessageTime(this.time)
   }
 
@@ -153,7 +203,7 @@ export default {
   white-space: pre-wrap;
   background-color: orangered;
   border-radius: 12px;
-  padding: 0.8rem 1rem;
+  padding: 12px 16px;
   margin-top: 6px;
   direction: ltr;
 }
@@ -165,6 +215,26 @@ export default {
 
 .imgType {
   max-height: 50vh;
+}
+
+.fileType {
+  display: flex;
+  justify-content: space-between;
+  width: 300px;
+  height: 100px;
+  background-color: beige;
+  cursor: pointer;
+}
+
+.fileTypeInner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.fileTypeIcon {
+  height: 64px;
+  margin: auto 0;
 }
 
 .time {
