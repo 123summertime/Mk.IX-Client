@@ -10,7 +10,7 @@
       </div>
       <div class="lower">
         <p class="payload textType" v-if="type == 'text'">{{ content }}</p>
-        <img class="payload imgType" v-else-if="type == 'image'" :src="content">
+        <el-image class="payload imgType" v-else-if="type == 'image'" :src="content" :preview-src-list="[content]" />
         <div class="payload fileType" @click="downloading" v-else>
           <div class="fileTypeInner">
             <p> {{ fileName }}</p>
@@ -150,8 +150,8 @@ export default {
 <style scoped>
 .avatar img {
   display: inline-block;
-  width: 3rem;
-  height: 3rem;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   transform: translateY(8px);
 }
@@ -213,7 +213,7 @@ export default {
   line-height: 1.5rem;
 }
 
-.imgType {
+:deep(.el-image__inner) {
   max-height: 50vh;
 }
 
@@ -227,12 +227,20 @@ export default {
 }
 
 .fileTypeInner {
+  width: 192px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
 }
 
+.fileTypeInner p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .fileTypeIcon {
+  width: 64px;
   height: 64px;
   margin: auto 0;
 }
