@@ -93,17 +93,17 @@ export default {
 .subTitle {
   display: block;
   font-size: 1rem;
-  margin-top: 2rem;
-  margin-bottom: 0.5rem;
+  margin-top: 32px;
+  margin-bottom: 8px;
   color: var(--el-color-black);
 }
 
 .submit {
   position: relative;
   width: 100%;
-  height: 2rem;
-  border-radius: 1rem;
-  margin-top: 1rem;
+  height: 32px;
+  border-radius: 16px;
+  margin-top: 16px;
   overflow: hidden;
 }
 
@@ -121,9 +121,9 @@ export default {
   left: 0;
   top: 0;
   width: 100%;
-  height: 2rem;
+  height: 32px;
   border: none;
-  border-radius: 1rem;
+  border-radius: 16px;
   background: transparent;
   cursor: pointer;
   z-index: 114514;

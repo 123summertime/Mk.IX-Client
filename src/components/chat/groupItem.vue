@@ -35,22 +35,6 @@ export default {
   },
 
   methods: {
-    async buildOrGetDB() {
-      const db = new Dexie(this.group)
-      db.version(1).stores({
-        History: "&time",
-      })
-      this.DB = new dbCRUD(db)
-    },
-
-    async getLastHistory() {
-      const history = await this.DB.queryRange('History', 0, 1)
-      if (history.length) {
-        const info = await queryInfo("Account", history[0]["senderKey"], history[0]["uuid"])
-        this.computeInfo({...info, ...history[0] })
-      }
-    },
-
     computeLastMessageTime(timeStamp) {
       const time = new Date(Number(timeStamp) * 1000)
       const year = time.getFullYear()
@@ -100,20 +84,16 @@ export default {
   },
 
   computed: {
-    newMessage() {
-      return this.$store.state[this.group]
+    getLastMessage() {
+      return this.$store.state[`lastMessageOf${this.group}`]
     }
   },
 
   watch: {
-    newMessage: {
-      immediate: true,
+    getLastMessage: {
       handler(newVal) {
         if (newVal) {
           this.computeInfo(newVal)
-          if (!this.active) {
-            this.unreadCount += 1
-          }
         }
       }
     },
@@ -127,11 +107,6 @@ export default {
       }
     }
   },
-
-  async mounted() {
-    await this.buildOrGetDB()
-    await this.getLastHistory()
-  }
 }
 </script>
 

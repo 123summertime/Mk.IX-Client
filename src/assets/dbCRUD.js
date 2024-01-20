@@ -7,8 +7,8 @@ export class dbCRUD {
         this.DB[table].add(kv)
     }
 
-    delete(table, k) {
-        this.DB[table].delete(k)
+    delete(table, k, v) {
+        this.DB[table].where(k).equals(v).delete()
     }
 
     update(table, kv) {

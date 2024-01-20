@@ -24,6 +24,10 @@ export default createStore({
 
     loginAs(context, info) {
       context.commit('loginAs', info)
+    },
+
+    lastMessage(context, info) {
+      context.commit('lastMessage', info)
     }
   },
 
@@ -38,6 +42,9 @@ export default createStore({
     loginAs(state, info) {
       state["account"] = info["account"]
       state["userName"] = info["userName"]
+    },
+    lastMessage(state, info) {
+      state[`lastMessageOf${info["group"]}`] = info["payload"]
     }
   },
 

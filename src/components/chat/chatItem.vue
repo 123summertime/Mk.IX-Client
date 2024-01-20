@@ -8,7 +8,8 @@
       :userName="msg['userName']"
       :payload="msg['payload']"
       :owner="owner"
-      :admin="admin"></message>
+      :admin="admin"
+      @deleteMsg="deleteMsg"></message>
   </div>
 </template>
 
@@ -73,6 +74,11 @@ export default {
       this.DB.add('History', message)
     },
 
+    deleteMsg(time) {
+      const idx = this.messageList.findIndex(i => i.time === time)
+      this.DB.delete("History", "time", time)
+      this.messageList.splice(idx, 1)
+    }
   },
 
   computed: {
@@ -90,13 +96,23 @@ export default {
           const { avatar: _a, userName: _b, group: _c, senderID: _d, ...storage } = newVal
           this.messageList.push(message)
           this.putHistory(storage)
-          
+
           if (newVal["uuid"] === this.$store.state["account"]) {
             this.$nextTick(function () {
               this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
             })
           }
         }
+      }
+    },
+
+    messageList: {
+      deep: true,
+      handler() {
+        this.$store.dispatch('lastMessage', {
+          group: this.group,
+          payload: this.messageList.slice(-1)[0]
+        })
       }
     },
 

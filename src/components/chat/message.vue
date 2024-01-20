@@ -24,7 +24,12 @@
         <p class="time">{{ formatedTime }}</p>
       </div>
     </div>
-    <messageMenu class="contextMenu" ref="ContextMenu"></messageMenu>
+    <messageMenu class="contextMenu" ref="ContextMenu"
+      :type="type"
+      @copyMsg="copyMsg"
+      @deleteMsg="deleteMsg"
+      @forwardMsg="forwardMsg">
+    </messageMenu>
   </div>
 </template>
 
@@ -89,14 +94,16 @@ export default {
       }
     },
 
-    base64ToBlob(base64) {
+    base64ToBlob(base64, fileType) {
+      fileType = fileType || "application/octet-stream"
+
       const bytes = atob(base64.split(',')[1])
-      const byteNumbers = new Array(bytes.length);
+      const byteNumbers = new Array(bytes.length)
       for (var i = 0; i < bytes.length; i++) {
         byteNumbers[i] = bytes.charCodeAt(i)
       }
       const byteArray = new Uint8Array(byteNumbers)
-      const blob = new Blob([byteArray], { type: "application/octet-stream" })
+      const blob = new Blob([byteArray], { type:  fileType})
       return blob
     },
 
@@ -145,7 +152,7 @@ export default {
     },
 
     dynamicFontsize() {
-      if ('IconText' in this.$refs) {
+      if (this.$refs.IconText) {
         let currFontsize = 16
         const temp = document.createElement('span')
         temp.style.fontSize = currFontsize + 'px'
@@ -166,26 +173,58 @@ export default {
       const rect = this.$refs.Message.getBoundingClientRect()
       const ref = this.$refs.ContextMenu.$el.style
 
-      ref.left = event.pageX - rect.left + 'px'
-      ref.top = event.pageY - rect.top + 'px'
+      const x = event.pageX - rect.left
+      const y = event.pageY - rect.top
+
+      ref.left = x + 'px'
+      ref.top = y + 'px'
       ref.display = 'block'
+    
+      // 右键菜单会超出屏幕则向左挪144px 144px是右键菜单的宽度
+      if (event.pageX + 144 > window.innerWidth) {
+        ref.left = x - 144 + 'px'
+      }
 
       event.preventDefault()
       if (!this.rightClicked) {
         this.rightClicked = true
         setTimeout(() => {
-        window.addEventListener('click', this.globalClick)  // 用于点击其它地方，关闭右键菜单
-        window.addEventListener('contextmenu', this.globalClick)
-      }, 50)
+          window.addEventListener('click', this.globalClick)  // 点击其它地方，关闭右键菜单
+          window.addEventListener('contextmenu', this.globalClick)
+        }, 100)
       }
     },
 
     globalClick(event) {
+      // 删除消息时不存在ContextMenu, if防报错
+      if (this.$refs.ContextMenu) {
+        this.$refs.ContextMenu.$el.style.display = 'none'
+      }
       this.rightClicked = false
-      this.$refs.ContextMenu.$el.style.display = 'none'
       window.removeEventListener('click', this.globalClick)
       window.removeEventListener('contextmenu', this.globalClick)
     },
+
+    copyMsg() {
+      const cb = navigator.clipboard
+      if (this.type === 'text') {
+        cb.writeText(this.payload)
+      }
+      if (this.type === 'image') {
+        const blob = this.base64ToBlob(this.payload, "image/png")
+        cb.write([
+          new ClipboardItem({ "image/png": blob })
+        ])
+      }
+    },
+
+    deleteMsg() {
+      this.$emit('deleteMsg', this.time)
+    },
+
+    forwardMsg() {
+
+    }
   },
 
   mounted() {
@@ -193,6 +232,10 @@ export default {
     this.getContent()
     this.dynamicFontsize()
     this.formatedTime = this.computeMessageTime(this.time)
+  },
+
+  beforeDestroy() {
+    this.globalClick()
   },
 
   components: {
@@ -327,8 +370,6 @@ export default {
 .contextMenu {
   display: none;
   position: absolute;
-  left: 0;
-  top: 0;
   direction: ltr;
 }
 </style>
