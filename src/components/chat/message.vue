@@ -1,5 +1,5 @@
 <template>
-  <div :class="messageFrom() ? 'message bySelf' : 'message'">
+  <div :class="messageFrom() ? 'message bySelf' : 'message'" ref="Message">
     <div class="avatar">
       <img :src="'data:image/png;base64,' + avatar">
     </div>
@@ -8,23 +8,29 @@
         <p class="nameplate" ref="Nameplate">{{ nameplate }}</p>
         <p class="userName">{{ userName }}</p>
       </div>
-      <div class="lower">
+      <div class="lower" @contextmenu.prevent="onRightClick">
         <p class="payload textType" v-if="type == 'text'">{{ content }}</p>
         <el-image class="payload imgType" v-else-if="type == 'image'" :src="content" :preview-src-list="[content]" />
         <div class="payload fileType" @click="downloading" v-else>
-          <div class="fileTypeInner">
+          <div class="fileTypeInnerL">
             <p> {{ fileName }}</p>
             <p> {{ fileSize }}</p>
           </div>
-          <Folder class="fileTypeIcon" />
+          <div class="fileTypeInnerR">
+            <Folder class="fileTypeIcon" />
+            <p ref="IconText">{{ fileName.split('.').slice(-1)[0] }}</p>
+          </div>
         </div>
         <p class="time">{{ formatedTime }}</p>
       </div>
     </div>
+    <messageMenu class="contextMenu" ref="ContextMenu"></messageMenu>
   </div>
 </template>
 
 <script>
+import messageMenu from './messageMenu.vue'
+
 export default {
   props: {
     time: String,
@@ -44,6 +50,7 @@ export default {
       content: "",
       nameplate: "",
       formatedTime: "",
+      rightClicked: false
     }
   },
 
@@ -66,16 +73,16 @@ export default {
       this.$refs.Nameplate.style.display = "none"
     },
 
-    // 文本类型:payload就是信息内容 文件类型:payload是包含文件名,文件大小和文件内容的base64字符串
+    // 文本类型:payload就是信息内容 文件类型:payload是包含文件名(UTF-8),文件大小和文件内容的base64字符串
     getContent() {
       if (this.type === "text") {
         this.content = this.payload
       } else {
         try {
           const c = JSON.parse(atob(this.payload))
-          this.fileSize = c["fileSize"]
-          this.fileName = c["fileName"]
           this.content = c["content"]
+          this.fileSize = c["fileSize"]
+          this.fileName = new TextDecoder().decode(new Uint8Array(c["fileName"]))
         } catch (err) {
           this.content = this.payload
         }
@@ -135,13 +142,61 @@ export default {
         return month + "/" + date + " " + T
       }
       return year + "/" + month + "/" + date + " " + T
-    }
+    },
+
+    dynamicFontsize() {
+      if ('IconText' in this.$refs) {
+        let currFontsize = 16
+        const temp = document.createElement('span')
+        temp.style.fontSize = currFontsize + 'px'
+        temp.innerText = this.fileName.split('.').slice(-1)[0]
+        document.body.appendChild(temp)
+
+        while (temp.offsetWidth > 48 || currFontsize == 8) {
+          currFontsize--
+          temp.style.fontSize = currFontsize + 'px'
+        }
+
+        this.$refs.IconText.style.fontSize = currFontsize + 'px'
+        document.body.removeChild(temp)
+      }
+    },
+
+    onRightClick(event) {
+      const rect = this.$refs.Message.getBoundingClientRect()
+      const ref = this.$refs.ContextMenu.$el.style
+
+      ref.left = event.pageX - rect.left + 'px'
+      ref.top = event.pageY - rect.top + 'px'
+      ref.display = 'block'
+
+      event.preventDefault()
+      if (!this.rightClicked) {
+        this.rightClicked = true
+        setTimeout(() => {
+        window.addEventListener('click', this.globalClick)  // 用于点击其它地方，关闭右键菜单
+        window.addEventListener('contextmenu', this.globalClick)
+      }, 50)
+      }
+    },
+
+    globalClick(event) {
+      this.rightClicked = false
+      this.$refs.ContextMenu.$el.style.display = 'none'
+      window.removeEventListener('click', this.globalClick)
+      window.removeEventListener('contextmenu', this.globalClick)
+    },
   },
 
   mounted() {
     this.getNameplate()
     this.getContent()
+    this.dynamicFontsize()
     this.formatedTime = this.computeMessageTime(this.time)
+  },
+
+  components: {
+    messageMenu
   }
 
 }
@@ -157,6 +212,7 @@ export default {
 }
 
 .message {
+  position: relative;
   display: flex;
   margin-bottom: 24px;
 }
@@ -226,28 +282,53 @@ export default {
   cursor: pointer;
 }
 
-.fileTypeInner {
+.fileTypeInnerL {
   width: 192px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
 }
 
-.fileTypeInner p {
+.fileTypeInnerL p {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.fileTypeIcon {
+.fileTypeInnerR {
+  position: relative;
   width: 64px;
   height: 64px;
   margin: auto 0;
 }
 
+.fileTypeInnerR p {
+  position: absolute;
+  top: 24px;
+  left: 8px;
+  width: 48px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.fileTypeIcon {
+  width: 100%;
+  height: 100%;
+}
+
 .time {
   font-size: 0.75rem;
   margin: 0 8px;
+  direction: ltr;
+}
+
+.contextMenu {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
   direction: ltr;
 }
 </style>

@@ -80,7 +80,7 @@ export default {
 
         reader.onload = () => {
           const base64 = reader.result
-          this.msgType = file.type.toLowerCase().split('/')[0]
+          this.msgType = file.type.toLowerCase().split('/')[0] || "application"
           if (this.msgType === "text") {
             this.msgType = "textFile"
           }
@@ -127,7 +127,8 @@ export default {
         if (items[i].type.indexOf('image') !== -1) {
           let blob = items[i].getAsFile()
           this.msgName = blob.name
-          
+          this.msgType = 'image'
+
           let reader = new FileReader()
           reader.onload = (event) => {
             this.toWebpBase64(event.target.result)
@@ -141,7 +142,7 @@ export default {
 
     beforeSending() {
       this.msgPayload = btoa(JSON.stringify({
-        "fileName": this.msgName,
+        "fileName": Array.from(new TextEncoder().encode(this.msgName)), // btoa不支持中文 进行UTF-8编码
         "fileSize": this.fileSize,
         "content": this.msgPayload
       }))
