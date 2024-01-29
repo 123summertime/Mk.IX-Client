@@ -1,7 +1,7 @@
 <template>
   <div :class="messageFrom() ? 'message bySelf' : 'message'" ref="Message">
     <div class="avatar">
-      <img :src="'data:image/png;base64,' + avatar">
+      <img :src="avatar">
     </div>
     <div class="container">
       <div class="upper">
@@ -30,6 +30,9 @@
       @deleteMsg="deleteMsg"
       @forwardMsg="forwardMsg">
     </messageMenu>
+
+
+
   </div>
 </template>
 
@@ -55,7 +58,7 @@ export default {
       content: "",
       nameplate: "",
       formatedTime: "",
-      rightClicked: false
+      rightClicked: false,
     }
   },
 
@@ -103,7 +106,7 @@ export default {
         byteNumbers[i] = bytes.charCodeAt(i)
       }
       const byteArray = new Uint8Array(byteNumbers)
-      const blob = new Blob([byteArray], { type:  fileType})
+      const blob = new Blob([byteArray], { type: fileType })
       return blob
     },
 
@@ -179,7 +182,7 @@ export default {
       ref.left = x + 'px'
       ref.top = y + 'px'
       ref.display = 'block'
-    
+
       // 右键菜单会超出屏幕则向左挪144px 144px是右键菜单的宽度
       if (event.pageX + 144 > window.innerWidth) {
         ref.left = x - 144 + 'px'
@@ -223,7 +226,11 @@ export default {
     },
 
     forwardMsg() {
-
+      this.$emit('forwardMsg', {
+        group: "",
+        type: this.type,
+        payload: this.payload,
+      })
     }
   },
 

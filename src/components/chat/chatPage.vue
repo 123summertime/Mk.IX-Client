@@ -20,7 +20,6 @@
     <splitter @splitter="groupSplitter" class="groupSplitter" ref="groupSplitter"></splitter>
 
     <div class="rightSide">
-
       <div class="header">
         <div class="groupToolBar" v-show="currGroupID">
           <p>{{ currGroupName }}</p>
@@ -37,14 +36,32 @@
             :name="item['name']"
             :active="item['group'] === currGroupID"
             v-show="currGroupID === item['group']"
+            @forwardMsg="forwardMsg"
             class="conversation"></chatItem>
         </div>
         <splitter @splitter="inputSplitter" class="inputSplitter" ref="inputSplitter"></splitter>
         <inputBox :currGroup="currGroupID" class="inputBox" ref="inputBox"></inputBox>
       </div>
       <div class="center" v-show="!currGroupID"></div>
-
     </div>
+
+    <!-- 转发遮罩层 -->
+    <el-dialog v-model="visible" :title="'转发至 ' + forwardTo[1]" width="30%" :show-close=false>
+      <div class="forwardGroups">
+        <div v-for="item in groupList" :key="item['group']" @click="forwardTo = [item['group'], item['name']]"
+          class="forwardGroupItem"
+          :class="{ 'forwardGroupItemSelected': forwardTo[0] === item['group'] }">
+          <img :src="item['avatar']" />
+          <p>{{ item['name'] }}</p>
+        </div>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button type="primary" @click="forwardSend">发送</el-button>
+          <el-button @click="visible = false">取消</el-button>
+        </span>
+      </template>
+    </el-dialog>
 
   </div>
 </template>
@@ -63,11 +80,14 @@ import splitter from './splitter.vue'
 export default {
   data() {
     return {
-      avatar: "data:image/png;base64,",
+      avatar: "",
       uuid: "",
       username: "",
       currGroupID: "",
       currGroupName: "",
+      visible: false,
+      forwardPayload: {},
+      forwardTo: ["", ""],  // 0:group 1:name
       groupList: [], // [{group:String, avatar:String, name:String, owner:Map, admin:Map}]
     }
   },
@@ -155,6 +175,17 @@ export default {
         this.$refs.inputBox.$el.style.height = window.innerHeight - posY + "px"
         localStorage.setItem('inputTop', posY)
       }
+    },
+
+    forwardMsg(payload) {
+      this.visible = true
+      this.forwardPayload = payload
+    },
+
+    forwardSend() {
+      this.visible = false
+      this.forwardPayload['group'] = this.forwardTo[0]
+      this.$store.state.wsConnections[this.forwardTo[0]].send(JSON.stringify(this.forwardPayload))
     },
 
     logout() {
@@ -313,6 +344,42 @@ export default {
 
 .inputSplitter:hover {
   cursor: ns-resize;
+}
+
+/* forward layer */
+.forwardGroups {
+  display: flex;
+  flex-direction: column;
+  max-height: 40vh;
+  overflow: scroll;
+}
+
+.forwardGroups::-webkit-scrollbar {
+  display: none;
+}
+
+.forwardGroupItem {
+  display: flex;
+  padding: 8px;
+  border-radius: 16px;
+}
+
+.forwardGroupItemSelected {
+  background-color: lightblue !important; 
+}
+
+.forwardGroupItem:hover {
+  background-color: lightcyan;
+  cursor: pointer;
+}
+
+.forwardGroupItem img {
+  border-radius: 50%;
+}
+
+.forwardGroupItem p {
+  line-height: 48px;
+  margin-left: 24px;
 }
 </style>
 

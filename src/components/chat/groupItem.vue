@@ -1,6 +1,6 @@
 <template>
   <div class="groupInfoRoot" ref="groupInfoRoot">
-    <img class="groupAvatar" :src="'data:image/png;base64,' + avatar">
+    <img class="groupAvatar" :src="avatar">
     <div class="groupInfo">
       <p class="groupName">{{ name }}</p>
       <p class="currMessage">{{ lastMessage }}</p>
@@ -13,11 +13,6 @@
 </template>
 
 <script>
-import Dexie from 'dexie'
-
-import { dbCRUD } from '../../assets/dbCRUD.js'
-import { queryInfo } from '../../assets/queryDB.js'
-
 export default {
   props: {
     avatar: String,

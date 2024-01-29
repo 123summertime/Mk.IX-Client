@@ -24,7 +24,7 @@
           </div>
           <div class="buttons">
             <el-button type="primary" @click="confirmed">确认</el-button>
-            <el-button @click="canceled">取消</el-button>
+            <el-button @click="visible = false">取消</el-button>
           </div>
         </span>
       </template>
@@ -154,9 +154,6 @@ export default {
       this.sending(this.msgType, this.msgPayload)
     },
 
-    canceled() {
-      this.visible = false
-    },
   },
 
   computed: {

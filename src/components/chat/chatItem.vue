@@ -9,7 +9,8 @@
       :payload="msg['payload']"
       :owner="owner"
       :admin="admin"
-      @deleteMsg="deleteMsg"></message>
+      @deleteMsg="deleteMsg"
+      @forwardMsg="forwardMsg"></message>
   </div>
 </template>
 
@@ -78,7 +79,12 @@ export default {
       const idx = this.messageList.findIndex(i => i.time === time)
       this.DB.delete("History", "time", time)
       this.messageList.splice(idx, 1)
+    },
+
+    forwardMsg(payload) {
+      this.$emit('forwardMsg', payload)
     }
+
   },
 
   computed: {
