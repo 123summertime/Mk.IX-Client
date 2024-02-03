@@ -102,7 +102,7 @@ export default {
         const userInfo = await queryInfo("Account", data["lastUpdate"], data["uuid"])
         this.uuid = data["uuid"]
         this.username = data["userName"]
-        this.avatar += userInfo["avatar"]
+        this.avatar = userInfo["avatar"]
         this.$store.dispatch('loginAs', {
           "account": this.uuid,
           "userName": this.username,
@@ -389,7 +389,8 @@ chatPage
   |- groupItem
   |- splitter
   |- inputBox
+  |     |-favorite
   |- chatItem
-        |- message
-              |- messageMenu
+  |     |- message
+  |     |      |- messageMenu
  -->

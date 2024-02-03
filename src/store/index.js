@@ -1,6 +1,19 @@
+import Dexie from 'dexie'
+
+import { dbCRUD } from '../assets/dbCRUD.js'
 import { queryInfo } from '../assets/queryDB.js'
 
 import { createStore } from 'vuex'
+
+
+async function buildOrGetDB(DBname) {
+  const db = new Dexie(DBname)
+  db.version(1).stores({
+    Image: "&time",
+  })
+  return new dbCRUD(db)
+}
+
 
 export default createStore({
   actions: {
@@ -51,6 +64,9 @@ export default createStore({
   state: {
     account: "",
     userName: "",
+    favoriteDB: await buildOrGetDB('Favorite'),
     wsConnections: {},
+    // {groupID}: group新收到的消息
+    // lastMessageOf{group}: group的最后一条消息
   },
 })

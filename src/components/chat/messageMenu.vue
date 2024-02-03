@@ -27,7 +27,7 @@ export default {
 
   methods: {
     addToFavorite() {
-
+      this.$emit('addToFavorite')
     },
 
     copyMsg() {
@@ -41,7 +41,7 @@ export default {
     forwardMsg() {
       this.$emit('forwardMsg')
     }
-  }
+  },
 }
 </script>
 

@@ -1,17 +1,26 @@
 <template>
   <div class="inputBoxRoot">
     <div class="bar">
-      <div>
-        <label class="fileLabel" for="fileUpload">
+      <div class="barItem" title="上传">
+        <label for="fileUpload">
           <FolderAdd class="icon" />
         </label>
         <input type="file" id="fileUpload" @change="fileUpload">
       </div>
-      <el-button class="send" type="primary" @click="sending('text', message)"
-        :disabled="message ? false : true">发送</el-button>
+      <div class="barItem" title="图片" @click="favorite = !favorite">
+        <Picture class="icon"></Picture>
+      </div>
+      <div class="barItem" title="SHIFT+ENTER也可以发送哦" @click="sending('text', message)">
+        <Promotion class="icon" :style="{ color: message ? 'black' : 'gray' }" />
+      </div>
     </div>
-    <textarea v-model=message @keydown="onKeyDown" v-on:paste="pasteImg"></textarea>
 
+    <div class="main">
+      <textarea v-model=message @keydown="onKeyDown" v-on:paste="pasteImg"></textarea>
+      <favorite class="favorite" v-if="favorite" @sendFavoriteImg="sendFavoriteImg"></favorite>
+    </div>
+    
+    
     <!-- 确认遮罩层 -->
     <el-dialog v-model="visible" title="发送确认" width="30%" :show-close=false>
       <img class="previewImg" :src="msgPayload" v-if="msgType === 'image'" />
@@ -23,7 +32,7 @@
             <div class="msgSize">{{ fileSize }}</div>
           </div>
           <div class="buttons">
-            <el-button type="primary" @click="confirmed">确认</el-button>
+            <el-button type="primary" @click="confirmedSending">确认</el-button>
             <el-button @click="visible = false">取消</el-button>
           </div>
         </span>
@@ -34,6 +43,8 @@
 </template>
 
 <script>
+import favorite from './favorite.vue'
+
 export default {
   props: {
     currGroup: String
@@ -47,11 +58,14 @@ export default {
       msgName: "",
       msgPayload: "",
       visible: false,
+      favorite: false,
     }
   },
 
   methods: {
     sending(type, payload) {
+      if (!payload) { return }
+
       this.$store.state.wsConnections[this.currGroup].send(JSON.stringify({
         "group": this.currGroup,
         "type": type,
@@ -140,18 +154,36 @@ export default {
       }
     },
 
-    beforeSending() {
+    encode() {
       this.msgPayload = btoa(JSON.stringify({
         "fileName": Array.from(new TextEncoder().encode(this.msgName)), // btoa不支持中文 进行UTF-8编码
         "fileSize": this.fileSize,
         "content": this.msgPayload
       }))
+    },  
+
+    beforeSending() {
+      this.encode()
       this.visible = true
     },
 
-    confirmed() {
+    confirmedSending() {
       this.visible = false
       this.sending(this.msgType, this.msgPayload)
+    },
+    
+    sendFavoriteImg(img) {
+      this.favorite = false
+      this.msgType = 'image'
+      this.msgPayload = img
+
+      const isWebp = img.substring(0, 30).indexOf('UklGR') >= 0
+      if (!isWebp) {
+        this.toWebpBase64(this.msgPayload)
+      }
+
+      this.encode()
+      this.confirmedSending()
     },
 
   },
@@ -168,16 +200,20 @@ export default {
       }
       return this.msgSize + "B"
     }
+  },
+
+  components: {
+    favorite
   }
 }
 </script>
 
 <style scoped>
 .inputBoxRoot {
-  display: flex;
-  flex-direction: column;
   background-color: lightsalmon;
 }
+
+/* bar */
 
 .bar {
   display: flex;
@@ -190,13 +226,16 @@ input[type="file"] {
   display: none;
 }
 
-.fileLabel {
-  display: block;
+.barItem {
   width: 64px;
   height: 100%;
   cursor: pointer;
-  background-color: #3498db;
+  background-color: transparent;
   color: black;
+}
+
+.barItem label {
+  cursor: pointer;
 }
 
 .icon {
@@ -205,9 +244,18 @@ input[type="file"] {
   margin: 0 auto;
 }
 
-textarea {
+/* main */
+
+.main {
+  position: relative;
   width: 100%;
-  flex-grow: 1;
+  height: calc(100% - 32px);
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  height: 100%;
   padding: 16px;
   font-size: 1.2rem;
   font-family: Microsoft Yahei;
@@ -221,7 +269,15 @@ textarea::-webkit-scrollbar {
   display: none;
 }
 
-/* mask */
+.favorite {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* check layer */
 .previewImg {
   display: block;
   max-width: 100%;

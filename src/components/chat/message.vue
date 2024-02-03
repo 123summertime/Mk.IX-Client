@@ -13,8 +13,8 @@
         <el-image class="payload imgType" v-else-if="type == 'image'" :src="content" :preview-src-list="[content]" />
         <div class="payload fileType" @click="downloading" v-else>
           <div class="fileTypeInnerL">
-            <p> {{ fileName }}</p>
-            <p> {{ fileSize }}</p>
+            <p :title="fileName"> {{ fileName }}</p>
+            <p :title="fileSize"> {{ fileSize }}</p>
           </div>
           <div class="fileTypeInnerR">
             <Folder class="fileTypeIcon" />
@@ -26,6 +26,7 @@
     </div>
     <messageMenu class="contextMenu" ref="ContextMenu"
       :type="type"
+      @addToFavorite="addToFavorite"
       @copyMsg="copyMsg"
       @deleteMsg="deleteMsg"
       @forwardMsg="forwardMsg">
@@ -59,10 +60,15 @@ export default {
       nameplate: "",
       formatedTime: "",
       rightClicked: false,
+      DB: null,
     }
   },
 
   methods: {
+    async getFavoriteDB() {
+      this.DB = await this.$store.state["favoriteDB"]
+    },
+
     messageFrom() {
       return this.uuid === this.$store.state["account"]
     },
@@ -208,6 +214,13 @@ export default {
       window.removeEventListener('contextmenu', this.globalClick)
     },
 
+    addToFavorite() {
+      this.DB.add('Image', {
+        time: Date.now(),
+        payload: this.content
+      })
+    },
+
     copyMsg() {
       const cb = navigator.clipboard
       if (this.type === 'text') {
@@ -227,22 +240,18 @@ export default {
 
     forwardMsg() {
       this.$emit('forwardMsg', {
-        group: "",
         type: this.type,
         payload: this.payload,
       })
     }
   },
 
-  mounted() {
+  async mounted() {
+    await this.getFavoriteDB()
     this.getNameplate()
     this.getContent()
     this.dynamicFontsize()
     this.formatedTime = this.computeMessageTime(this.time)
-  },
-
-  beforeDestroy() {
-    this.globalClick()
   },
 
   components: {

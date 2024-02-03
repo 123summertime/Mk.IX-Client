@@ -49,7 +49,7 @@ export default {
     },
 
     async getHistory() {
-      const history = await this.DB.queryRange('History', this.page * this.step, this.step)
+      const history = await this.DB.queryRange('History', this.page * this.step, this.step, true)
       for (const msg of history) {
         const info = await queryInfo("Account", msg["senderKey"], msg["uuid"])
         const { senderID: _1, senderKey: _2, group: _3, ...message } = { ...info, ...msg }  // 排除某些属性
@@ -59,7 +59,7 @@ export default {
     },
 
     async onScroll() {
-      if (this.$refs.messageView.scrollTop <= 30) {
+      if (this.$refs.messageView.scrollTop <= 50) {
         this.getHistory()
       }
     },
@@ -104,10 +104,13 @@ export default {
           this.putHistory(storage)
 
           if (newVal["uuid"] === this.$store.state["account"]) {
-            this.$nextTick(function () {
-              this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+            this.$nextTick(() => {
+              requestAnimationFrame(() => {
+                this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+              })
             })
           }
+          
         }
       }
     },

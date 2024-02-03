@@ -112,8 +112,8 @@ export default {
 }
 
 .groupAvatar {
-  width: 3rem;
-  height: 3rem;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   margin: auto 0;
 }
