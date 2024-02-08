@@ -60,7 +60,7 @@ export default {
 
     async onScroll() {
       if (this.$refs.messageView.scrollTop <= 50) {
-        this.getHistory()
+        await this.getHistory()
       }
     },
 

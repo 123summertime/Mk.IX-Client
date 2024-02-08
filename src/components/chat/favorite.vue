@@ -1,6 +1,6 @@
 <template>
   <div class="favoriteRoot">
-    <div class="imgsOuter">
+    <div class="imgsOuter" @scroll="onScroll" ref="ImgsOuter">
       <div class="imgs">
         <div class="eachImg" v-for="img, idx in favoriteImgs" :key="img['time']"
           title="左键发送，中键删除，右键移至最前"
@@ -33,6 +33,14 @@ export default {
       let imgs = await this.DB.queryRange('Image', this.page * this.step, this.step, false)
       for (const img of imgs) {
         this.favoriteImgs.push(img)
+      }
+      this.page += 1
+    },
+
+    async onScroll() {
+      const e = this.$refs.ImgsOuter
+      if (e.scrollLeft + e.clientWidth >= e.scrollWidth - 50) {
+        this.getFavoriteImg()
       }
     },
 

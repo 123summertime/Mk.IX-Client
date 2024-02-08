@@ -11,7 +11,7 @@
       <div class="lower" @contextmenu.prevent="onRightClick">
         <p class="payload textType" v-if="type == 'text'">{{ content }}</p>
         <el-image class="payload imgType" v-else-if="type == 'image'" :src="content" :preview-src-list="[content]" />
-        <div class="payload fileType" @click="downloading" v-else>
+        <div class="payload fileType" @click="downloading" ref="fileType" v-else>
           <div class="fileTypeInnerL">
             <p :title="fileName"> {{ fileName }}</p>
             <p :title="fileSize"> {{ fileSize }}</p>
@@ -31,9 +31,6 @@
       @deleteMsg="deleteMsg"
       @forwardMsg="forwardMsg">
     </messageMenu>
-
-
-
   </div>
 </template>
 
@@ -168,7 +165,7 @@ export default {
         temp.innerText = this.fileName.split('.').slice(-1)[0]
         document.body.appendChild(temp)
 
-        while (temp.offsetWidth > 48 || currFontsize == 8) {
+        while (temp.offsetWidth > 48 && currFontsize > 8) {
           currFontsize--
           temp.style.fontSize = currFontsize + 'px'
         }
@@ -342,9 +339,10 @@ export default {
 }
 
 .fileTypeInnerL {
-  width: 192px;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  max-width: 192px;
   justify-content: space-around;
 }
 
@@ -363,12 +361,14 @@ export default {
 
 .fileTypeInnerR p {
   position: absolute;
-  top: 24px;
+  top: 22px;
   left: 8px;
   width: 48px;
-  overflow: hidden;
-  white-space: nowrap;
+  height: 26px;
+  line-height: 26px;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
@@ -387,5 +387,14 @@ export default {
   display: none;
   position: absolute;
   direction: ltr;
+}
+
+@media screen and (max-width: 1000px) {
+  .fileTypeInnerL {
+    max-width: 100%;
+  }
+  .fileTypeInnerR {
+    display: none;
+  }
 }
 </style>

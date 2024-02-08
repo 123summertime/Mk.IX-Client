@@ -28,4 +28,10 @@ img {
 a {
   text-decoration: none;
 }
+
+@media screen and (max-width: 480px) {
+  body {
+    transform: rotateZ(90deg);
+  }
+}
 </style>

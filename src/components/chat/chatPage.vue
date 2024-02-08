@@ -365,7 +365,7 @@ export default {
 }
 
 .forwardGroupItemSelected {
-  background-color: lightblue !important; 
+  background-color: lightblue !important;
 }
 
 .forwardGroupItem:hover {
@@ -380,6 +380,13 @@ export default {
 .forwardGroupItem p {
   line-height: 48px;
   margin-left: 24px;
+}
+
+@media screen and (max-width: 480px) {
+  .chatPageRoot {
+    width: 100vh;
+    height: 100vw;
+  }
 }
 </style>
 

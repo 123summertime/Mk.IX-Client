@@ -1,5 +1,5 @@
 <template>
-  <div class="bkgd">
+  <div class="loginPageRoot">
     <div class="view">
       <login v-if="option == 0" @option="changeOption"></login>
       <register v-else @option="changeOption"></register>
@@ -54,7 +54,7 @@ export default {
 </script>
 
 <style scoped>
-.bkgd {
+.loginPageRoot {
   position: relative;
   width: 100vw;
   height: 100vh;
@@ -104,8 +104,10 @@ export default {
   --bkgdItem-size: 19vw;
 }
 
-.yuanshen {
-  width: 20px;
-  height: 20px;
+@media screen and (max-width: 480px) {
+  .loginPageRoot {
+    width: 100vh;
+    height: 100vw;
+  }
 }
 </style>
