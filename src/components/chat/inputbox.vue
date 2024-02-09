@@ -10,7 +10,7 @@
       <div class="barItem" title="图片" @click="favorite = !favorite">
         <Picture class="icon"></Picture>
       </div>
-      <div class="barItem" title="SHIFT+ENTER也可以发送哦" @click="sending('text', message)">
+      <div class="barItem" title="发送(Shift+Enter)" @click="sending('text', message)">
         <Promotion class="icon" :style="{ color: message ? 'black' : 'gray' }" />
       </div>
     </div>

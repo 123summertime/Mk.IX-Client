@@ -12,9 +12,13 @@
       <Delete></Delete>
       <p>删除</p>
     </div>
-    <div @click="forwardMsg">
+    <div @click="forwardMsg" v-if="!['revoke'].includes(type)">
       <Share></Share>
       <p>转发</p>
+    </div>
+    <div @click="revokeMsg" v-if="!['revoke'].includes(type) && checkPermissions">
+      <CircleClose></CircleClose>
+      <p>撤回</p>
     </div>
   </div>
 </template>
@@ -22,7 +26,10 @@
 <script>
 export default {
   props: {
-    type: String
+    type: String,
+    uuid: String,
+    owner: Object,
+    admin: Map,
   },
 
   methods: {
@@ -40,8 +47,32 @@ export default {
 
     forwardMsg() {
       this.$emit('forwardMsg')
+    },
+
+    revokeMsg() {
+      this.$emit('revokeMsg')
     }
   },
+
+  computed: {
+    checkPermissions() {
+      const account = this.$store.state["account"]
+
+      // 自己发的
+      if (this.uuid === account) {
+        return true
+      }
+      // 群主
+      if (this.owner.has(account)) {
+        return true
+      }
+      // 管理员 但不能是群主发的
+      if (this.admin.has(account) && !this.owner.has(this.uuid)) {
+        return true
+      }
+      return false
+    }
+  }
 }
 </script>
 

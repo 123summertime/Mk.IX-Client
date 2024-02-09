@@ -1,36 +1,53 @@
 <template>
-  <div :class="messageFrom() ? 'message bySelf' : 'message'" ref="Message">
-    <div class="avatar">
-      <img :src="avatar">
+  <div class="messageRoot" ref="MessageRoot">
+
+    <div v-if="['revoke'].includes(type)" @contextmenu.prevent="onRightClick">
+      <!-- 广播信息 -->
+      <p class="payload broadcastType">{{ content }}</p>
     </div>
-    <div class="container">
-      <div class="upper">
-        <p class="nameplate" ref="Nameplate">{{ nameplate }}</p>
-        <p class="userName">{{ userName }}</p>
+
+    <div :class="messageFrom() ? 'message bySelf' : 'message'" v-else>
+      <div class="avatar">
+        <img :src="avatar">
       </div>
-      <div class="lower" @contextmenu.prevent="onRightClick">
-        <p class="payload textType" v-if="type == 'text'">{{ content }}</p>
-        <el-image class="payload imgType" v-else-if="type == 'image'" :src="content" :preview-src-list="[content]" />
-        <div class="payload fileType" @click="downloading" ref="fileType" v-else>
-          <div class="fileTypeInnerL">
-            <p :title="fileName"> {{ fileName }}</p>
-            <p :title="fileSize"> {{ fileSize }}</p>
-          </div>
-          <div class="fileTypeInnerR">
-            <Folder class="fileTypeIcon" />
-            <p ref="IconText">{{ fileName.split('.').slice(-1)[0] }}</p>
-          </div>
+      <div class="container">
+        <div class="upper">
+          <p class="nameplate" ref="Nameplate">{{ nameplate }}</p>
+          <p class="userName">{{ userName }}</p>
         </div>
-        <p class="time">{{ formatedTime }}</p>
+        <div class="lower" @contextmenu.prevent="onRightClick">
+          <!-- 文字信息 -->
+          <p class="payload textType" v-if="type == 'text'">{{ content }}</p>
+          <!-- 图片信息 -->
+          <el-image class="payload imgType" v-else-if="type == 'image'" :src="content" :preview-src-list="[content]" />
+          <!-- 文件信息 -->
+          <div class="payload fileType" @click="downloading" ref="fileType" v-else>
+            <div class="fileTypeInnerL">
+              <p :title="fileName"> {{ fileName }}</p>
+              <p :title="fileSize"> {{ fileSize }}</p>
+            </div>
+            <div class="fileTypeInnerR">
+              <Folder class="fileTypeIcon" />
+              <p ref="IconText">{{ fileName.split('.').slice(-1)[0] }}</p>
+            </div>
+          </div>
+          <p class="time">{{ formatedTime }}</p>
+        </div>
       </div>
     </div>
+
     <messageMenu class="contextMenu" ref="ContextMenu"
       :type="type"
+      :uuid="uuid"
+      :owner="owner"
+      :admin="admin"
       @addToFavorite="addToFavorite"
       @copyMsg="copyMsg"
       @deleteMsg="deleteMsg"
-      @forwardMsg="forwardMsg">
+      @forwardMsg="forwardMsg"
+      @revokeMsg="revokeMsg">
     </messageMenu>
+
   </div>
 </template>
 
@@ -71,6 +88,9 @@ export default {
     },
 
     getNameplate() {
+      // 排除没有Nameplate的消息类型
+      if (['revoke'].includes(this.type)) { return }
+
       if (this.owner.has(this.uuid)) {
         this.$refs.Nameplate.style.backgroundColor = "gold"
         this.nameplate = "群主"
@@ -84,9 +104,10 @@ export default {
       this.$refs.Nameplate.style.display = "none"
     },
 
-    // 文本类型:payload就是信息内容 文件类型:payload是包含文件名(UTF-8),文件大小和文件内容的base64字符串
+    // 文本类型:payload就是信息内容
+    // 文件类型:payload是包含文件名(UTF-8),文件大小和文件内容的base64字符串
     getContent() {
-      if (this.type === "text") {
+      if (["text", "revoke"].includes(this.type)) {
         this.content = this.payload
       } else {
         try {
@@ -158,25 +179,25 @@ export default {
     },
 
     dynamicFontsize() {
-      if (this.$refs.IconText) {
-        let currFontsize = 16
-        const temp = document.createElement('span')
+      if (!this.$refs.IconText) { return }
+
+      let currFontsize = 16
+      const temp = document.createElement('span')
+      temp.style.fontSize = currFontsize + 'px'
+      temp.innerText = this.fileName.split('.').slice(-1)[0]
+      document.body.appendChild(temp)
+
+      while (temp.offsetWidth > 48 && currFontsize > 8) {
+        currFontsize--
         temp.style.fontSize = currFontsize + 'px'
-        temp.innerText = this.fileName.split('.').slice(-1)[0]
-        document.body.appendChild(temp)
-
-        while (temp.offsetWidth > 48 && currFontsize > 8) {
-          currFontsize--
-          temp.style.fontSize = currFontsize + 'px'
-        }
-
-        this.$refs.IconText.style.fontSize = currFontsize + 'px'
-        document.body.removeChild(temp)
       }
+
+      this.$refs.IconText.style.fontSize = currFontsize + 'px'
+      document.body.removeChild(temp)
     },
 
     onRightClick(event) {
-      const rect = this.$refs.Message.getBoundingClientRect()
+      const rect = this.$refs.MessageRoot.getBoundingClientRect()
       const ref = this.$refs.ContextMenu.$el.style
 
       const x = event.pageX - rect.left
@@ -240,6 +261,18 @@ export default {
         type: this.type,
         payload: this.payload,
       })
+    },
+
+    revokeMsg() {
+      this.$emit('revokeMsg', this.time)
+    }
+  },
+
+  watch: {
+    payload: {
+      handler() {
+        this.getContent()
+      }
     }
   },
 
@@ -259,6 +292,10 @@ export default {
 </script>
 
 <style scoped>
+.messageRoot {
+  position: relative;
+}
+
 .avatar img {
   display: inline-block;
   width: 48px;
@@ -268,7 +305,6 @@ export default {
 }
 
 .message {
-  position: relative;
   display: flex;
   margin-bottom: 24px;
 }
@@ -377,6 +413,13 @@ export default {
   height: 100%;
 }
 
+.broadcastType {
+  max-width: calc(100% - 112px);
+  margin: 0 auto;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
 .time {
   font-size: 0.75rem;
   margin: 0 8px;
@@ -393,6 +436,7 @@ export default {
   .fileTypeInnerL {
     max-width: 100%;
   }
+
   .fileTypeInnerR {
     display: none;
   }

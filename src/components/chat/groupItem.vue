@@ -61,7 +61,7 @@ export default {
     },
 
     cvtPayload(type, payload) {
-      if (type === "text") {
+      if (["text", "revoke"].includes(type)) {
         return payload
       }
       if (type === "image") {

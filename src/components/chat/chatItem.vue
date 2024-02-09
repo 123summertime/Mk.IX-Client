@@ -10,7 +10,8 @@
       :owner="owner"
       :admin="admin"
       @deleteMsg="deleteMsg"
-      @forwardMsg="forwardMsg"></message>
+      @forwardMsg="forwardMsg"
+      @revokeMsg="revokeMsg"></message>
   </div>
 </template>
 
@@ -83,6 +84,14 @@ export default {
 
     forwardMsg(payload) {
       this.$emit('forwardMsg', payload)
+    },
+
+    revokeMsg(time) {
+      this.$store.state.wsConnections[this.group].send(JSON.stringify({
+        "group": this.group,
+        "type": 'revoke',
+        "payload": time,
+      }))
     }
 
   },
@@ -97,13 +106,31 @@ export default {
     newMessage: {
       async handler(newVal) {
         if (newVal) {
+          if (newVal['type'] === 'revoke') {
+            const revokeID = newVal['payload']
+            const revokeMsg = await this.DB.query('History', {"time": revokeID})
+            const revokePayload = `${newVal['userName']} 撤回了一条${revokeMsg['uuid'] === newVal['uuid'] ? '' : '成员'}消息`
+
+            revokeMsg['type'] = 'revoke'
+            revokeMsg['payload'] = revokePayload
+            await this.DB.update('History', revokeMsg)
+
+            const idx = this.messageList.findIndex(i => i.time === revokeID)
+            if (idx != -1) {
+              this.messageList[idx]['type'] = 'revoke'
+              this.messageList[idx]['payload'] = revokePayload
+            }
+            return
+          }
+
           // 排除某些属性
           const { senderID: _1, senderKey: _2, group: _3, ...message } = newVal
           const { avatar: _a, userName: _b, group: _c, senderID: _d, ...storage } = newVal
+
           this.messageList.push(message)
           this.putHistory(storage)
 
-          if (newVal["uuid"] === this.$store.state["account"]) {
+          if (newVal["uuid"] === this.$store.state["account"] && newVal['type'] != 'revoke') {
             this.$nextTick(() => {
               requestAnimationFrame(() => {
                 this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
