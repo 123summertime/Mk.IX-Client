@@ -42,7 +42,7 @@ export default {
 
   methods: {
     async buildOrGetDB() {
-      const db = new Dexie(this.group)
+      const db = new Dexie(this.$store.state['account'] + '-' + this.group)
       db.version(1).stores({
         History: "&time",
       })
@@ -92,7 +92,7 @@ export default {
         "type": 'revoke',
         "payload": time,
       }))
-    }
+    },
 
   },
 
@@ -106,9 +106,11 @@ export default {
     newMessage: {
       async handler(newVal) {
         if (newVal) {
+          localStorage.setItem('lastMessage', newVal["time"])
+
           if (newVal['type'] === 'revoke') {
             const revokeID = newVal['payload']
-            const revokeMsg = await this.DB.query('History', {"time": revokeID})
+            const revokeMsg = await this.DB.query('History', { "time": revokeID })
             const revokePayload = `${newVal['userName']} 撤回了一条${revokeMsg['uuid'] === newVal['uuid'] ? '' : '成员'}消息`
 
             revokeMsg['type'] = 'revoke'
@@ -137,7 +139,7 @@ export default {
               })
             })
           }
-          
+
         }
       }
     },

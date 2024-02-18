@@ -5,9 +5,8 @@ import { queryInfo } from '../assets/queryDB.js'
 
 import { createStore } from 'vuex'
 
-
-async function buildOrGetDB(DBname) {
-  const db = new Dexie(DBname)
+async function favoriteDB() {
+  const db = new Dexie('Favorite')
   db.version(1).stores({
     Image: "&time",
   })
@@ -18,7 +17,10 @@ async function buildOrGetDB(DBname) {
 export default createStore({
   actions: {
     async wsConnect(context, info) {
-      const URL = `ws://${localStorage.getItem('adress')}/ws?userID=${info["uuid"]}&groupID=${info["groupID"]}&token=${localStorage.getItem('token')}`
+      const adress = localStorage.getItem('adress')
+      const lastMessage = localStorage.getItem('lastMessage') || "0"
+      const token = localStorage.getItem('token')
+      const URL = `ws://${adress}/ws?userID=${info["uuid"]}&groupID=${info["groupID"]}&lastMessage=${lastMessage}&token=${token}`
       const ws = new WebSocket(URL)
 
       context.commit('newConnection', {
@@ -41,7 +43,7 @@ export default createStore({
 
     lastMessage(context, info) {
       context.commit('lastMessage', info)
-    }
+    },
   },
 
   mutations: {
@@ -49,22 +51,25 @@ export default createStore({
       state.wsConnections[connect["groupID"]] = connect["ws"]
       state[connect["groupID"]] = ""
     },
+
     getNewMessage(state, payload) {
       state[payload["groupID"]] = payload["payload"]
     },
+
     loginAs(state, info) {
       state["account"] = info["account"]
       state["userName"] = info["userName"]
     },
+
     lastMessage(state, info) {
       state[`lastMessageOf${info["group"]}`] = info["payload"]
-    }
+    },
   },
 
   state: {
     account: "",
     userName: "",
-    favoriteDB: await buildOrGetDB('Favorite'),
+    favoriteDB: await favoriteDB(),
     wsConnections: {},
     // {groupID}: group新收到的消息
     // lastMessageOf{group}: group的最后一条消息
