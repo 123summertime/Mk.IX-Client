@@ -106,8 +106,6 @@ export default {
     newMessage: {
       async handler(newVal) {
         if (newVal) {
-          localStorage.setItem('lastMessage', newVal["time"])
-
           if (newVal['type'] === 'revoke') {
             const revokeID = newVal['payload']
             const revokeMsg = await this.DB.query('History', { "time": revokeID })

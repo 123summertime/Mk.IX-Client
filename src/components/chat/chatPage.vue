@@ -23,6 +23,7 @@
       <div class="header">
         <div class="groupToolBar" v-show="currGroupID">
           <p>{{ currGroupName }}</p>
+          <MoreFilled></MoreFilled>
         </div>
       </div>
 
@@ -280,6 +281,8 @@ export default {
 }
 
 .groupToolBar {
+  display: flex;
+  justify-content: space-between;
   width: 100%;
   height: 48px;
 }
@@ -287,6 +290,12 @@ export default {
 .groupToolBar p {
   font-size: 1.2rem;
   line-height: 48px;
+}
+
+.groupToolBar svg {
+  height: 32px;
+  margin: 8px 0;
+  cursor: pointer;
 }
 
 .center {

@@ -18,9 +18,8 @@ export default createStore({
   actions: {
     async wsConnect(context, info) {
       const adress = localStorage.getItem('adress')
-      const lastMessage = localStorage.getItem('lastMessage') || "0"
       const token = localStorage.getItem('token')
-      const URL = `ws://${adress}/ws?userID=${info["uuid"]}&groupID=${info["groupID"]}&lastMessage=${lastMessage}&token=${token}`
+      const URL = `ws://${adress}/ws?userID=${info["uuid"]}&groupID=${info["groupID"]}&token=${token}`
       const ws = new WebSocket(URL)
 
       context.commit('newConnection', {
@@ -29,6 +28,13 @@ export default createStore({
       })
       ws.onmessage = async function (event) {
         const data = JSON.parse(event["data"])
+        
+        // Error
+        if (data['group'] === '-1') {
+          ElMessage.error(data['payload'])
+          return
+        }
+
         const fullData = await queryInfo("Account", data["senderKey"], data["senderID"])
         context.commit('getNewMessage', {
           "groupID": data["group"],
@@ -71,7 +77,7 @@ export default createStore({
     userName: "",
     favoriteDB: await favoriteDB(),
     wsConnections: {},
-    // {groupID}: group新收到的消息
+    // {group}: group新收到的消息
     // lastMessageOf{group}: group的最后一条消息
   },
 })

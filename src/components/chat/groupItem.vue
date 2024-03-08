@@ -86,6 +86,7 @@ export default {
 
   watch: {
     getLastMessage: {
+      deep: true,
       handler(newVal) {
         if (newVal) {
           this.computeInfo(newVal)
