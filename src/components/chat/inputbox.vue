@@ -23,7 +23,7 @@
     
     <!-- 确认遮罩层 -->
     <el-dialog v-model="visible" title="发送确认" width="30%" :show-close=false>
-      <img class="previewImg" :src="msgPayload" v-if="msgType === 'image'" />
+      <img class="previewImg" :src="msgPayload" v-if="msgType === 'image'" ref="preview" />
       <p class="previewFile" v-else>{{ msgName.split(".").slice(-1)[0] + "文件" }}</p>
       <template #footer>
         <span class="footer">
@@ -33,7 +33,7 @@
           </div>
           <div class="buttons">
             <el-button type="primary" @click="confirmedSending">确认</el-button>
-            <el-button @click="visible = false">取消</el-button>
+            <el-button @click="canceledSending">取消</el-button>
           </div>
         </span>
       </template>
@@ -95,11 +95,11 @@ export default {
         reader.onload = () => {
           const base64 = reader.result
           this.msgType = file.type.toLowerCase().split('/')[0] || "application"
+
           if (this.msgType === "text") {
             this.msgType = "textFile"
-          }
-
-          if (this.msgType === "image") {
+          } else if (this.msgType === "image") {
+            this.msgSize = file.size
             this.toWebpBase64(base64)
             this.beforeSending()
           } else {
@@ -113,8 +113,13 @@ export default {
     },
 
     toWebpBase64(base64) {
-      let img = new Image();
-      img.src = base64;
+      if (base64.includes('data:image/gif') || base64.includes('data:image/webp')) {
+        this.msgPayload = base64
+        return
+      }
+
+      let img = new Image()
+      img.src = base64
 
       img.onload = () => {
         let canvas = document.createElement('canvas')
@@ -155,7 +160,7 @@ export default {
     },
 
     encode() {
-      this.msgPayload = btoa(JSON.stringify({
+      this.sendingPayload = btoa(JSON.stringify({
         "fileName": Array.from(new TextEncoder().encode(this.msgName)), // btoa不支持中文 进行UTF-8编码
         "fileSize": this.fileSize,
         "content": this.msgPayload
@@ -169,7 +174,11 @@ export default {
 
     confirmedSending() {
       this.visible = false
-      this.sending(this.msgType, this.msgPayload)
+      this.sending(this.msgType, this.sendingPayload)
+    },
+
+    canceledSending() {
+      this.visible = false
     },
     
     sendFavoriteImg(img) {
@@ -199,7 +208,8 @@ export default {
         return (this.msgSize / kb).toFixed(2) + "KB"
       }
       return this.msgSize + "B"
-    }
+    },
+
   },
 
   components: {

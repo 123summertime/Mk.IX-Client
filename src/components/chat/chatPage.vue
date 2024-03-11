@@ -23,7 +23,12 @@
       <div class="header">
         <div class="groupToolBar" v-show="currGroupID">
           <p>{{ currGroupName }}</p>
-          <MoreFilled></MoreFilled>
+          <MoreFilled @click="drawer = true"></MoreFilled>
+          <el-drawer v-model="drawer" title="I am the title" :with-header="false">
+            <groupConfig
+              :group="currGroupID"
+              :info="groupList.find(item => item.group === currGroupID)"></groupConfig>
+          </el-drawer>
         </div>
       </div>
 
@@ -77,6 +82,7 @@ import groupItem from './groupItem.vue'
 import chatItem from './chatItem.vue'
 import inputBox from './inputbox.vue'
 import splitter from './splitter.vue'
+import groupConfig from './groupConfig.vue'
 
 export default {
   data() {
@@ -87,6 +93,7 @@ export default {
       currGroupID: "",
       currGroupName: "",
       visible: false,
+      drawer: false,
       forwardPayload: {},
       forwardTo: ["", ""],  // 0:group 1:name
       groupList: [], // [{group:String, avatar:String, name:String, owner:Map, admin:Map}]
@@ -205,6 +212,7 @@ export default {
     chatItem,
     inputBox,
     splitter,
+    groupConfig,
   }
 }
 </script>
@@ -403,6 +411,7 @@ export default {
 <!-- 
 chatPage
   |- groupItem
+  |- groupConfig
   |- splitter
   |- inputBox
   |     |-favorite
