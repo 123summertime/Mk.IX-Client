@@ -22,12 +22,15 @@ export const queryInfo = async function (table, lastUpdate, uuid) {
       const URL = `http://${localStorage.getItem('adress')}/getUserInfo?uuid=${uuid}`
       const res = await axios.get(URL)
       const data = res["data"]
+      
       infoDB.update("Account", {
         "time": data["lastUpdate"],
         "uuid": uuid,
         "userName": data["userName"],
         "avatar": data["avatar"]
       })
+      
+      data["uuid"] = uuid
       return data
     }
 
@@ -35,12 +38,15 @@ export const queryInfo = async function (table, lastUpdate, uuid) {
       const URL = `http://${localStorage.getItem('adress')}/getGroupInfo?group=${uuid}`
       const res = await axios.get(URL)
       const data = res["data"]
+
       infoDB.update("Group", {
         "time": data["lastUpdate"],
         "group": uuid,
         "name": data["name"],
         "avatar": data["avatar"]
       })
+      
+      data["group"] = uuid
       return data
     }
   } catch (err) {

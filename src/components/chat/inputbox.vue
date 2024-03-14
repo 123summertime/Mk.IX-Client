@@ -23,13 +23,13 @@
     
     <!-- 确认遮罩层 -->
     <el-dialog v-model="visible" title="发送确认" width="30%" :show-close=false>
-      <img class="previewImg" :src="msgPayload" v-if="msgType === 'image'" ref="preview" />
+      <img class="previewImg" :src="msgPayload" v-if="msgType === 'image'" />
       <p class="previewFile" v-else>{{ msgName.split(".").slice(-1)[0] + "文件" }}</p>
       <template #footer>
         <span class="footer">
           <div class="fileInfo">
-            <div class="msgName">{{ msgName }}</div>
-            <div class="msgSize">{{ fileSize }}</div>
+            <div class="msgName" :title="msgName">{{ msgName }}</div>
+            <div class="msgSize" :title="fileSize">{{ fileSize }}</div>
           </div>
           <div class="buttons">
             <el-button type="primary" @click="confirmedSending">确认</el-button>

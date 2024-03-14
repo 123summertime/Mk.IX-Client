@@ -24,10 +24,12 @@
         <div class="groupToolBar" v-show="currGroupID">
           <p>{{ currGroupName }}</p>
           <MoreFilled @click="drawer = true"></MoreFilled>
-          <el-drawer v-model="drawer" title="I am the title" :with-header="false">
+          <el-drawer v-model="drawer" :with-header="false" :destroy-on-close="true" style="min-width: 400px;">
             <groupConfig
               :group="currGroupID"
-              :info="groupList.find(item => item.group === currGroupID)"></groupConfig>
+              :info="groupList.find(item => item.group === currGroupID)"
+              @groupNameModified="groupNameModified"
+              @groupAvatarModified="groupAvatarModified"></groupConfig>
           </el-drawer>
         </div>
       </div>
@@ -52,7 +54,7 @@
     </div>
 
     <!-- 转发遮罩层 -->
-    <el-dialog v-model="visible" :title="'转发至 ' + forwardTo[1]" width="30%" :show-close=false>
+    <el-dialog v-model="visible" :title="'转发至 ' + forwardTo[1]" width="540px" :show-close=false>
       <div class="forwardGroups">
         <div v-for="item in groupList" :key="item['group']" @click="forwardTo = [item['group'], item['name']]"
           class="forwardGroupItem"
@@ -183,6 +185,28 @@ export default {
         this.$refs.inputBox.$el.style.height = window.innerHeight - posY + "px"
         localStorage.setItem('inputTop', posY)
       }
+    },
+
+    groupNameModified(info) {
+      if (this.currGroupID === info['group']) {
+        this.currGroupName = info['name']
+      }
+
+      this.groupList = this.groupList.map(item => {
+        if (item.group === info['group']) {
+          return { ...item, name: info['name'] }
+        }
+        return item
+      })
+    },
+
+    groupAvatarModified(info) {
+      this.groupList = this.groupList.map(item => {
+        if (item.group === info['group']) {
+          return { ...item, avatar: info['avatar'] }
+        }
+        return item
+      })
     },
 
     forwardMsg(payload) {
