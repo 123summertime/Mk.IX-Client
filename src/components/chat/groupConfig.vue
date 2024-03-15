@@ -3,7 +3,7 @@
     <ul>
       <li>
         <p>群头像</p>
-        <img class="groupAvatar" :src="info['avatar']" @click="beforeModifyAvatar" />
+        <img class="groupAvatar" :src="info['avatar']" title="点击修改头像" @click="beforeModifyAvatar" />
       </li>
       <li>
         <p>群名称</p>
@@ -15,9 +15,24 @@
         <p>群ID</p>
         <p>{{ info['group'] }}</p>
       </li>
+      <li>
+        <p>群成员</p>
+        <div class="members" title="点击查看详细信息">
+          <p @click="membersVisible = true">{{ membersInfo.length + "人" }}</p>
+        </div>
+      </li>
+      <li>
+        <p>置顶</p>
+        <p></p>
+      </li>
+      <li>
+        <p>退出</p>
+        <p></p>
+      </li>
     </ul>
   </div>
 
+  <!-- 修改群头像 -->
   <el-dialog v-model="visible" width="540px">
     <ImgCutter class="imgCutter"
       :isModal="false"
@@ -26,11 +41,45 @@
       rate="1:1"
       @cutDown="groupAvatarModified"></ImgCutter>
   </el-dialog>
+
+  <!-- 群成员信息 -->
+  <el-dialog v-model="membersVisible" width="540px">
+    <div>
+      <ul>
+        <li>
+          <p>群主</p>
+        </li>
+        <li>
+          <eachMember :pair="getOwner"></eachMember>
+        </li>
+
+        <li>
+          <p>管理员</p>
+        </li>
+        <li>
+          <eachMember v-for="pair in getAdmin" 
+          :key="pair[0]"
+          :pair="pair"></eachMember>
+        </li>
+
+        <li>
+          <p>成员</p>
+        </li>
+        <li>
+          <eachMember v-for="pair in getUser" 
+          :key="pair[0]"
+          :pair="pair"></eachMember>
+        </li>
+      </ul>
+    </div>
+  </el-dialog>
 </template>
 
 <script>
 import axios from 'axios'
 import ImgCutter from 'vue-img-cutter'
+
+import eachMember from './eachMember.vue'
 
 export default {
   emits: ['groupNameModified', 'groupAvatarModified'],
@@ -43,7 +92,9 @@ export default {
   data() {
     return {
       groupName: this.info['name'],
-      visible: false
+      visible: false,
+      membersVisible: false,
+      membersInfo: [],
     }
   },
 
@@ -88,18 +139,53 @@ export default {
           type: "error",
         })
       })
-    }
+    },
+
+    getMembersInfo() {
+      const URL = `http://${localStorage.getItem('adress')}/getMembersInfo?group=${this.group}`
+      axios.get(URL).then(res => {
+        this.membersInfo = res["data"]["users"]
+      }).catch(err => {
+        console.log(err)
+      })
+    },
   },
 
   computed: {
     checkPermissions() {
       const account = this.$store.state["account"]
       return this.info['owner'].has(account) || this.info['admin'].has(account)
+    },
+
+    getOwner() {
+      return Array.from(this.info['owner'].entries())[0]
+    },
+
+    getAdmin() {
+      return Array.from(this.info['admin'].entries())
+    },
+
+    getUser() {
+      let owner = this.info['owner']
+      let admin = this.info['admin']
+      let users = []
+      this.membersInfo.forEach((pair) => {
+        let uuid = pair["uuid"]
+        if (!owner.has(uuid) && !admin.has(uuid)) {
+          users.push([pair["uuid"], pair["lastUpdate"]])
+        }
+      })
+      return users
     }
   },
 
+  mounted() {
+    this.getMembersInfo()
+  },
+
   components: {
-    ImgCutter
+    ImgCutter,
+    eachMember,
   }
 }
 </script>
@@ -156,7 +242,12 @@ ul li:nth-of-type(1) {
   opacity: 1;
 }
 
-.imgCutter {
-  width: 100%;
+.members {
+  width: 33%;
+  cursor: pointer;
+}
+
+.members p {
+  text-align: right;
 }
 </style>

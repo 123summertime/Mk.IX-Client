@@ -24,7 +24,7 @@
         <div class="groupToolBar" v-show="currGroupID">
           <p>{{ currGroupName }}</p>
           <MoreFilled @click="drawer = true"></MoreFilled>
-          <el-drawer v-model="drawer" :with-header="false" :destroy-on-close="true" style="min-width: 400px;">
+          <el-drawer v-model="drawer" :with-header="false" style="min-width: 400px;">
             <groupConfig
               :group="currGroupID"
               :info="groupList.find(item => item.group === currGroupID)"
@@ -435,8 +435,9 @@ export default {
 <!-- 
 chatPage
   |- groupItem
-  |- groupConfig
   |- splitter
+  |- groupConfig
+  |     |- eachMember
   |- inputBox
   |     |-favorite
   |- chatItem
