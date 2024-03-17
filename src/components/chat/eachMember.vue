@@ -1,15 +1,113 @@
 <template>
-  <div>
-    <p>{{ pair }}</p>
+  <div class="eachMemberRoot">
+    <div class="info">
+      <img :src="avatar" />
+      <p :class="role">{{ userName }}</p>
+    </div>
+    <div class="oper">
+      <div v-if="getManagePermission" :title="role === 'user' ? '添加管理员' : '移除管理员'">
+        <CirclePlus v-if="role === 'user'"></CirclePlus>
+        <Remove v-else-if="role === 'admin'"></Remove>
+      </div>
+      <div v-if="getRemovePermission" title="移除群聊">
+        <Close></Close>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import { queryInfo } from '../../assets/queryDB.js'
+
 export default {
   props: {
-    pair: Array
+    pair: Array,
+    role: String,
+    permission: String,
+  },
+
+  data() {
+    return {
+      uuid: "",
+      avatar: "",
+      userName: "",
+    }
+  },
+
+  methods: {
+    async getFullData() {
+      const info = await queryInfo('Account', this.pair[1], this.pair[0])
+      this.uuid = info["uuid"]
+      this.avatar = info["avatar"]
+      this.userName = info["userName"]
+    }
+  },
+
+  computed: {
+    getManagePermission() {
+      return this.permission === 'owner' && this.role != 'owner'
+    },
+
+    getRemovePermission() {
+      return (this.permission === 'owner' && this.role != 'owner') || (this.permission === 'admin' && this.role === 'user')
+    }
+  },
+
+  async mounted() {
+    await this.getFullData()
   }
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.eachMemberRoot {
+  display: flex;
+  height: 64px;
+  padding: 8px;
+  border-radius: 16px;
+  justify-content: space-between;
+}
+
+.eachMemberRoot:hover {
+  background-color: lightsalmon;
+}
+
+.info {
+  display: flex;
+}
+
+.info img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.info p {
+  line-height: 48px;
+  margin-left: 16px;
+}
+
+.owner {
+  color: gold;
+}
+
+.admin {
+  color: aqua;
+}
+
+.oper {
+  display: flex;
+}
+
+.oper div {
+  width: 24px;
+  height: 24px;
+  margin: auto 8px;
+  cursor: pointer;
+}
+
+.oper div svg {
+  width: 100%;
+  height: 100%;
+}
+</style>

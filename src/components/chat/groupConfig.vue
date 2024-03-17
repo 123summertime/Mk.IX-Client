@@ -1,6 +1,6 @@
 <template>
   <div class="groupConfigRoot">
-    <ul>
+    <ul class="groupItems">
       <li>
         <p>群头像</p>
         <img class="groupAvatar" :src="info['avatar']" title="点击修改头像" @click="beforeModifyAvatar" />
@@ -43,35 +43,45 @@
   </el-dialog>
 
   <!-- 群成员信息 -->
-  <el-dialog v-model="membersVisible" width="540px">
-    <div>
-      <ul>
-        <li>
-          <p>群主</p>
-        </li>
-        <li>
-          <eachMember :pair="getOwner"></eachMember>
-        </li>
+  <el-dialog v-model="membersVisible"
+    class="memberInfo"
+    width="540px"
+    :title="`${this.info['name']}(${this.membersInfo.length})`"
+    style="max-height: 70vh; overflow-y: auto;">
+    <ul class="list">
+      <li>
+        <p>群主</p>
+      </li>
+      <li>
+        <eachMember 
+        :pair="getOwner" 
+        :role="'owner'"
+        :permission="getRole"
+        ></eachMember>
+      </li>
 
-        <li>
-          <p>管理员</p>
-        </li>
-        <li>
-          <eachMember v-for="pair in getAdmin" 
+      <li>
+        <p>管理员</p>
+      </li>
+      <li>
+        <eachMember v-for="pair in getAdmin"
           :key="pair[0]"
-          :pair="pair"></eachMember>
-        </li>
+          :pair="pair"
+          :role="'admin'"
+          :permission="getRole"></eachMember>
+      </li>
 
-        <li>
-          <p>成员</p>
-        </li>
-        <li>
-          <eachMember v-for="pair in getUser" 
+      <li>
+        <p>成员</p>
+      </li>
+      <li>
+        <eachMember v-for="pair in getUser"
           :key="pair[0]"
-          :pair="pair"></eachMember>
-        </li>
-      </ul>
-    </div>
+          :pair="pair"
+          :role="'user'"
+          :permission="getRole"></eachMember>
+      </li>
+    </ul>
   </el-dialog>
 </template>
 
@@ -153,8 +163,15 @@ export default {
 
   computed: {
     checkPermissions() {
+      const role = this.getRole
+      return role === 'owner' || role === 'admin'
+    }, 
+
+    getRole() {
       const account = this.$store.state["account"]
-      return this.info['owner'].has(account) || this.info['admin'].has(account)
+      if (this.info['owner'].has(account)) return "owner"
+      if (this.info['admin'].has(account)) return "admin"
+      return "user"
     },
 
     getOwner() {
@@ -191,7 +208,7 @@ export default {
 </script>
 
 <style scoped>
-li {
+.groupItems li {
   display: flex;
   justify-content: space-between;
   height: 48px;
@@ -199,7 +216,7 @@ li {
   line-height: 48px;
 }
 
-ul li:nth-of-type(1) {
+.groupItems li:nth-of-type(1) {
   height: 64px;
   line-height: 64px;
 }
@@ -249,5 +266,29 @@ ul li:nth-of-type(1) {
 
 .members p {
   text-align: right;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.list li {
+  margin: 4px 0;
+}
+
+.list li:nth-of-type(2n - 1) {
+  height: 36px;
+  line-height: 36px;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.list li:nth-of-type(1) {
+  color: gold;
+}
+
+.list li:nth-of-type(3) {
+  color: aqua;
 }
 </style>

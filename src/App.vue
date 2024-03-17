@@ -34,4 +34,15 @@ a {
     transform: rotateZ(90deg);
   }
 }
+
+/* teleport */
+
+.el-overlay-dialog {
+  overflow: hidden;
+}
+
+.memberInfo .el-dialog__body {
+  padding: 20px;
+}
+
 </style>

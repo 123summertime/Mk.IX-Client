@@ -23,7 +23,7 @@
       <div class="header">
         <div class="groupToolBar" v-show="currGroupID">
           <p>{{ currGroupName }}</p>
-          <MoreFilled @click="drawer = true"></MoreFilled>
+          <MoreFilled @click="drawer = !drawer"></MoreFilled>
           <el-drawer v-model="drawer" :with-header="false" style="min-width: 400px;">
             <groupConfig
               :group="currGroupID"
