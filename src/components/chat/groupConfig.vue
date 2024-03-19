@@ -18,7 +18,7 @@
       <li>
         <p>群成员</p>
         <div class="members" title="点击查看详细信息">
-          <p @click="membersVisible = true">{{ membersInfo.length + "人" }}</p>
+          <p @click="membersVisible = true">{{ membersCount + "人" }}</p>
         </div>
       </li>
       <li>
@@ -46,18 +46,18 @@
   <el-dialog v-model="membersVisible"
     class="memberInfo"
     width="540px"
-    :title="`${this.info['name']}(${this.membersInfo.length})`"
+    :title="`${this.info['name']}(${this.membersCount})`"
     style="max-height: 70vh; overflow-y: auto;">
     <ul class="list">
       <li>
         <p>群主</p>
       </li>
       <li>
-        <eachMember 
-        :pair="getOwner" 
-        :role="'owner'"
-        :permission="getRole"
-        ></eachMember>
+        <eachMember
+          :pair="getOwner"
+          :role="'owner'"
+          :group="group"
+          :permission="getRole"></eachMember>
       </li>
 
       <li>
@@ -68,18 +68,24 @@
           :key="pair[0]"
           :pair="pair"
           :role="'admin'"
-          :permission="getRole"></eachMember>
+          :group="group"
+          :permission="getRole"
+          @groupAdminModified="groupAdminModified"
+          @userRemoved="userRemoved"></eachMember>
       </li>
 
       <li>
         <p>成员</p>
       </li>
       <li>
-        <eachMember v-for="pair in getUser"
-          :key="pair[0]"
-          :pair="pair"
+        <eachMember v-for="pair in membersInfo"
+          :key="pair['uuid']"
+          :pair="[pair['uuid'], pair['lastUpdate']]"
           :role="'user'"
-          :permission="getRole"></eachMember>
+          :group="group"
+          :permission="getRole"
+          @groupAdminModified="groupAdminModified"
+          @userRemoved="userRemoved"></eachMember>
       </li>
     </ul>
   </el-dialog>
@@ -92,7 +98,7 @@ import ImgCutter from 'vue-img-cutter'
 import eachMember from './eachMember.vue'
 
 export default {
-  emits: ['groupNameModified', 'groupAvatarModified'],
+  emits: ['groupNameModified', 'groupAvatarModified', 'groupAdminModified', 'userRemoved'],
 
   props: {
     group: String,
@@ -104,6 +110,7 @@ export default {
       groupName: this.info['name'],
       visible: false,
       membersVisible: false,
+      membersCount: 0,
       membersInfo: [],
     }
   },
@@ -154,18 +161,36 @@ export default {
     getMembersInfo() {
       const URL = `http://${localStorage.getItem('adress')}/getMembersInfo?group=${this.group}`
       axios.get(URL).then(res => {
-        this.membersInfo = res["data"]["users"]
+        const users = res["data"]["users"]
+        this.membersCount = users.length
+
+        const owner = this.info['owner']
+        const admin = this.info['admin']
+        this.membersInfo = users.filter(i => !(owner.has(i.uuid) || admin.has(i.uuid)))
       }).catch(err => {
         console.log(err)
       })
     },
+
+    groupAdminModified(info) {
+      const user = this.membersInfo.find(i => i.uuid == info['uuid'])
+      info['lastUpdate'] = user['lastUpdate']
+      this.$emit('groupAdminModified', info)
+    },
+
+    userRemoved(info) {
+      // TODO: 移除管理员时
+      const after = this.membersInfo.filter(i => { i.uuid != info['uuid'] })
+      this.membersInfo = after
+      this.$emit('userRemoved', info)
+    }
   },
 
   computed: {
     checkPermissions() {
       const role = this.getRole
       return role === 'owner' || role === 'admin'
-    }, 
+    },
 
     getRole() {
       const account = this.$store.state["account"]

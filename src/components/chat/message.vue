@@ -12,7 +12,7 @@
       </div>
       <div class="container">
         <div class="upper">
-          <p class="nameplate" ref="Nameplate">{{ nameplate }}</p>
+          <p class="nameplate" ref="Nameplate">{{ getNameplate }}</p>
           <p class="userName">{{ userName }}</p>
         </div>
         <div class="lower" @contextmenu.prevent="onRightClick">
@@ -71,7 +71,6 @@ export default {
       fileName: "",
       fileSize: "",
       content: "",
-      nameplate: "",
       formatedTime: "",
       rightClicked: false,
       DB: null,
@@ -85,23 +84,6 @@ export default {
 
     messageFrom() {
       return this.uuid === this.$store.state["account"]
-    },
-
-    getNameplate() {
-      // 排除没有Nameplate的消息类型
-      if (['revoke'].includes(this.type)) { return }
-
-      if (this.owner.has(this.uuid)) {
-        this.$refs.Nameplate.style.backgroundColor = "gold"
-        this.nameplate = "群主"
-        return
-      }
-      if (this.admin.has(this.uuid)) {
-        this.$refs.Nameplate.style.backgroundColor = "aqua"
-        this.nameplate = "管理员"
-        return
-      }
-      this.$refs.Nameplate.style.display = "none"
     },
 
     // 文本类型:payload就是信息内容
@@ -268,6 +250,34 @@ export default {
     }
   },
 
+  computed: {
+    getNameplate() {
+      // 排除没有Nameplate的消息类型
+      if (['revoke'].includes(this.type)) { return }
+
+      if (this.owner.has(this.uuid)) {
+        this.$nextTick(() => {
+          this.$refs.Nameplate.style.display = "block"
+          this.$refs.Nameplate.style.backgroundColor = "gold"
+        })
+        return "群主"
+      }
+
+      if (this.admin.has(this.uuid)) {
+        this.$nextTick(() => {
+          this.$refs.Nameplate.style.display = "block"
+          this.$refs.Nameplate.style.backgroundColor = "aqua"
+        })
+        return "管理员"
+      }
+      
+      this.$nextTick(() => {
+        this.$refs.Nameplate.style.display = "none"
+      })
+      return ""
+    },
+  },
+
   watch: {
     payload: {
       handler() {
@@ -278,7 +288,6 @@ export default {
 
   async mounted() {
     await this.getFavoriteDB()
-    this.getNameplate()
     this.getContent()
     this.dynamicFontsize()
     this.formatedTime = this.computeMessageTime(this.time)

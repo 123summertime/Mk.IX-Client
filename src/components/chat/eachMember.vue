@@ -5,11 +5,11 @@
       <p :class="role">{{ userName }}</p>
     </div>
     <div class="oper">
-      <div v-if="getManagePermission" :title="role === 'user' ? '添加管理员' : '移除管理员'">
+      <div v-if="getManagePermission" @click="adminModify" :title="role === 'user' ? '添加管理员' : '移除管理员'">
         <CirclePlus v-if="role === 'user'"></CirclePlus>
         <Remove v-else-if="role === 'admin'"></Remove>
       </div>
-      <div v-if="getRemovePermission" title="移除群聊">
+      <div v-if="getRemovePermission" @click="userRemoved" title="移除群聊">
         <Close></Close>
       </div>
     </div>
@@ -17,12 +17,17 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 import { queryInfo } from '../../assets/queryDB.js'
 
 export default {
+  emits: ['groupAdminModified', 'userRemoved'],
+
   props: {
     pair: Array,
     role: String,
+    group: String,
     permission: String,
   },
 
@@ -40,6 +45,39 @@ export default {
       this.uuid = info["uuid"]
       this.avatar = info["avatar"]
       this.userName = info["userName"]
+    },
+
+    adminModify() {
+      let isAdd = this.role === 'user'
+      const URL = `http://${localStorage.getItem('adress')}/admin?who=${this.uuid}&group=${this.group}&operation=${isAdd}`
+      axios.post(URL, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        ElMessage.success(`已将${this.userName}${isAdd ? '添加为' : '移除'}管理员`)
+        this.$emit('groupAdminModified', {"group": this.group, "uuid": this.uuid, "operation": isAdd})
+      }).catch(err => {
+        ElMessage({
+          message: `修改失败 ${err['response']['data']['detail']}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+    
+    userRemoved() {
+      const URL = `http://${localStorage.getItem('adress')}/deleteUser?who=${this.uuid}&group=${this.group}`
+      axios.post(URL, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        ElMessage.success(`已将${this.userName}移除群聊`)
+        this.$emit('userRemoved', {"group": this.group, "uuid": this.uuid})
+      }).catch(err => {
+        ElMessage({
+          message: `移除失败 ${err['response']['data']['detail']}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
     }
   },
 
@@ -49,7 +87,8 @@ export default {
     },
 
     getRemovePermission() {
-      return (this.permission === 'owner' && this.role != 'owner') || (this.permission === 'admin' && this.role === 'user')
+      return (this.permission === 'owner' && this.role != 'owner') || 
+             (this.permission === 'admin' && this.role === 'user')
     }
   },
 

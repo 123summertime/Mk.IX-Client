@@ -29,7 +29,9 @@
               :group="currGroupID"
               :info="groupList.find(item => item.group === currGroupID)"
               @groupNameModified="groupNameModified"
-              @groupAvatarModified="groupAvatarModified"></groupConfig>
+              @groupAvatarModified="groupAvatarModified"
+              @groupAdminModified="groupAdminModified"
+              @userRemoved="userRemoved"></groupConfig>
           </el-drawer>
         </div>
       </div>
@@ -207,6 +209,20 @@ export default {
         }
         return item
       })
+    },
+
+    groupAdminModified(info) {
+      let {group, uuid, operation, lastUpdate} = info
+      const targetGroup = this.groupList.find(i => i.group === group)
+      if (operation) {
+        targetGroup.admin.set(uuid, lastUpdate)
+      } else {
+        targetGroup.admin.delete(uuid)
+      }
+    },
+
+    userRemoved(info) {
+      console.log(info)
     },
 
     forwardMsg(payload) {
