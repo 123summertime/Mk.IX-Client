@@ -31,6 +31,7 @@ export default {
     owner: Object,
     admin: Map,
     active: Boolean,
+    deleted: Boolean,
   },
   data() {
     return {
@@ -41,11 +42,12 @@ export default {
   },
 
   methods: {
-    async buildOrGetDB() {
+    buildOrGetDB() {
       const db = new Dexie(this.$store.state['account'] + '-' + this.group)
       db.version(1).stores({
         History: "&time",
       })
+      this.DBroot = db
       this.DB = new dbCRUD(db)
     },
 
@@ -80,6 +82,20 @@ export default {
       const idx = this.messageList.findIndex(i => i.time === time)
       this.DB.delete("History", "time", time)
       this.messageList.splice(idx, 1)
+    },
+
+    deleteAll() {
+      console.log(this.group)
+      this.DBroot.delete().then(() => {
+        this.messageList = []
+        ElMessage.success("清空聊天记录成功")
+      }).catch(err => {
+        ElMessage({
+          message: '删除失败',
+          duration: 6000,
+          type: "error",
+        })
+      })
     },
 
     forwardMsg(payload) {
@@ -159,10 +175,18 @@ export default {
         })
       }
     },
+
+    deleted: {
+      handler(newVal) {
+        if (newVal) {
+          this.deleteAll()
+        }
+      }
+    }
   },
 
   async mounted() {
-    await this.buildOrGetDB()
+    this.buildOrGetDB()
     await this.getHistory()
     await this.makeConnection()
   },

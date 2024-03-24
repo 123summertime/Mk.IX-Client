@@ -26,7 +26,7 @@ export default {
 
   props: {
     pair: Array,  // [uuid, lastUpdate]
-    role: String, // owner / admin / user
+    role: String, // 'owner' or 'admin' or 'user'
     group: String,
     permission: String,
   },
@@ -56,7 +56,6 @@ export default {
         ElMessage.success(`已将${this.userName}${isAdd ? '添加为' : '移除'}管理员`)
         this.$emit('groupAdminModified', {"group": this.group, "uuid": this.uuid, "operation": isAdd})
       }).catch(err => {
-        console.log(err)
         ElMessage({
           message: `修改失败 ${err['response']['data']['detail']}`,
           duration: 6000,

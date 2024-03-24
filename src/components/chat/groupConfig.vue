@@ -25,9 +25,11 @@
         <p>置顶</p>
         <el-switch v-model="currPinned" @change="groupPinnedModified" />
       </li>
-      <li>
-        <p>退出</p>
-        <p></p>
+      <li class="deleteHistory">
+        <el-button type="danger" @click="deleteHistoryVisible = true">清空聊天记录</el-button>
+      </li>
+      <li class="unsubscribe">
+        <el-button type="danger" @click="unsubscribeVisible = true">{{ getRole === 'owner' ? '解散群' : '退出群' }}</el-button>
       </li>
     </ul>
   </div>
@@ -40,6 +42,34 @@
       fileType="webp"
       rate="1:1"
       @cutDown="groupAvatarModified"></ImgCutter>
+  </el-dialog>
+
+  <!-- 清空聊天记录确认 -->
+  <el-dialog v-model="deleteHistoryVisible" width="540px">
+    <div class="deleteHistoryText">
+      <WarningFilled></WarningFilled>
+      <p>确认清空聊天记录?</p>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="deleteHistoryVisible = false">取消</el-button>
+        <el-button type="danger" @click="deleteHistory">确认删除</el-button>
+      </span>
+    </template>
+  </el-dialog>
+
+  <!-- 退出群确认 -->
+  <el-dialog v-model="unsubscribeVisible" width="540px">
+    <div class="unsubscribeText">
+      <WarningFilled></WarningFilled>
+      <p>{{ getRole === 'owner' ? '确认解散群?' : '确认退出群?' }}</p>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="unsubscribeVisible = false">取消</el-button>
+        <el-button type="danger" @click="unsubscribe">{{ getRole === 'owner' ? '确认解散' : '确认退出' }}</el-button>
+      </span>
+    </template>
   </el-dialog>
 
   <!-- 群成员信息 -->
@@ -109,7 +139,8 @@ export default {
     'groupAvatarModified',
     'groupAdminModified',
     'userRemoved',
-    'groupPinnedModified'
+    'groupPinnedModified',
+    'deleteHistory'
   ],
 
   props: {
@@ -123,6 +154,8 @@ export default {
       groupName: this.info['name'],
       visible: false,
       membersVisible: false,
+      unsubscribeVisible: false,
+      deleteHistoryVisible: false,
       currPinned: this.isPinned,
       membersCount: 0,
       membersInfo: [],
@@ -193,7 +226,7 @@ export default {
         this.membersInfo = this.membersInfo.filter(i => i.uuid != info['uuid'])
       } else {
         const lastUpdate = this.info['admin'].get(info['uuid'])
-        this.membersInfo.push({"uuid": info['uuid'], "lastUpdate":lastUpdate})
+        this.membersInfo.push({ "uuid": info['uuid'], "lastUpdate": lastUpdate })
       }
       this.$emit('groupAdminModified', info)
     },
@@ -205,7 +238,29 @@ export default {
 
     groupPinnedModified() {
       this.$emit('groupPinnedModified', this.currPinned)
-    }
+    },
+
+    async deleteHistory() {
+      this.$emit('deleteHistory', this.group)
+      this.deleteHistoryVisible = false
+    },
+
+    unsubscribe() {
+      const URL = `http://${localStorage.getItem('adress')}/deleteGroup?group=${this.group}`
+      axios.post(URL, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        this.unsubscribeVisible = false
+        ElMessage.success("退出成功")
+      }).catch(err => {
+        ElMessage({
+          message: `退出失败 ${err['response']['data']['detail']}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+
   },
 
   computed: {
@@ -329,5 +384,32 @@ export default {
 .list .empty {
   height: 36px;
   line-height: 36px;
+}
+
+li .el-switch {
+  height: 48px;
+}
+
+li .el-button {
+  width: 100%;
+  height: 80%;
+  margin: auto 0;
+}
+
+.unsubscribeText,
+.deleteHistoryText {
+  display: flex;
+  width: 100%;
+  height: 48px;
+}
+
+.unsubscribeText svg, .deleteHistoryText svg {
+  width: 48px;
+  height: 48px;
+}
+
+.unsubscribeText p, .deleteHistoryText p {
+  line-height: 48px;
+  margin-left: 16px;
 }
 </style>

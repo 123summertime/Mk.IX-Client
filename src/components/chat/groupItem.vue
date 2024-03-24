@@ -72,6 +72,12 @@ export default {
     },
 
     computeInfo(message) {
+      if (message === 'empty') {
+        this.lastMessage = " "
+        this.lastMessageTime = ""
+        return
+      }
+
       const lastMessageTime = message["time"].substring(0, 10)
       if (this.isPinned) {
         this.$refs.groupInfoRoot.style.order = -1 * lastMessageTime

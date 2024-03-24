@@ -34,7 +34,8 @@
               @groupAvatarModified="groupAvatarModified"
               @groupAdminModified="groupAdminModified"
               @userRemoved="userRemoved"
-              @groupPinnedModified="groupPinnedModified"></groupConfig>
+              @groupPinnedModified="groupPinnedModified"
+              @deleteHistory="deleteHistory"></groupConfig>
           </el-drawer>
         </div>
       </div>
@@ -48,6 +49,7 @@
             :group="item['group']"
             :name="item['name']"
             :active="item['group'] === currGroupID"
+            :deleted="item['group'] === deleted"
             v-show="currGroupID === item['group']"
             @forwardMsg="forwardMsg"
             class="conversation"></chatItem>
@@ -99,6 +101,7 @@ export default {
       username: "",
       currGroupID: "",
       currGroupName: "",
+      deleted: "",
       visible: false,
       drawer: false,
       pinned: {},
@@ -240,6 +243,10 @@ export default {
     groupPinnedModified(info) {
       this.pinned[this.currGroupID] = info
       localStorage.setItem(`pinned`, JSON.stringify(this.pinned))
+    },
+
+    deleteHistory(info) {
+      this.deleted = info
     },
 
     forwardMsg(payload) {
