@@ -12,6 +12,7 @@
           :group="item['group']"
           :name="item['name']"
           :active="item['group'] === currGroupID"
+          :isPinned="pinned[item['group']] === true"
           @click="currGroupChange(item['group'], item['name'])"
           class="groupItem"></groupItem>
       </div>
@@ -24,14 +25,16 @@
         <div class="groupToolBar" v-show="currGroupID">
           <p>{{ currGroupName }}</p>
           <MoreFilled @click="drawer = !drawer"></MoreFilled>
-          <el-drawer v-model="drawer" :with-header="false" style="min-width: 400px;">
+          <el-drawer v-model="drawer" :with-header="false" :destroy-on-close="true" style="min-width: 400px;">
             <groupConfig
               :group="currGroupID"
               :info="groupList.find(item => item.group === currGroupID)"
+              :isPinned="pinned[currGroupID]"
               @groupNameModified="groupNameModified"
               @groupAvatarModified="groupAvatarModified"
               @groupAdminModified="groupAdminModified"
-              @userRemoved="userRemoved"></groupConfig>
+              @userRemoved="userRemoved"
+              @groupPinnedModified="groupPinnedModified"></groupConfig>
           </el-drawer>
         </div>
       </div>
@@ -98,8 +101,9 @@ export default {
       currGroupName: "",
       visible: false,
       drawer: false,
+      pinned: {},
       forwardPayload: {},
-      forwardTo: ["", ""],  // 0:group 1:name
+      forwardTo: ["", ""],  // [group, name]
       groupList: [], // [{group:String, avatar:String, name:String, owner:Map, admin:Map}]
     }
   },
@@ -164,6 +168,11 @@ export default {
       }
     },
 
+    getPinnedGroups() {
+      const pinned = localStorage.getItem(`pinned`) || '{}'
+      this.pinned = JSON.parse(pinned)
+    },
+
     currGroupChange(id, name) {
       this.currGroupID = id
       this.currGroupName = name
@@ -190,22 +199,24 @@ export default {
     },
 
     groupNameModified(info) {
-      if (this.currGroupID === info['group']) {
-        this.currGroupName = info['name']
+      let {group, name} = info
+      if (this.currGroupID === group) {
+        this.currGroupName = name
       }
 
       this.groupList = this.groupList.map(item => {
-        if (item.group === info['group']) {
-          return { ...item, name: info['name'] }
+        if (item.group === group) {
+          return { ...item, name: name }
         }
         return item
       })
     },
 
     groupAvatarModified(info) {
+      let {group, avatar} = info
       this.groupList = this.groupList.map(item => {
-        if (item.group === info['group']) {
-          return { ...item, avatar: info['avatar'] }
+        if (item.group === group) {
+          return { ...item, avatar }
         }
         return item
       })
@@ -222,7 +233,13 @@ export default {
     },
 
     userRemoved(info) {
-      console.log(info)
+      info["operation"] = false
+      this.groupAdminModified(info)
+    },
+
+    groupPinnedModified(info) {
+      this.pinned[this.currGroupID] = info
+      localStorage.setItem(`pinned`, JSON.stringify(this.pinned))
     },
 
     forwardMsg(payload) {
@@ -245,6 +262,7 @@ export default {
   async mounted() {
     this.initialization()
     this.readLayoutSettings()
+    this.getPinnedGroups()
   },
 
   components: {

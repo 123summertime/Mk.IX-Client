@@ -19,6 +19,7 @@ export default {
     group: String,
     name: String,
     active: Boolean,
+    isPinned: Boolean,
   },
 
   data() {
@@ -66,15 +67,42 @@ export default {
       }
       if (type === "image") {
         return "[图片]"
-      } 
+      }
       return "[文件]"
     },
 
     computeInfo(message) {
-      const short = message["time"].substring(0, 10)
-      this.$refs.groupInfoRoot.style.order = 2147483647 - short
-      this.lastMessage = message["userName"] + ": " + this.cvtPayload(message["type"] ,message["payload"])
-      this.lastMessageTime = this.computeLastMessageTime(short)
+      const lastMessageTime = message["time"].substring(0, 10)
+      if (this.isPinned) {
+        this.$refs.groupInfoRoot.style.order = -1 * lastMessageTime
+      } else {
+        this.$refs.groupInfoRoot.style.order = 2147483647 - lastMessageTime
+      }
+      this.lastMessage = message["userName"] + ": " + this.cvtPayload(message["type"], message["payload"])
+      this.lastMessageTime = this.computeLastMessageTime(lastMessageTime)
+    },
+
+    pinnedGroupInit() {
+      if (this.$refs.groupInfoRoot.style.order) { return }
+      if (this.isPinned) {
+        this.$refs.groupInfoRoot.style.backgroundColor = 'lightyellow'
+        this.$refs.groupInfoRoot.style.order = 0
+      } else {
+        this.$refs.groupInfoRoot.style.backgroundColor = 'darkkhaki'
+        this.$refs.groupInfoRoot.style.order = 2147483647
+      }
+    },
+
+    pinnedGroupModified() {
+      if (this.isPinned) {
+        this.$refs.groupInfoRoot.style.backgroundColor = 'lightyellow'
+        const lastMessageTime = 2147483647 - this.$refs.groupInfoRoot.style.order
+        this.$refs.groupInfoRoot.style.order = -1 * lastMessageTime
+      } else {
+        this.$refs.groupInfoRoot.style.backgroundColor = 'darkkhaki'
+        const lastMessageTime = -1 * this.$refs.groupInfoRoot.style.order
+        this.$refs.groupInfoRoot.style.order = 2147483647 - lastMessageTime
+      }
     }
   },
 
@@ -101,8 +129,19 @@ export default {
           this.unreadCount = 0
         }
       }
-    }
+    },
+
+    isPinned: {
+      handler() {
+        this.pinnedGroupModified()
+      }
+    },
+
   },
+
+  mounted() {
+    this.pinnedGroupInit()
+  }
 }
 </script>
 

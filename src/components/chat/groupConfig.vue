@@ -23,7 +23,7 @@
       </li>
       <li>
         <p>置顶</p>
-        <p></p>
+        <el-switch v-model="currPinned" @change="groupPinnedModified" />
       </li>
       <li>
         <p>退出</p>
@@ -63,7 +63,7 @@
       <li>
         <p>管理员</p>
       </li>
-      <li>
+      <li v-if="getAdmin.length">
         <eachMember v-for="pair in getAdmin"
           :key="pair[0]"
           :pair="pair"
@@ -73,11 +73,14 @@
           @groupAdminModified="groupAdminModified"
           @userRemoved="userRemoved"></eachMember>
       </li>
+      <li class="empty" v-else>
+        <p>无</p>
+      </li>
 
       <li>
         <p>成员</p>
       </li>
-      <li>
+      <li v-if="membersInfo.length">
         <eachMember v-for="pair in membersInfo"
           :key="pair['uuid']"
           :pair="[pair['uuid'], pair['lastUpdate']]"
@@ -86,6 +89,9 @@
           :permission="getRole"
           @groupAdminModified="groupAdminModified"
           @userRemoved="userRemoved"></eachMember>
+      </li>
+      <li class="empty" v-else>
+        <p>无</p>
       </li>
     </ul>
   </el-dialog>
@@ -98,11 +104,18 @@ import ImgCutter from 'vue-img-cutter'
 import eachMember from './eachMember.vue'
 
 export default {
-  emits: ['groupNameModified', 'groupAvatarModified', 'groupAdminModified', 'userRemoved'],
+  emits: [
+    'groupNameModified',
+    'groupAvatarModified',
+    'groupAdminModified',
+    'userRemoved',
+    'groupPinnedModified'
+  ],
 
   props: {
     group: String,
     info: Object,
+    isPinned: Boolean,
   },
 
   data() {
@@ -110,6 +123,7 @@ export default {
       groupName: this.info['name'],
       visible: false,
       membersVisible: false,
+      currPinned: this.isPinned,
       membersCount: 0,
       membersInfo: [],
     }
@@ -173,16 +187,24 @@ export default {
     },
 
     groupAdminModified(info) {
-      const user = this.membersInfo.find(i => i.uuid == info['uuid'])
-      info['lastUpdate'] = user['lastUpdate']
+      if (info['operation']) {
+        const user = this.membersInfo.find(i => i.uuid == info['uuid'])
+        info['lastUpdate'] = user['lastUpdate']
+        this.membersInfo = this.membersInfo.filter(i => i.uuid != info['uuid'])
+      } else {
+        const lastUpdate = this.info['admin'].get(info['uuid'])
+        this.membersInfo.push({"uuid": info['uuid'], "lastUpdate":lastUpdate})
+      }
       this.$emit('groupAdminModified', info)
     },
 
     userRemoved(info) {
-      // TODO: 移除管理员时
-      const after = this.membersInfo.filter(i => { i.uuid != info['uuid'] })
-      this.membersInfo = after
+      this.membersInfo = this.membersInfo.filter(i => i.uuid != info['uuid'])
       this.$emit('userRemoved', info)
+    },
+
+    groupPinnedModified() {
+      this.$emit('groupPinnedModified', this.currPinned)
     }
   },
 
@@ -206,19 +228,6 @@ export default {
     getAdmin() {
       return Array.from(this.info['admin'].entries())
     },
-
-    getUser() {
-      let owner = this.info['owner']
-      let admin = this.info['admin']
-      let users = []
-      this.membersInfo.forEach((pair) => {
-        let uuid = pair["uuid"]
-        if (!owner.has(uuid) && !admin.has(uuid)) {
-          users.push([pair["uuid"], pair["lastUpdate"]])
-        }
-      })
-      return users
-    }
   },
 
   mounted() {
@@ -315,5 +324,10 @@ export default {
 
 .list li:nth-of-type(3) {
   color: aqua;
+}
+
+.list .empty {
+  height: 36px;
+  line-height: 36px;
 }
 </style>
