@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import login from '../components/login/loginPage.vue'
 import chat from '../components/chat/chatPage.vue'
+import setting from '../components/setting/setting.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -21,7 +22,13 @@ const router = createRouter({
     {
       path: '/chat',
       name: 'chat',
-      component: chat
+      component: chat,
+      meta: { keepAlive: true }
+    },
+    {
+      path: '/setting',
+      name: 'setting',
+      component: setting,
     }
   ]
 })

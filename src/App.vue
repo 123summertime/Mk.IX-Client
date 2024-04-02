@@ -1,5 +1,9 @@
 <template>
-  <router-view></router-view>
+  <router-view v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
 </template>
 
 <script></script>
@@ -44,5 +48,4 @@ a {
 .memberInfo .el-dialog__body {
   padding: 20px;
 }
-
 </style>

@@ -16,6 +16,7 @@
           @click="currGroupChange(item['group'], item['name'])"
           class="groupItem"></groupItem>
       </div>
+      <tools @joinGroupSuccess="joinGroupSuccess"></tools>
     </div>
 
     <splitter @splitter="groupSplitter" class="groupSplitter" ref="groupSplitter"></splitter>
@@ -87,6 +88,7 @@ import axios from 'axios'
 import { queryInfo } from '../../assets/queryDB.js'
 import router from '../../router/index.js'
 
+import tools from './tools.vue'
 import groupItem from './groupItem.vue'
 import chatItem from './chatItem.vue'
 import inputBox from './inputbox.vue'
@@ -202,7 +204,7 @@ export default {
     },
 
     groupNameModified(info) {
-      let {group, name} = info
+      let { group, name } = info
       if (this.currGroupID === group) {
         this.currGroupName = name
       }
@@ -216,7 +218,7 @@ export default {
     },
 
     groupAvatarModified(info) {
-      let {group, avatar} = info
+      let { group, avatar } = info
       this.groupList = this.groupList.map(item => {
         if (item.group === group) {
           return { ...item, avatar }
@@ -226,7 +228,7 @@ export default {
     },
 
     groupAdminModified(info) {
-      let {group, uuid, operation, lastUpdate} = info
+      let { group, uuid, operation, lastUpdate } = info
       const targetGroup = this.groupList.find(i => i.group === group)
       if (operation) {
         targetGroup.admin.set(uuid, lastUpdate)
@@ -243,6 +245,11 @@ export default {
     groupPinnedModified(info) {
       this.pinned[this.currGroupID] = info
       localStorage.setItem(`pinned`, JSON.stringify(this.pinned))
+    },
+
+    joinGroupSuccess(info) {
+      this.getGroupInfo("", info["group"])
+      this.currGroupChange(info["group"], info["name"])
     },
 
     deleteHistory(info) {
@@ -273,6 +280,7 @@ export default {
   },
 
   components: {
+    tools,
     groupItem,
     chatItem,
     inputBox,
@@ -292,6 +300,7 @@ export default {
 
 /* leftSide */
 .leftSide {
+  position: relative;
   width: 20vw;
   height: 100%;
   background-color: bisque;
@@ -325,6 +334,7 @@ export default {
   flex-direction: column;
   width: 100%;
   height: calc(100% - 64px);
+  padding-bottom: 48px;
   overflow: scroll;
 }
 
@@ -477,6 +487,7 @@ export default {
 chatPage
   |- groupItem
   |- splitter
+  |- tools
   |- groupConfig
   |     |- eachMember
   |- inputBox
