@@ -124,10 +124,15 @@ export default {
         this.uuid = data["uuid"]
         this.username = data["userName"]
         this.avatar = userInfo["avatar"]
+
         this.$store.dispatch('loginAs', {
           "account": this.uuid,
           "userName": this.username,
         })
+        this.$store.dispatch('sysConnection', {
+          "uuid": this.uuid,
+        })
+
         data["groups"].forEach(id => {
           this.getGroupInfo(id["lastUpdate"], id["group"])
         })
@@ -274,7 +279,7 @@ export default {
   },
 
   async mounted() {
-    this.initialization()
+    await this.initialization()
     this.readLayoutSettings()
     this.getPinnedGroups()
   },

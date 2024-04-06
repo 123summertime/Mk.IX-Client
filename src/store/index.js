@@ -23,24 +23,33 @@ export default createStore({
       const ws = new WebSocket(URL)
 
       context.commit('newConnection', {
-        "groupID": info["groupID"], 
+        "groupID": info["groupID"],
         "ws": ws,
       })
+
       ws.onmessage = async function (event) {
         const data = JSON.parse(event["data"])
-        
-        // Error
-        if (data['group'] === '-1') {
-          ElMessage.error(data['payload'])
-          return
-        }
 
         const fullData = await queryInfo("Account", data["senderKey"], data["senderID"])
         context.commit('getNewMessage', {
           "groupID": data["group"],
-          "payload": {...fullData, ...data}
+          "payload": { ...fullData, ...data }
         })
       }
+    },
+
+    async sysConnection(context, info) {
+      const adress = localStorage.getItem('adress')
+      const token = localStorage.getItem('token')
+      const URL = `ws://${adress}/wsSys?userID=${info["uuid"]}&token=${token}`
+      const ws = new WebSocket(URL)
+
+      ws.onmessage = async function (event) {
+        const data = JSON.parse(event["data"])
+        context.commit('getNewSysMessage', data)
+      }
+
+      context.commit('sysConnection', { "ws": ws })
     },
 
     loginAs(context, info) {
@@ -58,8 +67,16 @@ export default createStore({
       state[connect["groupID"]] = ""
     },
 
+    sysConnection(state, ws) {
+      state["sys"] = ws
+    },
+
     getNewMessage(state, payload) {
       state[payload["groupID"]] = payload["payload"]
+    },
+
+    getNewSysMessage(state, payload) {
+      state["sysMsg"] = payload
     },
 
     loginAs(state, info) {
@@ -75,9 +92,11 @@ export default createStore({
   state: {
     account: "",
     userName: "",
+    sysMsg: "",
     favoriteDB: await favoriteDB(),
     wsConnections: {},
     // {group}: group新收到的消息
     // lastMessageOf{group}: group的最后一条消息
+    // sys: 系统消息Websocket
   },
 })

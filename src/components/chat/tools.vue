@@ -3,6 +3,9 @@
     <div title="设置" @click="gotoSetting">
       <Tools></Tools>
     </div>
+    <div title="收件箱">
+      <Bell></Bell>
+    </div>
     <div title="创建群" @click="makeVisible = true">
       <Plus></Plus>
     </div>
@@ -10,6 +13,8 @@
       <Search></Search>
     </div>
   </div>
+
+  <sysMsgGetter></sysMsgGetter>
 
   <!-- 创建群 -->
   <el-dialog v-model="makeVisible" title="创建群" width="540px">
@@ -72,6 +77,7 @@
 import axios from 'axios'
 
 import router from './../../router/index.js'
+import sysMsgGetter from './sysMsgGetter.vue'
 
 export default {
   emits: [
@@ -122,7 +128,7 @@ export default {
     },
 
     searchGroup() {
-      const URL = `http://${localStorage.getItem('adress')}/joinRequest?group=${this.searchGroupID}`
+      const URL = `http://${localStorage.getItem('adress')}/joinQuestion?group=${this.searchGroupID}`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -161,6 +167,10 @@ export default {
 
   mounted() {
     this.searchState = 0
+  },
+
+  components: {
+    sysMsgGetter
   }
 }
 </script>
