@@ -493,6 +493,7 @@ chatPage
   |- groupItem
   |- splitter
   |- tools
+  |     |- sysMsgGetter
   |- groupConfig
   |     |- eachMember
   |- inputBox

@@ -138,8 +138,8 @@ export default {
     'groupNameModified',
     'groupAvatarModified',
     'groupAdminModified',
-    'userRemoved',
     'groupPinnedModified',
+    'userRemoved',
     'deleteHistory'
   ],
 

@@ -6,6 +6,7 @@
 export default {
   methods: {
     sysMessageHandler(msg) {
+      console.log(msg)
       const { time, type, payload } = msg
       
       if (type == 'error') {

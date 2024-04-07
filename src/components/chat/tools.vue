@@ -47,27 +47,45 @@
         <el-button type="primary" @click="searchGroup">搜索</el-button>
       </div>
     </div>
+
     <div v-if="searchState == 1">
       <div class="groupOpersItem">
         <p>群名</p>
         <p>{{ searchGroupName }}</p>
       </div>
-      <div class="groupOpersItem">
-        <p>入群问题</p>
-        <p>{{ searchGroupQ }}</p>
+
+      <el-switch
+        class="searchGroupOption"
+        v-model="searchGroupOption"
+        active-text="通过发送入群申请"
+        inactive-text="通过回答验证问题" />
+
+      <div v-if="searchGroupOption">
+        <div class="groupOpersItem">
+          <p>申请理由</p>
+          <el-input v-model="searchGroupA"></el-input>
+        </div>
       </div>
-      <div class="groupOpersItem">
-        <p>答案</p>
-        <el-input v-model="searchGroupA"></el-input>
+      <div v-else>
+        <div class="groupOpersItem">
+          <p>入群问题</p>
+          <p>{{ searchGroupQ }}</p>
+        </div>
+        <div class="groupOpersItem">
+          <p>答案</p>
+          <el-input v-model="searchGroupA"></el-input>
+        </div>
       </div>
     </div>
+
     <div v-else-if="searchState == 2">
       <p class="searchFailed">{{ searchFailedDetail }}</p>
     </div>
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="searchVisible = false">取消</el-button>
-        <el-button type="primary" :disabled="searchState != 1" @click="gotoJoinGroup">加入</el-button>
+        <el-button type="primary" :disabled="searchState != 1" @click="gotoJoinGroupRequset" v-if="searchGroupOption">申请</el-button>
+        <el-button type="primary" :disabled="searchState != 1" @click="gotoJoinGroup" v-else>加入</el-button>
       </span>
     </template>
   </el-dialog>
@@ -97,6 +115,7 @@ export default {
       searchGroupQ: "",
       searchGroupA: "",
       searchFailedDetail: "",
+      searchGroupOption: false,
       searchVisible: false,
     }
   },
@@ -142,7 +161,7 @@ export default {
     },
 
     gotoJoinGroup() {
-      const A = {A: this.searchGroupA}
+      const A = { A: this.searchGroupA }
       const URL = `http://${localStorage.getItem('adress')}/join?group=${this.searchGroupID}`
       axios.post(URL, A, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -162,7 +181,28 @@ export default {
           type: "error",
         })
       })
-    }
+    },
+
+    gotoJoinGroupRequset() {
+      const URL = `http://${localStorage.getItem('adress')}/joinRequest?group=${this.searchGroupID}&joinText=${this.searchGroupA}`
+      axios.post(URL, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        ElMessage.success("申请已发送")
+        this.searchVisible = false
+        this.searchState = 0
+        this.searchGroupQ = ""
+        this.searchGroupA = ""
+        this.searchGroupID = ""
+      }).catch(err => {
+        ElMessage({
+          message: `申请失败 ${err['response']['data']['detail']}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+
   },
 
   mounted() {
@@ -205,12 +245,19 @@ export default {
   margin: 8px 0;
 }
 
-.groupOpersItem p, .searchGroupID p {
+.groupOpersItem p,
+.searchGroupID p {
   line-height: 32px;
 }
 
 .groupOpersItem .el-input {
   width: 60%;
+}
+
+.searchGroupOption {
+  width: 100%;
+  justify-content: center;
+  margin: 4px 0;
 }
 
 .searchGroupID {
