@@ -17,6 +17,7 @@
 
 <script>
 import Dexie from 'dexie'
+import axios from 'axios'
 
 import message from './message.vue'
 
@@ -28,7 +29,7 @@ export default {
     avatar: String,
     group: String,
     name: String,
-    owner: Object,
+    owner: Map,
     admin: Map,
     active: Boolean,
     deleted: Boolean,
@@ -71,6 +72,24 @@ export default {
       this.$store.dispatch('wsConnect', {
         "groupID": this.group,
         "uuid": this.$store.state["account"]
+      })
+    },
+
+    getGroupRequests() {
+      const account = this.$store.state['account']
+      if (!(this.owner.has(account) || this.admin.has(account))) { return }
+
+      const URL = `http://${localStorage.getItem('adress')}/queryJoinRequest?group=${this.group}`
+      axios.get(URL, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        // 结果会通过wsSys发送 sysMsgGetter将对其作处理
+      }).catch(err => {
+        ElMessage({
+          message: `在获取${this.name}的群验证时发送错误 ${err['response']['data']['detail']}`,
+          duration: 6000,
+          type: "error",
+        })
       })
     },
 
@@ -189,6 +208,7 @@ export default {
     this.buildOrGetDB()
     await this.getHistory()
     await this.makeConnection()
+    this.getGroupRequests()
   },
 
   components: {

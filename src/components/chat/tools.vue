@@ -3,7 +3,7 @@
     <div title="设置" @click="gotoSetting">
       <Tools></Tools>
     </div>
-    <div title="收件箱">
+    <div title="收件箱" @click="mailVisible = true">
       <Bell></Bell>
     </div>
     <div title="创建群" @click="makeVisible = true">
@@ -14,7 +14,26 @@
     </div>
   </div>
 
-  <sysMsgGetter></sysMsgGetter>
+  <sysMsgGetter @newJoinRequest="newJoinRequest"></sysMsgGetter>
+
+
+  <!-- 群验证 -->
+  <el-dialog v-model="mailVisible" title="群验证" width="540px">
+    <ul class="GroupMails">
+      <li v-for="msg in messageList" :key="msg['time']" class="mail">
+        <img :src="msg['avatar']" />
+        <div class="mailTexts">
+          <p>{{ groupMailText(msg['userName'], msg['type'], msg['group'], msg['groupKey']) }}</p>
+          <p>{{ msg['payload'] }}</p>
+        </div>
+        <div class="mailOpers">
+          <Close></Close>
+          <Check></Check>
+        </div>
+      </li>
+    </ul>
+  </el-dialog>
+
 
   <!-- 创建群 -->
   <el-dialog v-model="makeVisible" title="创建群" width="540px">
@@ -33,10 +52,11 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="makeVisible = false">取消</el-button>
-        <el-button type="primary" @click="gotoMakeGroup">确认</el-button>
+        <el-button type="primary" @click="makeGroup">确认</el-button>
       </span>
     </template>
   </el-dialog>
+
 
   <!-- 搜索群 -->
   <el-dialog v-model="searchVisible" title="搜索群" width="540px">
@@ -84,8 +104,9 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="searchVisible = false">取消</el-button>
-        <el-button type="primary" :disabled="searchState != 1" @click="gotoJoinGroupRequset" v-if="searchGroupOption">申请</el-button>
-        <el-button type="primary" :disabled="searchState != 1" @click="gotoJoinGroup" v-else>加入</el-button>
+        <el-button type="primary" :disabled="searchState != 1" @click="joinGroupByReq"
+          v-if="searchGroupOption">申请</el-button>
+        <el-button type="primary" :disabled="searchState != 1" @click="joinGroupByQA" v-else>加入</el-button>
       </span>
     </template>
   </el-dialog>
@@ -96,6 +117,8 @@ import axios from 'axios'
 
 import router from './../../router/index.js'
 import sysMsgGetter from './sysMsgGetter.vue'
+
+import { queryInfo } from '../../assets/queryDB.js'
 
 export default {
   emits: [
@@ -117,6 +140,10 @@ export default {
       searchFailedDetail: "",
       searchGroupOption: false,
       searchVisible: false,
+
+      mailVisible: false,
+
+      messageList: [],
     }
   },
 
@@ -125,7 +152,7 @@ export default {
       router.push('/setting')
     },
 
-    gotoMakeGroup() {
+    makeGroup() {
       const QA = { Q: this.makeGroupQ, A: this.makeGroupA }
       const URL = `http://${localStorage.getItem('adress')}/makeGroup?name=${this.makeGroupName}`
       axios.post(URL, QA, {
@@ -160,7 +187,7 @@ export default {
       })
     },
 
-    gotoJoinGroup() {
+    joinGroupByQA() {
       const A = { A: this.searchGroupA }
       const URL = `http://${localStorage.getItem('adress')}/join?group=${this.searchGroupID}`
       axios.post(URL, A, {
@@ -183,7 +210,7 @@ export default {
       })
     },
 
-    gotoJoinGroupRequset() {
+    joinGroupByReq() {
       const URL = `http://${localStorage.getItem('adress')}/joinRequest?group=${this.searchGroupID}&joinText=${this.searchGroupA}`
       axios.post(URL, {}, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -202,6 +229,24 @@ export default {
         })
       })
     },
+
+    async newJoinRequest(joinRequset) {
+      const { time, type, group, groupKey, state, senderID, senderKey, payload } = joinRequset
+      const info = await queryInfo("Account", senderKey, senderID)
+      const { lastUpdate: _1, ...userInfo } = info
+      this.messageList.push({ time, type, group, groupKey, state, payload, ...userInfo })
+      console.log(this.messageList)
+    },
+
+    // async 解决
+    async groupMailText(name, type, group, groupKey) {
+      console.log(name, type, group, groupKey)
+      const info = await queryInfo("Group", groupKey, group)
+      console.log(info)
+      if (type === 'join') {
+        return `${name} 申请加入 ${info["name"]}`
+      }
+    }
 
   },
 
@@ -236,6 +281,41 @@ export default {
   width: 100%;
   height: 100%;
   cursor: pointer;
+}
+
+.GroupMails {
+  display: flex;
+  flex-direction: column;
+  max-height: 40vh;
+  overflow: scroll;
+}
+
+.GroupMails::-webkit-scrollbar {
+  display: none;
+}
+
+.mail {
+  display: flex;
+  padding: 8px;
+  border-radius: 16px;
+}
+
+.mail img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.mail .mailTexts {
+  display: flex;
+  flex-direction: column;
+  margin: 0 24px;
+}
+
+.mail .mailOpers {
+  display: flex;
+  width: 30%;
+  height: 100%;
 }
 
 .groupOpersItem {
