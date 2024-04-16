@@ -3,7 +3,7 @@
 <script>
 export default {
   emits: [
-    'newJoinRequest'
+    'newJoinRequest', "joined"
   ],
 
   methods: {
@@ -25,6 +25,11 @@ export default {
       }
       if (type == 'join') {
         this.$emit('newJoinRequest', msg)
+        return
+      }
+      if (type == "joined") {
+        ElMessage.success(`你已成功加入 ${payload}`)
+        this.$emit('joined', msg)
         return
       }
 

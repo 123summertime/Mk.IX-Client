@@ -73,7 +73,7 @@
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="forwardSend">发送</el-button>
+          <el-button type="primary" :disabled="forwardTo[0] === ''" @click="forwardSend">发送</el-button>
           <el-button @click="visible = false">取消</el-button>
         </span>
       </template>
@@ -191,7 +191,7 @@ export default {
     groupSplitter(pos) {
       const posX = pos["x"]
       const rate = posX / window.innerWidth
-      if (rate < 0.5) {
+      if (rate > 0.125 && rate < 0.5) {
         this.$refs.groupSplitter.$el.style.left = posX - 8 + "px"
         this.$refs.leftSide.style.width = posX + "px"
         localStorage.setItem('groupWidth', posX)
@@ -252,9 +252,11 @@ export default {
       localStorage.setItem(`pinned`, JSON.stringify(this.pinned))
     },
 
-    joinGroupSuccess(info) {
+    joinGroupSuccess(info, autoChangeGroup) {
       this.getGroupInfo("", info["group"])
-      this.currGroupChange(info["group"], info["name"])
+      if (autoChangeGroup) {
+        this.currGroupChange(info["group"], info["name"])
+      }
     },
 
     deleteHistory(info) {

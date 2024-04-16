@@ -7,7 +7,7 @@
     </div>
 
     <div :class="messageFrom() ? 'message bySelf' : 'message'" v-else>
-      <div class="avatar">
+      <div class="avatar" @click="showProfile">
         <img :src="avatar">
       </div>
       <div class="container">
@@ -48,10 +48,39 @@
       @revokeMsg="revokeMsg">
     </messageMenu>
 
+    <el-dialog v-model="namecardVisible" :show-close="false" width="540px">
+      <div class="namecard">
+        <div class="namecardAvatar">
+          <img :src="avatar" />
+        </div>
+        <div class="namecardInfo">
+          <span>
+            <i>昵称:</i>
+            <i>{{ userName }}</i>
+          </span>
+          <span>
+            <i>uuid:</i>
+            <i>{{ uuid }}</i>
+          </span>
+          <span>
+            <i>个性签名:</i>
+            <i>{{ bio }}</i>
+          </span>
+          <span>
+            <i>最后访问:</i>
+            <i>{{ lastSeen === "Online" ? "在线" : computeMessageTime(lastSeen) }}</i>
+          </span>
+        </div>
+      </div>
+
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+
 import messageMenu from './messageMenu.vue'
 
 export default {
@@ -73,7 +102,10 @@ export default {
       content: "",
       formatedTime: "",
       rightClicked: false,
-      DB: null,
+      namecardVisible: false,
+
+      bio: "",
+      lastSeen: "",
     }
   },
 
@@ -221,6 +253,19 @@ export default {
       })
     },
 
+    showProfile() {
+      this.namecardVisible = true
+
+      const URL = `http://${localStorage.getItem('adress')}/getUserCurrentInfo?uuid=${this.uuid}`
+      axios.get(URL).then(res => {
+        const data = res["data"]
+        this.bio = data["bio"]
+        this.lastSeen = data["lastSeen"]
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+
     copyMsg() {
       const cb = navigator.clipboard
       if (this.type === 'text') {
@@ -270,7 +315,7 @@ export default {
         })
         return "管理员"
       }
-      
+
       this.$nextTick(() => {
         this.$refs.Nameplate.style.display = "none"
       })
@@ -294,7 +339,7 @@ export default {
   },
 
   components: {
-    messageMenu
+    messageMenu,
   }
 
 }
@@ -306,6 +351,7 @@ export default {
 }
 
 .avatar img {
+  position: relative;
   display: inline-block;
   width: 48px;
   height: 48px;
@@ -441,6 +487,46 @@ export default {
   direction: ltr;
 }
 
+:deep(.el-dialog__body) {
+  padding-top: 0;
+}
+
+.namecard {
+  display: flex;
+  width: 100%;
+}
+
+.namecardAvatar img{
+  width: 96px;
+  height: 96px;
+  border-radius: 16px;
+}
+
+.namecardInfo {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-left: 32px;
+}
+
+.namecardInfo span{
+  display: flex;
+  margin: 12px 0;
+}
+
+.namecardInfo span:nth-child(1){
+  margin-top: 0;
+}
+
+.namecardInfo span i:nth-child(1) {
+  width: 96px;
+}
+
+.namecardInfo span i:nth-child(2) {
+  width: calc(100% - 96px);
+  word-break: break-all;
+}
+
 @media screen and (max-width: 1000px) {
   .fileTypeInnerL {
     max-width: 100%;
@@ -449,5 +535,4 @@ export default {
   .fileTypeInnerR {
     display: none;
   }
-}
-</style>
+}</style>

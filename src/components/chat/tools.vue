@@ -14,21 +14,26 @@
     </div>
   </div>
 
-  <sysMsgGetter @newJoinRequest="newJoinRequest"></sysMsgGetter>
+  <sysMsgGetter
+    @newJoinRequest="newJoinRequest"
+    @joined="joined"></sysMsgGetter>
 
 
   <!-- 群验证 -->
   <el-dialog v-model="mailVisible" title="群验证" width="540px">
     <ul class="GroupMails">
       <li v-for="msg in messageList" :key="msg['time']" class="mail">
-        <img :src="msg['avatar']" />
+        <img :src="msg['senderAvatar']" />
         <div class="mailTexts">
-          <p>{{ groupMailText(msg['userName'], msg['type'], msg['group'], msg['groupKey']) }}</p>
-          <p>{{ msg['payload'] }}</p>
+          <p>{{ groupMailText(msg) }}</p>
+          <p>{{ '理由：' + msg['payload'] }}</p>
         </div>
-        <div class="mailOpers">
-          <Close></Close>
-          <Check></Check>
+        <div class="mailOpers" v-if="msg['state'] === 0">
+          <Close @click="requestResponse(msg['group'], msg['time'], false)"></Close>
+          <Check @click="requestResponse(msg['group'], msg['time'], true)"></Check>
+        </div>
+        <div class="mailResponse" v-else>
+          <p>{{ cvtState(msg['state']) }}</p>
         </div>
       </li>
     </ul>
@@ -163,7 +168,7 @@ export default {
         this.makeGroupQ = ""
         this.makeGroupA = ""
         ElMessage.success("创建成功")
-        this.$emit('joinGroupSuccess', { "group": res["data"]["groupID"], "name": this.makeGroupName })
+        this.$emit('joinGroupSuccess', { "group": res["data"]["groupID"], "name": this.makeGroupName }, true)
       }).catch(err => {
         ElMessage({
           message: `创建失败 ${err['response']['data']['detail']}`,
@@ -194,7 +199,7 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success("加入成功")
-        this.$emit('joinGroupSuccess', { "group": this.searchGroupID, "name": this.searchGroupName })
+        this.$emit('joinGroupSuccess', { "group": this.searchGroupID, "name": this.searchGroupName }, true)
 
         this.searchVisible = false
         this.searchState = 0
@@ -232,21 +237,56 @@ export default {
 
     async newJoinRequest(joinRequset) {
       const { time, type, group, groupKey, state, senderID, senderKey, payload } = joinRequset
-      const info = await queryInfo("Account", senderKey, senderID)
-      const { lastUpdate: _1, ...userInfo } = info
-      this.messageList.push({ time, type, group, groupKey, state, payload, ...userInfo })
-      console.log(this.messageList)
+      const senderInfo = await queryInfo("Account", senderKey, senderID)
+      const groupInfo = await queryInfo("Group", groupKey, group)
+      const { avatar: senderAvatar, userName } = senderInfo
+      const { avatar: groupAvatar, name: groupName } = groupInfo
+
+      const idx = this.messageList.findIndex(i => i.time === time)
+      if (idx === -1) {  // new
+        this.messageList.push({ time, type, group, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName })
+      } else {  // update
+        this.messageList[idx] = { time, type, group, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName }
+      }
     },
 
-    // async 解决
-    async groupMailText(name, type, group, groupKey) {
-      console.log(name, type, group, groupKey)
-      const info = await queryInfo("Group", groupKey, group)
-      console.log(info)
+    groupMailText(msg) {
+      const { time, type, group, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName } = msg
       if (type === 'join') {
-        return `${name} 申请加入 ${info["name"]}`
+        return `${userName} 申请加入 ${groupName}`
       }
-    }
+    },
+
+    requestResponse(group, time, verdict) {
+      const URL = `http://${localStorage.getItem('adress')}/requestResponse?group=${group}&time=${time}&verdict=${verdict}`
+      axios.post(URL, {}, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        ElMessage.success(verdict ? "已通过" : "已拒绝")
+      }).catch(err => {
+        ElMessage({
+          message: `失败 ${err['response']['data']['detail']}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+
+    cvtState(state) {
+      let map = {
+        1: "群主已同意",
+        2: "群主已拒绝",
+        3: "管理员已同意",
+        4: "管理员已拒绝",
+        5: "用户已同意",
+        6: "用户已拒绝",
+      }
+      return map[state]
+    },
+
+    joined(msg) {
+      this.$emit('joinGroupSuccess', { "group": msg['group'], "name": msg['payload'] }, false)
+    },
 
   },
 
@@ -309,13 +349,35 @@ export default {
 .mail .mailTexts {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-around;
   margin: 0 24px;
 }
 
 .mail .mailOpers {
   display: flex;
-  width: 30%;
+  justify-content: space-around;
+  width: 20%;
   height: 100%;
+  margin: auto 0;
+}
+
+.mail .mailOpers svg {
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+}
+
+.mail .mailOpers svg:nth-child(1):hover {
+  color: red;
+}
+
+.mail .mailOpers svg:nth-child(2):hover {
+  color: green;
+}
+
+.mailResponse {
+  line-height: 48px;
 }
 
 .groupOpersItem {
