@@ -41,6 +41,7 @@ import axios from 'axios'
 
 export default {
   emits: ["option"],
+
   data() {
     return {
       adress: "",
@@ -52,12 +53,14 @@ export default {
       fail: false,
     }
   },
+
   methods: {
     async register() {
       this.clicked = true
 
-      const URL = `http://${this.adress}/register?userName=${this.username}&password=${this.password}`
-      axios.post(URL).then(response => {
+      const register = {"userName": this.username, "password": this.password}
+      const URL = `http://${this.adress}/v1/user/register`
+      axios.post(URL, register).then(response => {
         this.uuid = response["data"]["uuid"]
         localStorage.setItem("adress", this.adress)
         localStorage.setItem("account", this.uuid)

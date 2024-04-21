@@ -79,7 +79,7 @@ export default {
       const account = this.$store.state['account']
       if (!(this.owner.has(account) || this.admin.has(account))) { return }
 
-      const URL = `http://${localStorage.getItem('adress')}/queryJoinRequest?group=${this.group}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/verify/request`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -104,7 +104,6 @@ export default {
     },
 
     deleteAll() {
-      console.log(this.group)
       this.DBroot.delete().then(() => {
         this.messageList = []
         ElMessage.success("清空聊天记录成功")

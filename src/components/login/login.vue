@@ -38,6 +38,7 @@ import router from './../../router/index.js'
 
 export default {
   emits: ["option"],
+
   data() {
     return {
       adress: "",
@@ -50,11 +51,20 @@ export default {
       success: false,
     }
   },
+
   methods: {
+    async hash(input) {
+      const data = new TextEncoder().encode(input)
+      const buffer = await crypto.subtle.digest('SHA-256', data)
+      const array = Array.from(new Uint8Array(buffer))
+      const hex = array.map(char => char.toString(16).padStart(2, '0')).join('')
+      return hex
+    },
+
     async login() {
       this.clicked = true
-      const URL = `http://${this.adress}/token?isBot=${this.asBot ? '1' : '0'}`
-      const formData = `grant_type=password&username=${this.account}&password=${this.password}`
+      const URL = `http://${this.adress}/v1/user/token?isBot=${this.asBot}`
+      const formData = `grant_type=password&username=${this.account}&password=${await this.hash(this.password)}`
 
       axios.post(URL, formData, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -69,12 +79,13 @@ export default {
           localStorage.setItem("token", response["data"]["access_token"])
           router.push('/chat')
         }
-      }).catch(error => {
+      }).catch(err => {
         this.errorPassword = true
         this.clicked = false
       })
     }
   },
+
   mounted() {
     this.adress = localStorage.getItem("adress") ?? ""
     this.account = localStorage.getItem("account") ?? ""

@@ -49,8 +49,8 @@ export default {
 
     adminModify() {
       let isAdd = this.role === 'user'
-      const URL = `http://${localStorage.getItem('adress')}/admin?who=${this.uuid}&group=${this.group}&operation=${isAdd}`
-      axios.post(URL, {}, {
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/admin/${this.uuid}?operation=${isAdd}`
+      axios.patch(URL, {}, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success(`已将${this.userName}${isAdd ? '添加为' : '移除'}管理员`)
@@ -65,8 +65,8 @@ export default {
     },
     
     userRemoved() {
-      const URL = `http://${localStorage.getItem('adress')}/deleteUser?who=${this.uuid}&group=${this.group}`
-      axios.post(URL, {}, {
+      const URL = `http://${localStorage.getItem('adress')}/group/${this.group}/members/${this.uuid}`
+      axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success(`已将${this.userName}移除群聊`)

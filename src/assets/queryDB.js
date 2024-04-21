@@ -19,7 +19,7 @@ export const queryInfo = async function (table, lastUpdate, uuid) {
     }
 
     if (table === "Account") {
-      const URL = `http://${localStorage.getItem('adress')}/getUserInfo?uuid=${uuid}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/${uuid}`
       const res = await axios.get(URL)
       const data = res["data"]
       
@@ -35,7 +35,7 @@ export const queryInfo = async function (table, lastUpdate, uuid) {
     }
 
     if (table === "Group") {
-      const URL = `http://${localStorage.getItem('adress')}/getGroupInfo?group=${uuid}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${uuid}/info`
       const res = await axios.get(URL)
       const data = res["data"]
 

@@ -165,8 +165,9 @@ export default {
   methods: {
     groupNameModified(event) {
       if (event.key === 'Enter') {
-        const URL = `http://${localStorage.getItem('adress')}/modifyGroupName?group=${this.group}&newName=${this.groupName}`
-        axios.post(URL, {}, {
+        const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/info/name`
+        const payload = { "note": this.groupName }
+        axios.patch(URL, payload, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         }).then(res => {
           ElMessage.success("修改成功")
@@ -189,8 +190,8 @@ export default {
 
     groupAvatarModified(info) {
       const base64 = info["dataURL"]
-      const URL = `http://${localStorage.getItem('adress')}/modifyGroupAvatar?group=${this.group}`
-      axios.post(URL, { 'avatar': base64 }, {
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/info/avatar`
+      axios.post(URL, { 'note': base64 }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         this.visible = false
@@ -206,8 +207,10 @@ export default {
     },
 
     getMembersInfo() {
-      const URL = `http://${localStorage.getItem('adress')}/getMembersInfo?group=${this.group}`
-      axios.get(URL).then(res => {
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members`
+      axios.get(URL, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
         const users = res["data"]["users"]
         this.membersCount = users.length
 
@@ -246,8 +249,11 @@ export default {
     },
 
     unsubscribe() {
-      const URL = `http://${localStorage.getItem('adress')}/deleteGroup?group=${this.group}`
-      axios.post(URL, {}, {
+      const URL = this.getRole === 'owner'
+        ? `http://${localStorage.getItem('adress')}/v1/group/${this.group}`
+        : `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/me`
+
+      axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         this.unsubscribeVisible = false
@@ -403,12 +409,14 @@ li .el-button {
   height: 48px;
 }
 
-.unsubscribeText svg, .deleteHistoryText svg {
+.unsubscribeText svg,
+.deleteHistoryText svg {
   width: 48px;
   height: 48px;
 }
 
-.unsubscribeText p, .deleteHistoryText p {
+.unsubscribeText p,
+.deleteHistoryText p {
   line-height: 48px;
   margin-left: 16px;
 }

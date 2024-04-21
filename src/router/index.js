@@ -43,7 +43,7 @@ router.beforeEach((to, from, next) => {
 
   const adress = localStorage.getItem("adress") ?? ""
   const token = localStorage.getItem("token") ?? ""
-  const URL = `http://${adress}/check`
+  const URL = `http://${adress}/v1/user/check`
 
   axios.get(URL, {
     headers: { 'Authorization': `Bearer ${token}` }

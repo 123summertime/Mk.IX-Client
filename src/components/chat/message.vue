@@ -256,7 +256,7 @@ export default {
     showProfile() {
       this.namecardVisible = true
 
-      const URL = `http://${localStorage.getItem('adress')}/getUserCurrentInfo?uuid=${this.uuid}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.uuid}`
       axios.get(URL).then(res => {
         const data = res["data"]
         this.bio = data["bio"]
@@ -299,7 +299,7 @@ export default {
     getNameplate() {
       // 排除没有Nameplate的消息类型
       if (['revoke'].includes(this.type)) { return }
-
+      
       if (this.owner.has(this.uuid)) {
         this.$nextTick(() => {
           this.$refs.Nameplate.style.display = "block"

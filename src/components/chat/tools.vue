@@ -158,8 +158,8 @@ export default {
     },
 
     makeGroup() {
-      const QA = { Q: this.makeGroupQ, A: this.makeGroupA }
-      const URL = `http://${localStorage.getItem('adress')}/makeGroup?name=${this.makeGroupName}`
+      const QA = { Q: this.makeGroupQ, A: this.makeGroupA, name: this.makeGroupName}
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/register`
       axios.post(URL, QA, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -179,7 +179,7 @@ export default {
     },
 
     searchGroup() {
-      const URL = `http://${localStorage.getItem('adress')}/joinQuestion?group=${this.searchGroupID}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/question`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -194,7 +194,7 @@ export default {
 
     joinGroupByQA() {
       const A = { A: this.searchGroupA }
-      const URL = `http://${localStorage.getItem('adress')}/join?group=${this.searchGroupID}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/answer`
       axios.post(URL, A, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -216,8 +216,9 @@ export default {
     },
 
     joinGroupByReq() {
-      const URL = `http://${localStorage.getItem('adress')}/joinRequest?group=${this.searchGroupID}&joinText=${this.searchGroupA}`
-      axios.post(URL, {}, {
+      const A = {note: this.searchGroupA}
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/request`
+      axios.post(URL, A, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success("申请已发送")
@@ -258,8 +259,9 @@ export default {
     },
 
     requestResponse(group, time, verdict) {
-      const URL = `http://${localStorage.getItem('adress')}/requestResponse?group=${group}&time=${time}&verdict=${verdict}`
-      axios.post(URL, {}, {
+      const T = {"note": time}
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${group}/verify/response?verdict=${verdict}`
+      axios.post(URL, T, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success(verdict ? "已通过" : "已拒绝")

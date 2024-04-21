@@ -24,28 +24,35 @@ export default {
       option: 0,
     }
   },
+
   methods: {
+    tryLogin() {
+      const adress = localStorage.getItem("adress") ?? ""
+      const token = localStorage.getItem("token") ?? ""
+
+      if (adress && token) {
+        const URL = `http://${adress}/v1/user/check`
+        axios.get(URL, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).then(res => {
+          // 刷新token
+          if (res["data"]["refreshToken"] != "") {
+            localStorage.setItem("token", res["data"]["refreshToken"])
+          }
+          router.push('/chat')
+        }).catch(err => { console.log(err) })
+      }
+    },
+
     changeOption() {
       this.option = !this.option
     }
   },
-  async mounted() {
-    const adress = localStorage.getItem("adress") ?? ""
-    const token = localStorage.getItem("token") ?? ""
 
-    if (adress && token) {
-      const URL = `http://${adress}/check`
-      axios.get(URL, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      }).then(res => {
-        // 刷新token
-        if (res["data"]["refreshToken"] != "") {
-          localStorage.setItem("token", res["data"]["refreshToken"])
-        }
-        router.push('/chat')
-      }).catch(err => { console.log(err) })
-    }
+  mounted() {
+    this.tryLogin()
   },
+
   components: {
     login,
     register
@@ -64,20 +71,21 @@ export default {
 }
 
 .view {
-  position: absolute;
-  left: 35vw;
-  width: 30vw;
+  width: 50%;
+  min-width: 450px;
+  max-width: 750px;
   height: 80vh;
+  margin: 0 auto;
+  padding: 32px;
+  border-radius: 32px;
   background-color: rgba(245, 245, 245, 0.5);
-  backdrop-filter: blur(15px);
-  padding: 7.5vh 3vw;
-  border-radius: 5%;
+  backdrop-filter: blur(16px);
   overflow: scroll;
   z-index: 10;
 }
 
 .view::-webkit-scrollbar {
-  	display: none;
+  display: none;
 }
 
 .bkgdItem {

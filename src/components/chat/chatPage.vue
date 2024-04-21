@@ -115,7 +115,7 @@ export default {
 
   methods: {
     async initialization() {
-      const URL = `http://${localStorage.getItem('adress')}/profile`
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/me`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(async res => {
@@ -158,7 +158,7 @@ export default {
     },
 
     async getAdminsInfo(groupID) {
-      const URL = `http://${localStorage.getItem('adress')}/getAdminInfo?group=${groupID}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${groupID}/members/admin`
       try {
         const res = await axios.get(URL)
         return res["data"]
