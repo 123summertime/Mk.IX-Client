@@ -191,7 +191,7 @@ export default {
     groupAvatarModified(info) {
       const base64 = info["dataURL"]
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/info/avatar`
-      axios.post(URL, { 'note': base64 }, {
+      axios.patch(URL, { 'note': base64 }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         this.visible = false

@@ -36,6 +36,7 @@ export default {
   },
   data() {
     return {
+      switch: false,  // 防止onScroll同一时间反复触发getHistory
       page: 0,
       step: 10,
       messageList: []
@@ -59,11 +60,13 @@ export default {
         const { senderID: _1, senderKey: _2, group: _3, ...message } = { ...info, ...msg }  // 排除某些属性
         this.messageList.unshift(message)
       }
+      this.switch = false
       this.page += 1
     },
 
     async onScroll() {
-      if (this.$refs.messageView.scrollTop <= 50) {
+      if (this.$refs.messageView.scrollTop <= 50 && !this.switch) {
+        this.switch = true
         await this.getHistory()
       }
     },

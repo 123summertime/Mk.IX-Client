@@ -162,6 +162,7 @@ export default {
 
     computeMessageTime(timeStamp) {
       timeStamp = Math.round(Number(timeStamp.substring(0, 10)))  // 精确到秒的时间戳(10位)
+      let todayMidnight = new Date().setHours(0, 0, 0, 0) / 1000
 
       const time = new Date(timeStamp * 1000)
       const year = time.getFullYear()
@@ -169,24 +170,22 @@ export default {
       const date = time.getDate()
       let hours = time.getHours()
       let minutes = time.getMinutes()
-      const current = Math.round(new Date() / 1000)
-      const delta = current - timeStamp
 
       hours = (hours < 10) ? "0" + hours : hours
       minutes = (minutes < 10) ? "0" + minutes : minutes
       const T = hours + ":" + minutes
 
       // 1d === 86400s
-      if (delta < 86400) {
+      if (timeStamp >= todayMidnight) {
         return T
       }
-      if (delta < 2 * 86400) {
+      if (timeStamp >= todayMidnight - 86400) {
         return "昨天 " + T
       }
-      if (delta < 3 * 86400) {
+      if (timeStamp >= todayMidnight - 2 * 86400) {
         return "前天 " + T
       }
-      if (delta < 365 * 86400) {
+      if (timeStamp >= todayMidnight - 364 * 86400) {
         return month + "/" + date + " " + T
       }
       return year + "/" + month + "/" + date + " " + T
