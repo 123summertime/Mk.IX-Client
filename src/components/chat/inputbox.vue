@@ -101,7 +101,6 @@ export default {
           } else if (this.msgType === "image") {
             this.msgSize = file.size
             this.toWebpBase64(base64)
-            this.beforeSending()
           } else {
             this.msgPayload = base64
             this.msgSize = file.size
@@ -110,6 +109,8 @@ export default {
         }
         reader.readAsDataURL(file)
       }
+
+      event.target.value = ''
     },
 
     toWebpBase64(base64) {
@@ -133,6 +134,7 @@ export default {
           let readerWebP = new FileReader()
           readerWebP.onload = (eventWebP) => {
             this.msgPayload = eventWebP.target.result
+            this.beforeSending()
           }
           readerWebP.readAsDataURL(webpBlob)
         }, 'image/webp')
@@ -151,7 +153,6 @@ export default {
           let reader = new FileReader()
           reader.onload = (event) => {
             this.toWebpBase64(event.target.result)
-            this.beforeSending()
           }
 
           reader.readAsDataURL(blob)
