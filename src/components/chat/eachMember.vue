@@ -65,7 +65,7 @@ export default {
     },
     
     userRemoved() {
-      const URL = `http://${localStorage.getItem('adress')}/group/${this.group}/members/${this.uuid}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}`
       axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {

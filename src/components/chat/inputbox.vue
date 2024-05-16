@@ -10,25 +10,25 @@
       <div class="barItem" title="图片" @click="favorite = !favorite">
         <Picture class="icon"></Picture>
       </div>
-      <div class="barItem" title="发送(Shift+Enter)" @click="sending('text', message)">
-        <Promotion class="icon" :style="{ color: message ? 'black' : 'gray' }" />
+      <div class="barItem" title="发送(Shift+Enter)" @click="sendingText()">
+        <Promotion class="icon" :style="{ color: input ? 'black' : 'gray' }" />
       </div>
     </div>
 
     <div class="main">
-      <textarea v-model=message @keydown="onKeyDown" v-on:paste="pasteImg"></textarea>
+      <textarea v-model=input @keydown="onKeyDown" v-on:paste="pasteImg"></textarea>
       <favorite class="favorite" v-if="favorite" @sendFavoriteImg="sendFavoriteImg"></favorite>
     </div>
-    
-    
+
+
     <!-- 确认遮罩层 -->
     <el-dialog v-model="visible" title="发送确认" width="30%" :show-close=false>
-      <img class="previewImg" :src="msgPayload" v-if="msgType === 'image'" />
-      <p class="previewFile" v-else>{{ msgName.split(".").slice(-1)[0] + "文件" }}</p>
+      <img class="previewImg" :src="payload.content" v-if="payload.type === 'image'" />
+      <p class="previewFile" v-else>{{ payload.name.split(".").slice(-1)[0] + "文件" }}</p>
       <template #footer>
         <span class="footer">
           <div class="fileInfo">
-            <div class="msgName" :title="msgName">{{ msgName }}</div>
+            <div class="msgName" :title="payload.name">{{ payload.name }}</div>
             <div class="msgSize" :title="fileSize">{{ fileSize }}</div>
           </div>
           <div class="buttons">
@@ -43,45 +43,74 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 import favorite from './favorite.vue'
 
 export default {
   props: {
-    currGroup: String
+    group: String,
   },
 
   data() {
     return {
-      message: "",
-      msgType: "",
-      msgSize: "",
-      msgName: "",
-      msgPayload: "",
+      input: "",
+      payload: {
+        type: "",
+        size: "",
+        name: "",
+        content: ""
+      },
       visible: false,
       favorite: false,
     }
   },
 
   methods: {
-    sending(type, payload) {
-      if (!payload) { return }
+    sendingText() {
+      if (!this.input) { return }
 
-      this.$store.state.wsConnections[this.currGroup].send(JSON.stringify({
-        "group": this.currGroup,
-        "type": type,
-        "payload": payload,
+      // 文字类型消息格式: {"type": "text", "payload": 消息内容}  通过WS
+      this.$store.state.wsConnections[this.group].send(JSON.stringify({
+        "type": "text",
+        "payload": this.input,
       }))
+      this.input = ""
+    },
 
-      if (type == "text") {
-        this.message = ""
-      }
+    sendingImage() {
+      if (!this.payload.content) { return }
+
+      // 图片类型消息格式: {"type": "image", "payload": 图片base64}  通过WS
+      this.$store.state.wsConnections[this.group].send(JSON.stringify({
+        "type": "image",
+        "payload": this.payload.content,
+      }))
+    },
+
+    sendingFile() {
+      // 文件类型消息格式: FormData  通过HTTP
+      const FD = new FormData()
+      FD.append('file', this.payload.content)
+
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/upload`
+      axios.post(URL, FD, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).catch(err => {
+        ElMessage({
+          message: `上传文件失败 ${err['response']['data']['detail']}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
     },
 
     onKeyDown(event) {
-      if (!this.message) { return }
+      if (!this.input) { return }
+
       if (event.shiftKey && event.key === 'Enter') {
         event.preventDefault()
-        this.sending("text", this.message)
+        this.sendingText()
       }
     },
 
@@ -89,33 +118,28 @@ export default {
       const file = event.target.files[0]
 
       if (file) {
-        this.msgName = file.name
+        this.payload.name = file.name
         const reader = new FileReader()
 
         reader.onload = () => {
-          const base64 = reader.result
-          this.msgType = file.type.toLowerCase().split('/')[0] || "application"
+          this.payload.size = file.size
+          this.payload.type = file.type.toLowerCase().split('/')[0] === "image" ? "image" : "file" 
 
-          if (this.msgType === "text") {
-            this.msgType = "textFile"
-          } else if (this.msgType === "image") {
-            this.msgSize = file.size
-            this.toWebpBase64(base64)
+          if (this.payload.type === "image") {
+            this.toWebpBase64(reader.result)
           } else {
-            this.msgPayload = base64
-            this.msgSize = file.size
+            this.payload.content = file
             this.beforeSending()
           }
+          event.target.value = ""
         }
         reader.readAsDataURL(file)
       }
-
-      event.target.value = ''
     },
 
     toWebpBase64(base64) {
       if (base64.includes('data:image/gif') || base64.includes('data:image/webp')) {
-        this.msgPayload = base64
+        this.payload.content = base64
         return
       }
 
@@ -130,13 +154,14 @@ export default {
         ctx.drawImage(img, 0, 0)
 
         canvas.toBlob((webpBlob) => {
-          this.msgSize = webpBlob.size
-          let readerWebP = new FileReader()
-          readerWebP.onload = (eventWebP) => {
-            this.msgPayload = eventWebP.target.result
+          this.payload.size = webpBlob.size
+
+          let readerWebp = new FileReader()
+          readerWebp.onload = (event) => {
+            this.payload.content = event.target.result
             this.beforeSending()
           }
-          readerWebP.readAsDataURL(webpBlob)
+          readerWebp.readAsDataURL(webpBlob)
         }, 'image/webp')
       }
     },
@@ -146,76 +171,69 @@ export default {
 
       for (let i = 0; i < items.length; i++) {
         if (items[i].type.indexOf('image') !== -1) {
-          let blob = items[i].getAsFile()
-          this.msgName = blob.name
-          this.msgType = 'image'
+          this.payload.type = 'image'
 
           let reader = new FileReader()
           reader.onload = (event) => {
             this.toWebpBase64(event.target.result)
           }
-
+          
+          let blob = items[i].getAsFile()
           reader.readAsDataURL(blob)
         }
       }
     },
 
-    encode() {
-      this.sendingPayload = btoa(JSON.stringify({
-        "fileName": Array.from(new TextEncoder().encode(this.msgName)), // btoa不支持中文 进行UTF-8编码
-        "fileSize": this.fileSize,
-        "content": this.msgPayload
-      }))
-    },  
-
     beforeSending() {
-      this.encode()
       this.visible = true
     },
 
     confirmedSending() {
       this.visible = false
-      this.sending(this.msgType, this.sendingPayload)
+      let callFunction = {
+        "text": this.sendingText,
+        "image": this.sendingImage,
+        "file": this.sendingFile,
+      }
+      callFunction[this.payload.type]()
     },
 
     canceledSending() {
       this.visible = false
     },
-    
+
     sendFavoriteImg(img) {
       this.favorite = false
-      this.msgType = 'image'
-      this.msgPayload = img
+      this.payload.type = 'image'
+      this.payload.content = img
 
       const isWebp = img.substring(0, 30).indexOf('UklGR') >= 0
       if (!isWebp) {
-        this.toWebpBase64(this.msgPayload)
+        this.toWebpBase64(img)
       }
 
-      this.encode()
       this.confirmedSending()
     },
-
   },
 
   computed: {
     fileSize() {
       const mb = 2 ** 20
       const kb = 2 ** 10
-      if (this.msgSize >= mb) {
-        return (this.msgSize / mb).toFixed(2) + "MB"
+      if (this.payload.size >= mb) {
+        return (this.payload.size / mb).toFixed(2) + "MB"
       }
-      if (this.msgSize >= kb) {
-        return (this.msgSize / kb).toFixed(2) + "KB"
+      if (this.payload.size >= kb) {
+        return (this.payload.size / kb).toFixed(2) + "KB"
       }
-      return this.msgSize + "B"
+      return this.payload.size + "B"
     },
 
   },
 
   components: {
     favorite
-  }
+  },
 }
 </script>
 

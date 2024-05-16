@@ -56,7 +56,7 @@
             class="conversation"></chatItem>
         </div>
         <splitter @splitter="inputSplitter" class="inputSplitter" ref="inputSplitter"></splitter>
-        <inputBox :currGroup="currGroupID" class="inputBox" ref="inputBox"></inputBox>
+        <inputBox :group="currGroupID" class="inputBox" ref="inputBox"></inputBox>
       </div>
       <div class="center" v-show="!currGroupID"></div>
     </div>
