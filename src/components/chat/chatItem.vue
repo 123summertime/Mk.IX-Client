@@ -1,12 +1,13 @@
 <template>
   <div @scroll="onScroll" ref="messageView">
     <message v-for="msg in messageList" :key="msg['time']"
+      :group="group"
       :time="msg['time']"
       :type="msg['type']"
       :avatar="msg['avatar']"
       :uuid="msg['uuid']"
       :userName="msg['userName']"
-      :payload="msg['payload']"
+      :message="msg['payload']"
       :owner="owner"
       :admin="admin"
       @deleteMsg="deleteMsg"
@@ -124,8 +125,8 @@ export default {
     },
 
     revokeMsg(time) {
+      // 撤回类型消息格式: {"type": "revoke", "payload": 被撤回消息的time}  通过WS
       this.$store.state.wsConnections[this.group].send(JSON.stringify({
-        "group": this.group,
         "type": 'revoke',
         "payload": time,
       }))

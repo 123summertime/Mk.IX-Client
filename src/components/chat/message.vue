@@ -3,7 +3,7 @@
 
     <div v-if="['revoke'].includes(type)" @contextmenu.prevent="onRightClick">
       <!-- 广播信息 -->
-      <p class="payload broadcastType">{{ content }}</p>
+      <p class="payload broadcastType">{{ payload.content }}</p>
     </div>
 
     <div :class="messageFrom() ? 'message bySelf' : 'message'" v-else>
@@ -17,18 +17,19 @@
         </div>
         <div class="lower" @contextmenu.prevent="onRightClick">
           <!-- 文字信息 -->
-          <p class="payload textType" v-if="type == 'text'">{{ content }}</p>
+          <p class="payload textType" v-if="type == 'text'">{{ payload.content }}</p>
           <!-- 图片信息 -->
-          <el-image class="payload imgType" v-else-if="type == 'image'" :src="content" :preview-src-list="[content]" />
+          <el-image class="payload imgType" v-else-if="type == 'image'" :src="payload.content"
+            :preview-src-list="[payload.content]" />
           <!-- 文件信息 -->
-          <div class="payload fileType" @click="downloading" ref="fileType" v-else>
+          <div class="payload fileType" @click="download" ref="fileType" v-else>
             <div class="fileTypeInnerL">
-              <p :title="fileName"> {{ fileName }}</p>
+              <p :title="payload.name"> {{ payload.name }}</p>
               <p :title="fileSize"> {{ fileSize }}</p>
             </div>
             <div class="fileTypeInnerR">
               <Folder class="fileTypeIcon" />
-              <p ref="IconText">{{ fileName.split('.').slice(-1)[0] }}</p>
+              <p ref="IconText">{{ payload.name.split('.').slice(-1)[0] }}</p>
             </div>
           </div>
           <p class="time">{{ formatedTime }}</p>
@@ -72,7 +73,6 @@
           </span>
         </div>
       </div>
-
     </el-dialog>
 
   </div>
@@ -85,21 +85,24 @@ import messageMenu from './messageMenu.vue'
 
 export default {
   props: {
+    group: String,
     time: String,
     type: String,
     avatar: String,
     uuid: String,
     userName: String,
-    payload: String,
+    message: String,
     owner: Object,
     admin: Map,
   },
 
   data() {
     return {
-      fileName: "",
-      fileSize: "",
-      content: "",
+      payload: {
+        name: "",
+        size: "",
+        content: "",
+      },
       formatedTime: "",
       rightClicked: false,
       namecardVisible: false,
@@ -118,46 +121,40 @@ export default {
       return this.uuid === this.$store.state["account"]
     },
 
-    // 文本类型:payload就是信息内容
-    // 文件类型:payload是包含文件名(UTF-8),文件大小和文件内容的base64字符串
+    // file类型: payload是包含文件名，文件大小，文件ID的JSON字符串
+    // text, image, revoke类型: payload就是信息内容
     getContent() {
-      if (["text", "revoke"].includes(this.type)) {
-        this.content = this.payload
+      if (this.type === 'file') {
+        let info = JSON.parse(this.message)
+        this.payload.name = info["name"]
+        this.payload.size = info["size"]
+        this.payload.content = info["hashcode"]
       } else {
-        try {
-          const c = JSON.parse(atob(this.payload))
-          this.content = c["content"]
-          this.fileSize = c["fileSize"]
-          this.fileName = new TextDecoder().decode(new Uint8Array(c["fileName"]))
-        } catch (err) {
-          this.content = this.payload
+        this.payload.content = this.message
+      }
+    },
+
+    download() {
+      const url = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/download/${this.payload.content}`
+      axios.get(url, {
+        responseType: 'blob',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+        onDownloadProgress(event) {
+          console.log(event.loaded / event.total + "%")
         }
-      }
-    },
-
-    base64ToBlob(base64, fileType) {
-      fileType = fileType || "application/octet-stream"
-
-      const bytes = atob(base64.split(',')[1])
-      const byteNumbers = new Array(bytes.length)
-      for (var i = 0; i < bytes.length; i++) {
-        byteNumbers[i] = bytes.charCodeAt(i)
-      }
-      const byteArray = new Uint8Array(byteNumbers)
-      const blob = new Blob([byteArray], { type: fileType })
-      return blob
-    },
-
-    downloadFile(blob, fileName) {
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = fileName
-      link.click()
-    },
-
-    downloading() {
-      const blob = this.base64ToBlob(this.content)
-      this.downloadFile(blob, this.fileName)
+      }).then(res => {
+        const blob = new Blob([res.data])
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = this.payload.name
+        link.click()
+      }).catch(err => {
+        ElMessage({
+          message: `下载文件失败 ${err}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
     },
 
     computeMessageTime(timeStamp) {
@@ -197,7 +194,7 @@ export default {
       let currFontsize = 16
       const temp = document.createElement('span')
       temp.style.fontSize = currFontsize + 'px'
-      temp.innerText = this.fileName.split('.').slice(-1)[0]
+      temp.innerText = this.payload.name.split('.').slice(-1)[0]
       document.body.appendChild(temp)
 
       while (temp.offsetWidth > 48 && currFontsize > 8) {
@@ -248,7 +245,7 @@ export default {
     addToFavorite() {
       this.DB.add('Image', {
         time: Date.now(),
-        payload: this.content
+        payload: this.payload.content
       })
     },
 
@@ -263,6 +260,19 @@ export default {
       }).catch(err => {
         console.log(err)
       })
+    },
+
+    base64ToBlob(base64, fileType) {
+      fileType = fileType || "application/octet-stream"
+
+      const bytes = atob(base64.split(',')[1])
+      const byteNumbers = new Array(bytes.length)
+      for (var i = 0; i < bytes.length; i++) {
+        byteNumbers[i] = bytes.charCodeAt(i)
+      }
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: fileType })
+      return blob
     },
 
     copyMsg() {
@@ -298,7 +308,7 @@ export default {
     getNameplate() {
       // 排除没有Nameplate的消息类型
       if (['revoke'].includes(this.type)) { return }
-      
+
       if (this.owner.has(this.uuid)) {
         this.$nextTick(() => {
           this.$refs.Nameplate.style.display = "block"
@@ -320,6 +330,19 @@ export default {
       })
       return ""
     },
+
+    fileSize() {
+      const mb = 2 ** 20
+      const kb = 2 ** 10
+      if (this.payload.size >= mb) {
+        return (this.payload.size / mb).toFixed(2) + "MB"
+      }
+      if (this.payload.size >= kb) {
+        return (this.payload.size / kb).toFixed(2) + "KB"
+      }
+      return this.payload.size + "B"
+    },
+
   },
 
   watch: {
@@ -495,7 +518,7 @@ export default {
   width: 100%;
 }
 
-.namecardAvatar img{
+.namecardAvatar img {
   width: 96px;
   height: 96px;
   border-radius: 16px;
@@ -508,12 +531,12 @@ export default {
   margin-left: 32px;
 }
 
-.namecardInfo span{
+.namecardInfo span {
   display: flex;
   margin: 12px 0;
 }
 
-.namecardInfo span:nth-child(1){
+.namecardInfo span:nth-child(1) {
   margin-top: 0;
 }
 
@@ -534,4 +557,5 @@ export default {
   .fileTypeInnerR {
     display: none;
   }
-}</style>
+}
+</style>
