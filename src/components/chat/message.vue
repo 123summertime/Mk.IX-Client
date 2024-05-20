@@ -22,14 +22,23 @@
           <el-image class="payload imgType" v-else-if="type == 'image'" :src="payload.content"
             :preview-src-list="[payload.content]" />
           <!-- 文件信息 -->
-          <div class="payload fileType" @click="download" ref="fileType" v-else>
+          <div class="payload fileType" @click="downloading" ref="fileType" v-else>
             <div class="fileTypeInnerL">
               <p :title="payload.name"> {{ payload.name }}</p>
-              <p :title="fileSize"> {{ fileSize }}</p>
+              <p :title="fileSize(payload.size)" v-if="download.state == 'pending'"> {{ fileSize(payload.size) }}</p>
+              <p v-else>
+                <span>{{ downloadSPD }}</span>
+                <span>{{ downloadETC }}</span>
+              </p>
             </div>
             <div class="fileTypeInnerR">
-              <Folder class="fileTypeIcon" />
-              <p ref="IconText">{{ payload.name.split('.').slice(-1)[0] }}</p>
+              <div v-if="download.state == 'pending'">
+                <Folder class="fileTypeIcon" />
+                <p ref="IconText">{{ payload.name.split('.').slice(-1)[0] }}</p>
+              </div>
+              <div v-else>
+                <canvas width="64" height="64" ref="progress"></canvas>
+              </div>
             </div>
           </div>
           <p class="time">{{ formatedTime }}</p>
@@ -69,7 +78,7 @@
           </span>
           <span>
             <i>最后访问:</i>
-            <i>{{ lastSeen === "Online" ? "在线" : computeMessageTime(lastSeen) }}</i>
+            <i>{{ lastSeen === "Online" ? "在线" : computeTime(lastSeen) }}</i>
           </span>
         </div>
       </div>
@@ -103,6 +112,12 @@ export default {
         size: "",
         content: "",
       },
+      download: {
+        state: "pending",
+        speed: 0,
+        rate: 0,
+      },
+
       formatedTime: "",
       rightClicked: false,
       namecardVisible: false,
@@ -134,13 +149,22 @@ export default {
       }
     },
 
-    download() {
+    downloading() {
+      this.download.state = "downloading"
+      
       const url = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/download/${this.payload.content}`
       axios.get(url, {
         responseType: 'blob',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-        onDownloadProgress(event) {
-          console.log(event.loaded / event.total + "%")
+        onDownloadProgress: event => {
+          this.download.speed = event.rate ?? 0
+          this.download.rate = event.progress * 100 ?? 0
+
+          this.canvasDrawer(this.download.rate, '#E5EAF3', '#409EFF')
+          if (this.download.rate >= 100) {
+            this.canvasDrawer(0, '#67C23A', '#000000')
+            this.download.state = "success"
+          }
         }
       }).then(res => {
         const blob = new Blob([res.data])
@@ -149,6 +173,7 @@ export default {
         link.download = this.payload.name
         link.click()
       }).catch(err => {
+        this.download.state = "failed"
         ElMessage({
           message: `下载文件失败 ${err}`,
           duration: 6000,
@@ -157,7 +182,45 @@ export default {
       })
     },
 
-    computeMessageTime(timeStamp) {
+    canvasDrawer(percentage, color1, color2) {
+      const canvas = this.$refs.progress
+
+      const ctx = canvas.getContext('2d')
+      const X = canvas.width / 2
+      const Y = canvas.height / 2
+      const R = X - 4
+      const start = -0.5 * Math.PI
+      const end = start + 2 * Math.PI * (percentage / 100)
+
+      ctx.lineWidth = 4
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      ctx.beginPath()
+      ctx.arc(X, Y, R, 0, 2 * Math.PI, false)
+      ctx.strokeStyle = color1
+      ctx.stroke()
+
+      ctx.beginPath()
+      ctx.arc(X, Y, R, start, end, false)
+      ctx.strokeStyle = color2
+      ctx.stroke()
+    },
+
+    fileSize(size) {
+      const mb = 2 ** 20
+      const kb = 2 ** 10
+
+      size = Number(size)
+      if (size >= mb) {
+        return (size / mb).toFixed(2) + "MB"
+      }
+      if (size >= kb) {
+        return (size / kb).toFixed(2) + "KB"
+      }
+      return size.toFixed(0) + "B"
+    },
+
+    computeTime(timeStamp) {
       timeStamp = Math.round(Number(timeStamp.substring(0, 10)))  // 精确到秒的时间戳(10位)
       let todayMidnight = new Date().setHours(0, 0, 0, 0) / 1000
 
@@ -331,18 +394,26 @@ export default {
       return ""
     },
 
-    fileSize() {
-      const mb = 2 ** 20
-      const kb = 2 ** 10
-      if (this.payload.size >= mb) {
-        return (this.payload.size / mb).toFixed(2) + "MB"
-      }
-      if (this.payload.size >= kb) {
-        return (this.payload.size / kb).toFixed(2) + "KB"
-      }
-      return this.payload.size + "B"
+    downloadSPD() {
+      return this.fileSize(this.download.speed) + '/s'
     },
 
+    downloadETC() {
+      const remain = this.payload.size * (100 - this.download.rate) / 100
+      const speed = this.download.speed
+      const time = remain / speed
+
+      if (!Number.isFinite(time)) {
+        return ""
+      }
+      if (time <= 60) {
+        return "还需" + time.toFixed(0) + "秒"
+      }
+      if (time <= 60 * 60) {
+        return "还需" + (time / 60).toFixed(0) + "分"
+      }
+      return "还需" + (time / 60 / 60).toFixed(0) + "时"
+    },
   },
 
   watch: {
@@ -357,7 +428,7 @@ export default {
     await this.getFavoriteDB()
     this.getContent()
     this.dynamicFontsize()
-    this.formatedTime = this.computeMessageTime(this.time)
+    this.formatedTime = this.computeTime(this.time)
   },
 
   components: {
