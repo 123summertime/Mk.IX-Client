@@ -25,19 +25,21 @@
           <div class="payload fileType" @click="downloading" ref="fileType" v-else>
             <div class="fileTypeInnerL">
               <p :title="payload.name"> {{ payload.name }}</p>
-              <p :title="fileSize(payload.size)" v-if="download.state == 'pending'"> {{ fileSize(payload.size) }}</p>
-              <p v-else>
-                <span>{{ downloadSPD }}</span>
-                <span>{{ downloadETC }}</span>
-              </p>
+              <p v-if="download.state == 'pending'" :title="fileSize(payload.size)"> {{ fileSize(payload.size) }}</p>
+              <p v-else-if="download.state == 'downloading'" class="downloadingInfo"><i>{{ downloadSPD }}</i><i>{{
+                downloadETC }}</i></p>
+              <p v-else-if="download.state == 'success'">下载完成</p>
+              <p v-else>下载失败</p>
             </div>
             <div class="fileTypeInnerR">
               <div v-if="download.state == 'pending'">
                 <Folder class="fileTypeIcon" />
-                <p ref="IconText">{{ payload.name.split('.').slice(-1)[0] }}</p>
+                <p ref="IconText" class="iconInnerText">{{ payload.name.split('.').slice(-1)[0] }}</p>
               </div>
               <div v-else>
                 <canvas width="64" height="64" ref="progress"></canvas>
+                <p v-if="download.state == 'downloading'" class="iconInnerText">{{ download.rate.toFixed(0) + '%' }}</p>
+                <Check v-else-if="download.state == 'success'" color="#67C23A" class="iconInnerText"></Check>
               </div>
             </div>
           </div>
@@ -151,7 +153,7 @@ export default {
 
     downloading() {
       this.download.state = "downloading"
-      
+
       const url = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/download/${this.payload.content}`
       axios.get(url, {
         responseType: 'blob',
@@ -536,6 +538,11 @@ export default {
   text-overflow: ellipsis;
 }
 
+.downloadingInfo {
+  display: flex;
+  justify-content: space-between;
+}
+
 .fileTypeInnerR {
   position: relative;
   width: 64px;
@@ -543,12 +550,12 @@ export default {
   margin: auto 0;
 }
 
-.fileTypeInnerR p {
+.iconInnerText {
   position: absolute;
-  top: 22px;
+  top: 20px;
   left: 8px;
   width: 48px;
-  height: 26px;
+  height: 24px;
   line-height: 26px;
   text-align: center;
   white-space: nowrap;
@@ -557,8 +564,8 @@ export default {
 }
 
 .fileTypeIcon {
-  width: 100%;
-  height: 100%;
+  width: 64px;
+  height: 64px;
 }
 
 .broadcastType {
