@@ -26,8 +26,9 @@
             <div class="fileTypeInnerL">
               <p :title="payload.name"> {{ payload.name }}</p>
               <p v-if="download.state == 'pending'" :title="fileSize(payload.size)"> {{ fileSize(payload.size) }}</p>
-              <p v-else-if="download.state == 'downloading'" class="downloadingInfo"><i>{{ downloadSPD }}</i><i>{{
-                downloadETC }}</i></p>
+              <p v-else-if="download.state == 'downloading'" class="downloadingInfo">
+                <i>{{ downloadSPD }}</i><i>{{ downloadETC }}</i>
+              </p>
               <p v-else-if="download.state == 'success'">下载完成</p>
               <p v-else>下载失败</p>
             </div>
@@ -141,7 +142,7 @@ export default {
     // file类型: payload是包含文件名，文件大小，文件ID的JSON字符串
     // text, image, revoke类型: payload就是信息内容
     getContent() {
-      if (this.type === 'file') {
+      if (this.type != 'text' && this.type != 'image') {
         let info = JSON.parse(this.message)
         this.payload.name = info["name"]
         this.payload.size = info["size"]

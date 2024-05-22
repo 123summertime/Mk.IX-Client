@@ -10,6 +10,19 @@
       <div class="barItem" title="图片" @click="favorite = !favorite">
         <Picture class="icon"></Picture>
       </div>
+      <div class="barItem" title="语音">
+        <el-popover
+          :visible="recorder.recording"
+          placement="top"
+          :width="200"
+          trigger="click"
+          :hide-after="40"
+          :content="`录音中, 再次点击结束录音\n已录制 ${recorder.time}s`">
+          <template #reference>
+            <Microphone class="icon" @click="audioRecorder"></Microphone>
+          </template>
+        </el-popover>
+      </div>
       <div class="barItem" title="发送(Shift+Enter)" @click="sendingText()">
         <Promotion class="icon" :style="{ color: input ? 'black' : 'gray' }" />
       </div>
@@ -61,6 +74,11 @@ export default {
         name: "",
         content: ""
       },
+      recorder: {
+        time: 0,
+        timer: null,
+        recording: false,
+      },
       visible: false,
       favorite: false,
     }
@@ -89,9 +107,11 @@ export default {
     },
 
     sendingFile() {
-      // 文件类型消息格式: FormData  通过HTTP
+      // 文件类型消息格式: FormData  payload.content: File  通过HTTP
       const FD = new FormData()
       FD.append('file', this.payload.content)
+      FD.append('fileType', this.payload.type)
+      console.log(this.payload.content)
 
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/upload`
       axios.post(URL, FD, {
@@ -123,7 +143,7 @@ export default {
 
         reader.onload = () => {
           this.payload.size = file.size
-          this.payload.type = file.type.toLowerCase().split('/')[0] === "image" ? "image" : "file" 
+          this.payload.type = file.type.toLowerCase().split('/')[0] === "image" ? "image" : "file"
 
           if (this.payload.type === "image") {
             this.toWebpBase64(reader.result)
@@ -177,11 +197,51 @@ export default {
           reader.onload = (event) => {
             this.toWebpBase64(event.target.result)
           }
-          
+
           let blob = items[i].getAsFile()
           reader.readAsDataURL(blob)
         }
       }
+    },
+
+    async recorderBuilder() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      this.recorder.recorder = new MediaRecorder(stream)
+    },
+
+    async audioRecorder() {
+      this.recorder.recorder.ondataavailable = event => {
+        this.payload.content.push(event.data)
+      }
+
+      this.recorder.recorder.onstop = () => {
+        this.payload.name = '录音.mp3'
+        const blob = new File(this.payload.content, this.payload.name, { type: 'audio/mp3' })
+        this.payload.size = blob.size
+        this.payload.content = blob
+        clearInterval(this.recorder.timer)
+        this.beforeSending()
+      }
+
+      if (this.recorder.recording) {
+        this.recorder.recording = false
+        this.recorder.recorder.stop()
+        return
+      }
+
+      this.payload.type = 'audio'
+      this.payload.content = []
+      this.recorder.time = 0
+      this.recorder.recording = true
+      this.recorder.recorder.start()
+
+      this.recorder.timer = setInterval(() => {
+        if (this.recorder.time === 50 && this.recorder.recording) {
+          this.recorder.recording = false
+          this.recorder.recorder.stop()
+        }
+        this.recorder.time += 1
+      }, 1000)
     },
 
     beforeSending() {
@@ -190,9 +250,10 @@ export default {
 
     confirmedSending() {
       this.visible = false
-      let callFunction = {
+      const callFunction = {
         "text": this.sendingText,
         "image": this.sendingImage,
+        "audio": this.sendingFile,
         "file": this.sendingFile,
       }
       callFunction[this.payload.type]()
@@ -234,6 +295,10 @@ export default {
   components: {
     favorite
   },
+
+  async mounted() {
+    await this.recorderBuilder()
+  }
 }
 </script>
 
@@ -271,6 +336,7 @@ input[type="file"] {
   display: block;
   height: 100%;
   margin: 0 auto;
+  outline: none;
 }
 
 /* main */
