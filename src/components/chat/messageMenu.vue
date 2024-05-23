@@ -1,22 +1,22 @@
 <template>
   <div class="msgMenuRoot">
-    <div @click="addToFavorite" v-if="type === 'image'">
+    <div @click="addToFavorite" v-if="display.favorite">
       <Plus></Plus>
       <p>添加到表情</p>
     </div>
-    <div @click="copyMsg" v-if="['text', 'image'].includes(type)">
+    <div @click="copyMsg" v-if="display.copy">
       <DocumentCopy></DocumentCopy>
       <p>复制</p>
     </div>
-    <div @click="deleteMsg">
+    <div @click="deleteMsg" v-if="display.delete">
       <Delete></Delete>
       <p>删除</p>
     </div>
-    <div @click="forwardMsg" v-if="!['revoke'].includes(type)">
+    <div @click="forwardMsg" v-if="display.forward">
       <Share></Share>
       <p>转发</p>
     </div>
-    <div @click="revokeMsg" v-if="!['revoke'].includes(type) && checkPermissions">
+    <div @click="revokeMsg" v-if="display.revoke">
       <CircleClose></CircleClose>
       <p>撤回</p>
     </div>
@@ -27,18 +27,62 @@
 export default {
   props: {
     type: String,
+    content: String,
     uuid: String,
     owner: Object,
     admin: Map,
   },
 
+  data() {
+    return {
+      display: {
+        "favorite": false,
+        "copy": false,
+        "delete": false,
+        "forward": false,
+        "revoke": false,
+      }
+    }
+  },
+
   methods: {
-    addToFavorite() {
-      this.$emit('addToFavorite')
+    async getFavoriteDB() {
+      this.DB = await this.$store.state["favoriteDB"]
+    },
+
+    async addToFavorite() {
+      if (!this.DB) {
+        await this.getFavoriteDB()
+      }
+
+      this.DB.add('Image', {
+        time: Date.now(),
+        payload: this.content
+      })
+    },
+
+    base64ToBlob(base64, fileType) {
+      fileType = fileType || "application/octet-stream"
+
+      const bytes = atob(base64.split(',')[1])
+      const byteNumbers = new Array(bytes.length)
+      for (var i = 0; i < bytes.length; i++) {
+        byteNumbers[i] = bytes.charCodeAt(i)
+      }
+      const byteArray = new Uint8Array(byteNumbers)
+      const blob = new Blob([byteArray], { type: fileType })
+      return blob
     },
 
     copyMsg() {
-      this.$emit('copyMsg')
+      const cb = navigator.clipboard
+      if (this.type === 'text') {
+        cb.writeText(this.content)
+      }
+      if (this.type === 'image') {
+        const blob = this.base64ToBlob(this.content, "image/png")
+        cb.write([new ClipboardItem({ "image/png": blob })])
+      }
     },
 
     deleteMsg() {
@@ -72,6 +116,16 @@ export default {
       }
       return false
     }
+  },
+
+  mounted() {
+    const displayMap = {
+      "text": { "favorite": false, "copy": true, "delete": true, "forward": true, "revoke": this.checkPermissions },
+      "image": { "favorite": true, "copy": true, "delete": true, "forward": true, "revoke": this.checkPermissions },
+      "file": { "favorite": false, "copy": false, "delete": true, "forward": true, "revoke": this.checkPermissions },
+      "revoke": { "favorite": false, "copy": false, "delete": true, "forward": false, "revoke": false },
+    }
+    this.display = displayMap[this.type] || displayMap["file"]
   }
 }
 </script>

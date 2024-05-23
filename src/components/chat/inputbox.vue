@@ -111,7 +111,6 @@ export default {
       const FD = new FormData()
       FD.append('file', this.payload.content)
       FD.append('fileType', this.payload.type)
-      console.log(this.payload.content)
 
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/upload`
       axios.post(URL, FD, {
@@ -210,6 +209,10 @@ export default {
     },
 
     async audioRecorder() {
+      if (!this.recorder.recorder) {
+        await this.recorderBuilder()
+      }
+
       this.recorder.recorder.ondataavailable = event => {
         this.payload.content.push(event.data)
       }
@@ -221,6 +224,7 @@ export default {
         this.payload.content = blob
         clearInterval(this.recorder.timer)
         this.beforeSending()
+        this.recorder.recorder = null
       }
 
       if (this.recorder.recording) {
@@ -296,9 +300,6 @@ export default {
     favorite
   },
 
-  async mounted() {
-    await this.recorderBuilder()
-  }
 }
 </script>
 

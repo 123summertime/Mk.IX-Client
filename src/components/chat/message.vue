@@ -1,9 +1,8 @@
 <template>
   <div class="messageRoot" ref="MessageRoot">
 
-    <div v-if="['revoke'].includes(type)" @contextmenu.prevent="onRightClick">
-      <!-- 广播信息 -->
-      <p class="payload broadcastType">{{ payload.content }}</p>
+    <div v-if="type === 'revoke'" @contextmenu.prevent="onRightClick">
+      <broadcast class="payload" :payload="payload"></broadcast>
     </div>
 
     <div :class="messageFrom() ? 'message bySelf' : 'message'" v-else>
@@ -16,34 +15,9 @@
           <p class="userName">{{ userName }}</p>
         </div>
         <div class="lower" @contextmenu.prevent="onRightClick">
-          <!-- 文字信息 -->
-          <p class="payload textType" v-if="type == 'text'">{{ payload.content }}</p>
-          <!-- 图片信息 -->
-          <el-image class="payload imgType" v-else-if="type == 'image'" :src="payload.content"
-            :preview-src-list="[payload.content]" />
-          <!-- 文件信息 -->
-          <div class="payload fileType" @click="downloading" ref="fileType" v-else>
-            <div class="fileTypeInnerL">
-              <p :title="payload.name"> {{ payload.name }}</p>
-              <p v-if="download.state == 'pending'" :title="fileSize(payload.size)"> {{ fileSize(payload.size) }}</p>
-              <p v-else-if="download.state == 'downloading'" class="downloadingInfo">
-                <i>{{ downloadSPD }}</i><i>{{ downloadETC }}</i>
-              </p>
-              <p v-else-if="download.state == 'success'">下载完成</p>
-              <p v-else>下载失败</p>
-            </div>
-            <div class="fileTypeInnerR">
-              <div v-if="download.state == 'pending'">
-                <Folder class="fileTypeIcon" />
-                <p ref="IconText" class="iconInnerText">{{ payload.name.split('.').slice(-1)[0] }}</p>
-              </div>
-              <div v-else>
-                <canvas width="64" height="64" ref="progress"></canvas>
-                <p v-if="download.state == 'downloading'" class="iconInnerText">{{ download.rate.toFixed(0) + '%' }}</p>
-                <Check v-else-if="download.state == 'success'" color="#67C23A" class="iconInnerText"></Check>
-              </div>
-            </div>
-          </div>
+          <textMsg class="payload" v-if="type == 'text'" :payload="payload"></textMsg>
+          <imageMsg class="payload" v-else-if="type == 'image'" :payload="payload"></imageMsg>
+          <fileMsg class="payload" v-else :group="group" :payload="payload"></fileMsg>
           <p class="time">{{ formatedTime }}</p>
         </div>
       </div>
@@ -51,11 +25,10 @@
 
     <messageMenu class="contextMenu" ref="ContextMenu"
       :type="type"
+      :content="payload.content"
       :uuid="uuid"
       :owner="owner"
       :admin="admin"
-      @addToFavorite="addToFavorite"
-      @copyMsg="copyMsg"
       @deleteMsg="deleteMsg"
       @forwardMsg="forwardMsg"
       @revokeMsg="revokeMsg">
@@ -93,6 +66,10 @@
 <script>
 import axios from 'axios'
 
+import broadcast from './messageType/broadcast.vue'
+import fileMsg from './messageType/fileMsg.vue'
+import imageMsg from './messageType/imageMsg.vue'
+import textMsg from './messageType/textMsg.vue'
 import messageMenu from './messageMenu.vue'
 
 export default {
@@ -115,11 +92,6 @@ export default {
         size: "",
         content: "",
       },
-      download: {
-        state: "pending",
-        speed: 0,
-        rate: 0,
-      },
 
       formatedTime: "",
       rightClicked: false,
@@ -131,96 +103,21 @@ export default {
   },
 
   methods: {
-    async getFavoriteDB() {
-      this.DB = await this.$store.state["favoriteDB"]
-    },
-
     messageFrom() {
       return this.uuid === this.$store.state["account"]
     },
 
-    // file类型: payload是包含文件名，文件大小，文件ID的JSON字符串
+    // file, audio类型: payload是包含文件名，文件大小，文件hashcode的JSON字符串
     // text, image, revoke类型: payload就是信息内容
     getContent() {
-      if (this.type != 'text' && this.type != 'image') {
-        let info = JSON.parse(this.message)
+      if (this.type === 'file' || this.type === 'audio') {
+        const info = JSON.parse(this.message)
         this.payload.name = info["name"]
         this.payload.size = info["size"]
         this.payload.content = info["hashcode"]
       } else {
         this.payload.content = this.message
       }
-    },
-
-    downloading() {
-      this.download.state = "downloading"
-
-      const url = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/download/${this.payload.content}`
-      axios.get(url, {
-        responseType: 'blob',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-        onDownloadProgress: event => {
-          this.download.speed = event.rate ?? 0
-          this.download.rate = event.progress * 100 ?? 0
-
-          this.canvasDrawer(this.download.rate, '#E5EAF3', '#409EFF')
-          if (this.download.rate >= 100) {
-            this.canvasDrawer(0, '#67C23A', '#000000')
-            this.download.state = "success"
-          }
-        }
-      }).then(res => {
-        const blob = new Blob([res.data])
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = this.payload.name
-        link.click()
-      }).catch(err => {
-        this.download.state = "failed"
-        ElMessage({
-          message: `下载文件失败 ${err}`,
-          duration: 6000,
-          type: "error",
-        })
-      })
-    },
-
-    canvasDrawer(percentage, color1, color2) {
-      const canvas = this.$refs.progress
-
-      const ctx = canvas.getContext('2d')
-      const X = canvas.width / 2
-      const Y = canvas.height / 2
-      const R = X - 4
-      const start = -0.5 * Math.PI
-      const end = start + 2 * Math.PI * (percentage / 100)
-
-      ctx.lineWidth = 4
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      ctx.beginPath()
-      ctx.arc(X, Y, R, 0, 2 * Math.PI, false)
-      ctx.strokeStyle = color1
-      ctx.stroke()
-
-      ctx.beginPath()
-      ctx.arc(X, Y, R, start, end, false)
-      ctx.strokeStyle = color2
-      ctx.stroke()
-    },
-
-    fileSize(size) {
-      const mb = 2 ** 20
-      const kb = 2 ** 10
-
-      size = Number(size)
-      if (size >= mb) {
-        return (size / mb).toFixed(2) + "MB"
-      }
-      if (size >= kb) {
-        return (size / kb).toFixed(2) + "KB"
-      }
-      return size.toFixed(0) + "B"
     },
 
     computeTime(timeStamp) {
@@ -254,23 +151,7 @@ export default {
       return year + "/" + month + "/" + date + " " + T
     },
 
-    dynamicFontsize() {
-      if (!this.$refs.IconText) { return }
-
-      let currFontsize = 16
-      const temp = document.createElement('span')
-      temp.style.fontSize = currFontsize + 'px'
-      temp.innerText = this.payload.name.split('.').slice(-1)[0]
-      document.body.appendChild(temp)
-
-      while (temp.offsetWidth > 48 && currFontsize > 8) {
-        currFontsize--
-        temp.style.fontSize = currFontsize + 'px'
-      }
-
-      this.$refs.IconText.style.fontSize = currFontsize + 'px'
-      document.body.removeChild(temp)
-    },
+    
 
     onRightClick(event) {
       const rect = this.$refs.MessageRoot.getBoundingClientRect()
@@ -308,13 +189,6 @@ export default {
       window.removeEventListener('contextmenu', this.globalClick)
     },
 
-    addToFavorite() {
-      this.DB.add('Image', {
-        time: Date.now(),
-        payload: this.payload.content
-      })
-    },
-
     showProfile() {
       this.namecardVisible = true
 
@@ -328,32 +202,6 @@ export default {
       })
     },
 
-    base64ToBlob(base64, fileType) {
-      fileType = fileType || "application/octet-stream"
-
-      const bytes = atob(base64.split(',')[1])
-      const byteNumbers = new Array(bytes.length)
-      for (var i = 0; i < bytes.length; i++) {
-        byteNumbers[i] = bytes.charCodeAt(i)
-      }
-      const byteArray = new Uint8Array(byteNumbers)
-      const blob = new Blob([byteArray], { type: fileType })
-      return blob
-    },
-
-    copyMsg() {
-      const cb = navigator.clipboard
-      if (this.type === 'text') {
-        cb.writeText(this.payload)
-      }
-      if (this.type === 'image') {
-        const blob = this.base64ToBlob(this.payload, "image/png")
-        cb.write([
-          new ClipboardItem({ "image/png": blob })
-        ])
-      }
-    },
-
     deleteMsg() {
       this.$emit('deleteMsg', this.time)
     },
@@ -361,7 +209,7 @@ export default {
     forwardMsg() {
       this.$emit('forwardMsg', {
         type: this.type,
-        payload: this.payload,
+        payload: this.payload.content,
       })
     },
 
@@ -397,30 +245,11 @@ export default {
       return ""
     },
 
-    downloadSPD() {
-      return this.fileSize(this.download.speed) + '/s'
-    },
-
-    downloadETC() {
-      const remain = this.payload.size * (100 - this.download.rate) / 100
-      const speed = this.download.speed
-      const time = remain / speed
-
-      if (!Number.isFinite(time)) {
-        return ""
-      }
-      if (time <= 60) {
-        return "还需" + time.toFixed(0) + "秒"
-      }
-      if (time <= 60 * 60) {
-        return "还需" + (time / 60).toFixed(0) + "分"
-      }
-      return "还需" + (time / 60 / 60).toFixed(0) + "时"
-    },
   },
 
   watch: {
-    payload: {
+    // 撤回时watch props的变化
+    message: {
       handler() {
         this.getContent()
       }
@@ -428,13 +257,15 @@ export default {
   },
 
   async mounted() {
-    await this.getFavoriteDB()
     this.getContent()
-    this.dynamicFontsize()
     this.formatedTime = this.computeTime(this.time)
   },
 
   components: {
+    broadcast,
+    fileMsg,
+    imageMsg,
+    textMsg,
     messageMenu,
   }
 
@@ -497,83 +328,13 @@ export default {
 }
 
 .payload {
-  max-width: 90%;
+  /* max-width: 90%; */
   word-wrap: break-word;
   white-space: pre-wrap;
-  background-color: orangered;
   border-radius: 12px;
   padding: 12px 16px;
   margin-top: 6px;
   direction: ltr;
-}
-
-.textType {
-  font-size: 1.2rem;
-  line-height: 1.5rem;
-}
-
-:deep(.el-image__inner) {
-  max-height: 50vh;
-}
-
-.fileType {
-  display: flex;
-  justify-content: space-between;
-  width: 300px;
-  height: 100px;
-  background-color: beige;
-  cursor: pointer;
-}
-
-.fileTypeInnerL {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  max-width: 192px;
-  justify-content: space-around;
-}
-
-.fileTypeInnerL p {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.downloadingInfo {
-  display: flex;
-  justify-content: space-between;
-}
-
-.fileTypeInnerR {
-  position: relative;
-  width: 64px;
-  height: 64px;
-  margin: auto 0;
-}
-
-.iconInnerText {
-  position: absolute;
-  top: 20px;
-  left: 8px;
-  width: 48px;
-  height: 24px;
-  line-height: 26px;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.fileTypeIcon {
-  width: 64px;
-  height: 64px;
-}
-
-.broadcastType {
-  max-width: calc(100% - 112px);
-  margin: 0 auto;
-  text-align: center;
-  margin-bottom: 24px;
 }
 
 .time {
@@ -626,15 +387,5 @@ export default {
 .namecardInfo span i:nth-child(2) {
   width: calc(100% - 96px);
   word-break: break-all;
-}
-
-@media screen and (max-width: 1000px) {
-  .fileTypeInnerL {
-    max-width: 100%;
-  }
-
-  .fileTypeInnerR {
-    display: none;
-  }
 }
 </style>

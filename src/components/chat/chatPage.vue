@@ -493,6 +493,7 @@ export default {
 
 
 <!-- 
+文件关系结构
 chatPage
   |- groupItem
   |- splitter
@@ -504,5 +505,9 @@ chatPage
   |     |-favorite
   |- chatItem
   |     |- message
-  |     |      |- messageMenu
+  |     |     |- broadcast
+  |     |     |- fileMsg
+  |     |     |- imageMsg
+  |     |     |- textMsg
+  |     |     |- messageMenu
  -->
