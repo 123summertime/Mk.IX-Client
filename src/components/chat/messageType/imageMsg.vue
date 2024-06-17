@@ -24,6 +24,6 @@ export default {
 }
 
 :deep(.el-image__inner) {
-  max-height: 50vh;
+  max-height: 40vh;
 }
 </style>

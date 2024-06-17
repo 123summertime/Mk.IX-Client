@@ -69,10 +69,10 @@ export default {
     return {
       input: "",
       payload: {
-        type: "",
-        size: "",
-        name: "",
-        content: ""
+        type: "text",
+        size: null,
+        name: null,
+        content: null,
       },
       recorder: {
         time: 0,
@@ -88,26 +88,33 @@ export default {
     sendingText() {
       if (!this.input) { return }
 
-      // 文字类型消息格式: {"type": "text", "payload": 消息内容}  通过WS
       this.$store.state.wsConnections[this.group].send(JSON.stringify({
         "type": "text",
-        "payload": this.input,
+        "payload": {
+          name: null,
+          size: null,
+          content: this.input,
+        }
       }))
       this.input = ""
     },
 
-    sendingImage() {
+
+    sendingMessage() {
       if (!this.payload.content) { return }
 
-      // 图片类型消息格式: {"type": "image", "payload": 图片base64}  通过WS
       this.$store.state.wsConnections[this.group].send(JSON.stringify({
-        "type": "image",
-        "payload": this.payload.content,
+        "type": this.payload.type,
+        "payload": {
+          name: this.payload.name,
+          size: this.payload.size,
+          content: this.payload.content,
+        }
       }))
+      this.payload.content = ""
     },
 
     sendingFile() {
-      // 文件类型消息格式: FormData  payload.content: File  通过HTTP
       const FD = new FormData()
       FD.append('file', this.payload.content)
       FD.append('fileType', this.payload.type)
@@ -190,6 +197,7 @@ export default {
 
       for (let i = 0; i < items.length; i++) {
         if (items[i].type.indexOf('image') !== -1) {
+          this.payload.name = 'Image.webp'
           this.payload.type = 'image'
 
           let reader = new FileReader()
@@ -218,7 +226,7 @@ export default {
       }
 
       this.recorder.recorder.onstop = () => {
-        this.payload.name = '录音.mp3'
+        this.payload.name = 'record.mp3'
         const blob = new File(this.payload.content, this.payload.name, { type: 'audio/mp3' })
         this.payload.size = blob.size
         this.payload.content = blob
@@ -256,7 +264,7 @@ export default {
       this.visible = false
       const callFunction = {
         "text": this.sendingText,
-        "image": this.sendingImage,
+        "image": this.sendingMessage,
         "audio": this.sendingFile,
         "file": this.sendingFile,
       }

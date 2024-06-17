@@ -28,12 +28,19 @@ export default createStore({
       })
 
       ws.onmessage = async function (event) {
-        const data = JSON.parse(event["data"])
-
+        const data = JSON.parse(event.data)
         const fullData = await queryInfo("Account", data["senderKey"], data["senderID"])
         context.commit('getNewMessage', {
-          "groupID": data["group"],
-          "payload": { ...fullData, ...data }
+          "groupID": data.group,
+          "payload": {
+            time: data.time,
+            type: data.type,
+            group: data.group,
+            uuid: fullData.uuid,
+            userName: fullData.userName,
+            avatar: fullData.avatar,
+            payload: data.payload
+          }
         })
       }
     },

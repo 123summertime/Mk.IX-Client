@@ -63,13 +63,13 @@ export default {
     },
 
     cvtPayload(type, payload) {
-      if (["text", "revoke"].includes(type)) {
-        return payload
+      const mapping = {
+        text: payload,
+        revoke: payload,
+        image: "[图片]",
+        audio: "[语音]"
       }
-      if (type === "image") {
-        return "[图片]"
-      }
-      return "[文件]"
+      return mapping[type] || "[文件]"
     },
 
     computeInfo(message) {
@@ -79,13 +79,13 @@ export default {
         return
       }
 
-      const lastMessageTime = message["time"].substring(0, 10)
+      const lastMessageTime = message.time.substring(0, 10)
       if (this.isPinned) {
         this.$refs.groupInfoRoot.style.order = -1 * lastMessageTime
       } else {
         this.$refs.groupInfoRoot.style.order = 2147483647 - lastMessageTime
       }
-      this.lastMessage = message["userName"] + ": " + this.cvtPayload(message["type"], message["payload"])
+      this.lastMessage = message.userName + ": " + this.cvtPayload(message.type, message.payload.content)
       this.lastMessageTime = this.computeLastMessageTime(lastMessageTime)
     },
 

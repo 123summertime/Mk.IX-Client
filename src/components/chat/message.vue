@@ -17,6 +17,7 @@
         <div class="lower" @contextmenu.prevent="onRightClick">
           <textMsg class="payload" v-if="type == 'text'" :payload="payload"></textMsg>
           <imageMsg class="payload" v-else-if="type == 'image'" :payload="payload"></imageMsg>
+          <audioMsg class="payload" v-else-if="type == 'audio'" :payload="payload"></audioMsg>
           <fileMsg class="payload" v-else :group="group" :payload="payload"></fileMsg>
           <p class="time">{{ formatedTime }}</p>
         </div>
@@ -70,6 +71,7 @@ import broadcast from './messageType/broadcast.vue'
 import fileMsg from './messageType/fileMsg.vue'
 import imageMsg from './messageType/imageMsg.vue'
 import textMsg from './messageType/textMsg.vue'
+import audioMsg  from './messageType/audioMsg.vue'
 import messageMenu from './messageMenu.vue'
 
 export default {
@@ -80,7 +82,7 @@ export default {
     avatar: String,
     uuid: String,
     userName: String,
-    message: String,
+    message: Object,
     owner: Object,
     admin: Map,
   },
@@ -91,6 +93,7 @@ export default {
         name: "",
         size: "",
         content: "",
+        meta: "",
       },
 
       formatedTime: "",
@@ -107,17 +110,11 @@ export default {
       return this.uuid === this.$store.state["account"]
     },
 
-    // file, audio类型: payload是包含文件名，文件大小，文件hashcode的JSON字符串
-    // text, image, revoke类型: payload就是信息内容
     getContent() {
-      if (this.type === 'file' || this.type === 'audio') {
-        const info = JSON.parse(this.message)
-        this.payload.name = info["name"]
-        this.payload.size = info["size"]
-        this.payload.content = info["hashcode"]
-      } else {
-        this.payload.content = this.message
-      }
+      this.payload.name = this.message.name
+      this.payload.size = this.message.size
+      this.payload.content = this.message.content
+      this.payload.meta = this.message.meta
     },
 
     computeTime(timeStamp) {
@@ -208,8 +205,12 @@ export default {
 
     forwardMsg() {
       this.$emit('forwardMsg', {
-        type: this.type,
-        payload: this.payload.content,
+        type: this.type === "file" ? "forwardFile" : this.type,
+        payload: {
+          "name": this.payload.name,
+          "size": this.payload.size,
+          "content": this.payload.content
+        }
       })
     },
 
@@ -221,7 +222,7 @@ export default {
   computed: {
     getNameplate() {
       // 排除没有Nameplate的消息类型
-      if (['revoke'].includes(this.type)) { return }
+      if (this.type === 'revoke') { return }
 
       if (this.owner.has(this.uuid)) {
         this.$nextTick(() => {
@@ -266,6 +267,7 @@ export default {
     fileMsg,
     imageMsg,
     textMsg,
+    audioMsg,
     messageMenu,
   }
 

@@ -125,10 +125,13 @@ export default {
     },
 
     revokeMsg(time) {
-      // 撤回类型消息格式: {"type": "revoke", "payload": 被撤回消息的time}  通过WS
       this.$store.state.wsConnections[this.group].send(JSON.stringify({
         "type": 'revoke',
-        "payload": time,
+        "payload": {
+          name: null,
+          size: null,
+          content: time,
+        },
       }))
     },
 
@@ -144,28 +147,36 @@ export default {
     newMessage: {
       async handler(newVal) {
         if (newVal) {
-          if (newVal['type'] === 'revoke') {
-            const revokeID = newVal['payload']
+          if (newVal.type === 'revoke') {
+            const revokeID = newVal.payload.content
             const revokeMsg = await this.DB.query('History', { "time": revokeID })
-            const revokePayload = `${newVal['userName']} 撤回了一条${revokeMsg['uuid'] === newVal['uuid'] ? '' : '成员'}消息`
+            const newPayload = {
+              name: null,
+              size: null,
+              content: `${newVal.userName} 撤回了一条${revokeMsg.uuid === newVal.uuid ? '' : '成员'}消息`,
+              meta: null,
+            }
 
-            revokeMsg['type'] = 'revoke'
-            revokeMsg['payload'] = revokePayload
+            revokeMsg.type = 'revoke'
+            revokeMsg.payload = newPayload
             await this.DB.update('History', revokeMsg)
 
             const idx = this.messageList.findIndex(i => i.time === revokeID)
             if (idx != -1) {
-              this.messageList[idx]['type'] = 'revoke'
-              this.messageList[idx]['payload'] = revokePayload
+              this.messageList[idx].type = 'revoke'
+              this.messageList[idx].payload = newPayload
             }
             return
           }
 
           // 排除某些属性
-          const { senderID: _1, senderKey: _2, group: _3, ...message } = newVal
-          const { avatar: _a, userName: _b, group: _c, senderID: _d, ...storage } = newVal
-
-          this.messageList.push(message)
+          const storage = {
+            time: newVal.time,
+            type: newVal.type,
+            uuid: newVal.uuid,
+            payload: JSON.parse(JSON.stringify(newVal.payload))
+          }
+          this.messageList.push(newVal)
           this.putHistory(storage)
 
           if (newVal["uuid"] === this.$store.state["account"] && newVal['type'] != 'revoke') {
