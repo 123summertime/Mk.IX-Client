@@ -62,18 +62,20 @@ export default {
       return year + "/" + month + "/" + date
     },
 
-    cvtPayload(type, payload) {
+    getSummary(message) {
+      const type = message.type
+      const prefix = message.userName + ": "
       const mapping = {
-        text: payload,
-        revoke: payload,
-        image: "[图片]",
-        audio: "[语音]"
+        text: prefix + message.payload.content,
+        revoke: message.payload.content,
+        image: prefix + "[图片]",
+        audio: prefix + "[语音]"
       }
-      return mapping[type] || "[文件]"
+      return mapping[type] || (prefix + "[文件]")
     },
 
     computeInfo(message) {
-      if (message === 'empty') {
+      if (!message) {
         this.lastMessage = " "
         this.lastMessageTime = ""
         return
@@ -85,7 +87,7 @@ export default {
       } else {
         this.$refs.groupInfoRoot.style.order = 2147483647 - lastMessageTime
       }
-      this.lastMessage = message.userName + ": " + this.cvtPayload(message.type, message.payload.content)
+      this.lastMessage = this.getSummary(message)
       this.lastMessageTime = this.computeLastMessageTime(lastMessageTime)
     },
 

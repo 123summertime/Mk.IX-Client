@@ -1,13 +1,14 @@
 <template>
   <div class="imageMsg">
-    <el-image :src="payload.content" :preview-src-list="[payload.content]" />
+    <el-image :src="message.payload.content" :preview-src-list="[message.payload.content]" />
   </div>
 </template>
   
 <script>
 export default {
   props: {
-    payload: Object
+    group: String,
+    message: Object
   },
 
   data() {

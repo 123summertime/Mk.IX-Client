@@ -1,13 +1,8 @@
 <template>
   <div @scroll="onScroll" ref="messageView">
-    <message v-for="msg in messageList" :key="msg['time']"
+    <message v-for="msg in messageList" :key="msg.time"
       :group="group"
-      :time="msg['time']"
-      :type="msg['type']"
-      :avatar="msg['avatar']"
-      :uuid="msg['uuid']"
-      :userName="msg['userName']"
-      :message="msg['payload']"
+      :message="msg"
       :owner="owner"
       :admin="admin"
       @deleteMsg="deleteMsg"
@@ -57,8 +52,15 @@ export default {
     async getHistory() {
       const history = await this.DB.queryRange('History', this.page * this.step, this.step, true)
       for (const msg of history) {
-        const info = await queryInfo("Account", msg["senderKey"], msg["uuid"])
-        const { senderID: _1, senderKey: _2, group: _3, ...message } = { ...info, ...msg }  // 排除某些属性
+        const info = await queryInfo("Account", msg.senderKey, msg.uuid)
+        const message = {
+          time: msg.time,
+          type: msg.type,
+          uuid: msg.uuid,
+          payload: msg.payload,
+          avatar: info.avatar,
+          userName: info.userName,
+        }
         this.messageList.unshift(message)
       }
       this.switch = false
@@ -87,7 +89,7 @@ export default {
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        // 结果会通过wsSys发送 sysMsgGetter将对其作处理
+        // 结果会通过wsSys发送 sysMsgGetter.vue将对其作处理
       }).catch(err => {
         ElMessage({
           message: `在获取${this.name}的群验证时发送错误 ${err['response']['data']['detail']}`,
@@ -169,7 +171,6 @@ export default {
             return
           }
 
-          // 排除某些属性
           const storage = {
             time: newVal.time,
             type: newVal.type,

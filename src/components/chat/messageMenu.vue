@@ -26,9 +26,7 @@
 <script>
 export default {
   props: {
-    type: String,
-    content: String,
-    uuid: String,
+    message: Object,
     owner: Object,
     admin: Map,
   },
@@ -57,7 +55,7 @@ export default {
 
       this.DB.add('Image', {
         time: Date.now(),
-        payload: this.content
+        payload: this.message.content
       })
     },
 
@@ -76,11 +74,11 @@ export default {
 
     copyMsg() {
       const cb = navigator.clipboard
-      if (this.type === 'text') {
-        cb.writeText(this.content)
+      if (this.message.type === 'text') {
+        cb.writeText(this.message.content)
       }
-      if (this.type === 'image') {
-        const blob = this.base64ToBlob(this.content, "image/png")
+      if (this.message.type === 'image') {
+        const blob = this.base64ToBlob(this.message.payload.content, "image/png")
         cb.write([new ClipboardItem({ "image/png": blob })])
       }
     },
@@ -100,10 +98,10 @@ export default {
 
   computed: {
     checkPermissions() {
-      const account = this.$store.state["account"]
+      const account = this.$store.state.account
 
       // 自己发的
-      if (this.uuid === account) {
+      if (this.message.uuid === account) {
         return true
       }
       // 群主
@@ -111,7 +109,7 @@ export default {
         return true
       }
       // 管理员 但不能是群主发的
-      if (this.admin.has(account) && !this.owner.has(this.uuid)) {
+      if (this.admin.has(account) && !this.owner.has(this.message.uuid)) {
         return true
       }
       return false
@@ -125,7 +123,7 @@ export default {
       "file": { "favorite": false, "copy": false, "delete": true, "forward": true, "revoke": this.checkPermissions },
       "revoke": { "favorite": false, "copy": false, "delete": true, "forward": false, "revoke": false },
     }
-    this.display = displayMap[this.type] || displayMap["file"]
+    this.display = displayMap[this.message.type] || displayMap["file"]
   }
 }
 </script>

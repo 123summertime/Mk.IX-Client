@@ -92,7 +92,7 @@ export default createStore({
     },
 
     lastMessage(state, info) {
-      state[`lastMessageOf${info["group"]}`] = info["payload"] || "empty" // 当没有lastMessage时 为"empty"
+      state[`lastMessageOf${info["group"]}`] = info["payload"]
     },
   },
 

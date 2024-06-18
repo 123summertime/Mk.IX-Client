@@ -1,13 +1,14 @@
 <template>
   <div class="textMsg">
-    <p>{{ payload.content }}</p>
+    <p>{{ message.payload.content }}</p>
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    payload: Object
+    group: String,
+    message: Object
   }
 }
 </script>

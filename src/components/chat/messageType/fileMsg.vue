@@ -1,8 +1,8 @@
 <template>
   <div class="fileMsg" @click="downloading">
     <div class="fileMsgInnerL">
-      <p :title="payload.name"> {{ payload.name }}</p>
-      <p v-if="download.state == 'pending'" :title="fileSize(payload.size)"> {{ fileSize(payload.size) }}</p>
+      <p :title="message.payload.name"> {{ message.payload.name }}</p>
+      <p v-if="download.state == 'pending'" :title="fileSize(message.payload.size)"> {{ fileSize(message.payload.size) }}</p>
       <p v-else-if="download.state == 'downloading'" class="downloadingInfo">
         <i>{{ downloadSPD }}</i><i>{{ downloadETC }}</i>
       </p>
@@ -12,7 +12,7 @@
     <div class="fileMsgInnerR">
       <div v-if="download.state == 'pending'">
         <Folder class="fileMsgIcon" />
-        <p ref="IconText" class="iconInnerText">{{ payload.name.split('.').slice(-1)[0] }}</p>
+        <p ref="IconText" class="iconInnerText">{{ message.payload.name.split('.').slice(-1)[0] }}</p>
       </div>
       <div v-else>
         <canvas width="64" height="64" ref="progress"></canvas>
@@ -30,13 +30,13 @@ import axios from 'axios'
 export default {
   props: {
     group: String,
-    payload: Object
+    message: Object
   },
 
   data() {
     return {
       download: {
-        state: "pending",
+        state: "pending", // pending | downloading | success | failed
         speed: 0,
         rate: 0,
       },
@@ -47,7 +47,7 @@ export default {
     downloading() {
       this.download.state = "downloading"
 
-      const url = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/download/${this.payload.content}`
+      const url = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/download/${this.message.payload.content}`
       axios.get(url, {
         responseType: 'blob',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
@@ -65,7 +65,7 @@ export default {
         const blob = new Blob([res.data])
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = this.payload.name
+        link.download = this.message.payload.name
         link.click()
       }).catch(err => {
         this.canvasDrawer(0, '#F56C6C', '#114514')
@@ -122,7 +122,7 @@ export default {
       let currFontsize = 16
       const temp = document.createElement('span')
       temp.style.fontSize = currFontsize + 'px'
-      temp.innerText = this.payload.name.split('.').slice(-1)[0]
+      temp.innerText = this.message.payload.name.split('.').slice(-1)[0]
       document.body.appendChild(temp)
 
       while (temp.offsetWidth > 48 && currFontsize > 8) {
@@ -142,7 +142,7 @@ export default {
     },
 
     downloadETC() {
-      const remain = this.payload.size * (100 - this.download.rate) / 100
+      const remain = this.message.payload.size * (100 - this.download.rate) / 100
       const speed = this.download.speed
       const time = remain / speed
 

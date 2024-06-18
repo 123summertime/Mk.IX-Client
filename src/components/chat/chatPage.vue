@@ -509,5 +509,6 @@ chatPage
   |     |     |- fileMsg
   |     |     |- imageMsg
   |     |     |- textMsg
+  |     |     |- audioMsg
   |     |     |- messageMenu
  -->

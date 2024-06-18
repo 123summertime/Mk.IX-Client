@@ -1,35 +1,31 @@
 <template>
   <div class="messageRoot" ref="MessageRoot">
 
-    <div v-if="type === 'revoke'" @contextmenu.prevent="onRightClick">
-      <broadcast class="payload" :payload="payload"></broadcast>
+    <div v-if="message.type === 'revoke'" @contextmenu.prevent="onRightClick">
+      <broadcast class="payload" :group="group" :message="message"></broadcast>
     </div>
 
     <div :class="messageFrom() ? 'message bySelf' : 'message'" v-else>
       <div class="avatar" @click="showProfile">
-        <img :src="avatar">
+        <img :src="message.avatar">
       </div>
       <div class="container">
         <div class="upper">
           <p class="nameplate" ref="Nameplate">{{ getNameplate }}</p>
-          <p class="userName">{{ userName }}</p>
+          <p class="userName">{{ message.userName }}</p>
         </div>
         <div class="lower" @contextmenu.prevent="onRightClick">
-          <textMsg class="payload" v-if="type == 'text'" :payload="payload"></textMsg>
-          <imageMsg class="payload" v-else-if="type == 'image'" :payload="payload"></imageMsg>
-          <audioMsg class="payload" v-else-if="type == 'audio'" :payload="payload"></audioMsg>
-          <fileMsg class="payload" v-else :group="group" :payload="payload"></fileMsg>
+          <textMsg class="payload" v-if="message.type == 'text'" :group="group" :message="message"></textMsg>
+          <imageMsg class="payload" v-else-if="message.type == 'image'" :group="group" :message="message"></imageMsg>
+          <audioMsg class="payload" v-else-if="message.type == 'audio'" :group="group" :message="message"></audioMsg>
+          <fileMsg class="payload" v-else :group="group" :message="message"></fileMsg>
           <p class="time">{{ formatedTime }}</p>
         </div>
       </div>
     </div>
 
     <messageMenu class="contextMenu" ref="ContextMenu"
-      :type="type"
-      :content="payload.content"
-      :uuid="uuid"
-      :owner="owner"
-      :admin="admin"
+      :message="message"
       @deleteMsg="deleteMsg"
       @forwardMsg="forwardMsg"
       @revokeMsg="revokeMsg">
@@ -38,16 +34,16 @@
     <el-dialog v-model="namecardVisible" :show-close="false" width="540px">
       <div class="namecard">
         <div class="namecardAvatar">
-          <img :src="avatar" />
+          <img :src="message.avatar" />
         </div>
         <div class="namecardInfo">
           <span>
             <i>昵称:</i>
-            <i>{{ userName }}</i>
+            <i>{{ message.userName }}</i>
           </span>
           <span>
             <i>uuid:</i>
-            <i>{{ uuid }}</i>
+            <i>{{ message.uuid }}</i>
           </span>
           <span>
             <i>个性签名:</i>
@@ -71,17 +67,12 @@ import broadcast from './messageType/broadcast.vue'
 import fileMsg from './messageType/fileMsg.vue'
 import imageMsg from './messageType/imageMsg.vue'
 import textMsg from './messageType/textMsg.vue'
-import audioMsg  from './messageType/audioMsg.vue'
+import audioMsg from './messageType/audioMsg.vue'
 import messageMenu from './messageMenu.vue'
 
 export default {
   props: {
     group: String,
-    time: String,
-    type: String,
-    avatar: String,
-    uuid: String,
-    userName: String,
     message: Object,
     owner: Object,
     admin: Map,
@@ -107,7 +98,7 @@ export default {
 
   methods: {
     messageFrom() {
-      return this.uuid === this.$store.state["account"]
+      return this.message.uuid === this.$store.state.account
     },
 
     getContent() {
@@ -148,7 +139,7 @@ export default {
       return year + "/" + month + "/" + date + " " + T
     },
 
-    
+
 
     onRightClick(event) {
       const rect = this.$refs.MessageRoot.getBoundingClientRect()
@@ -189,7 +180,7 @@ export default {
     showProfile() {
       this.namecardVisible = true
 
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.uuid}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.message.uuid}`
       axios.get(URL).then(res => {
         const data = res["data"]
         this.bio = data["bio"]
@@ -200,12 +191,12 @@ export default {
     },
 
     deleteMsg() {
-      this.$emit('deleteMsg', this.time)
+      this.$emit('deleteMsg', this.message.time)
     },
 
     forwardMsg() {
       this.$emit('forwardMsg', {
-        type: this.type === "file" ? "forwardFile" : this.type,
+        type: this.message.type === "file" ? "forwardFile" : this.message.type,
         payload: {
           "name": this.payload.name,
           "size": this.payload.size,
@@ -215,16 +206,16 @@ export default {
     },
 
     revokeMsg() {
-      this.$emit('revokeMsg', this.time)
+      this.$emit('revokeMsg', this.message.time)
     }
   },
 
   computed: {
     getNameplate() {
       // 排除没有Nameplate的消息类型
-      if (this.type === 'revoke') { return }
+      if (this.message.type === 'revoke') { return }
 
-      if (this.owner.has(this.uuid)) {
+      if (this.owner.has(this.message.uuid)) {
         this.$nextTick(() => {
           this.$refs.Nameplate.style.display = "block"
           this.$refs.Nameplate.style.backgroundColor = "gold"
@@ -232,7 +223,7 @@ export default {
         return "群主"
       }
 
-      if (this.admin.has(this.uuid)) {
+      if (this.admin.has(this.message.uuid)) {
         this.$nextTick(() => {
           this.$refs.Nameplate.style.display = "block"
           this.$refs.Nameplate.style.backgroundColor = "aqua"
@@ -259,7 +250,7 @@ export default {
 
   async mounted() {
     this.getContent()
-    this.formatedTime = this.computeTime(this.time)
+    this.formatedTime = this.computeTime(this.message.time)
   },
 
   components: {
