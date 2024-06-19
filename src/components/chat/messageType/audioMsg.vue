@@ -6,11 +6,16 @@
     </div>
     <div class="bar" ref="Bar">
       <audio :src="audioURL" ref="Audio"
-        @canplaythrough="playAfterDownload"
+        @canplaythrough="playAfterLoaded"
         @timeupdate="audioPlaying"
         @ended="audioEnd"></audio>
-      <div class="progressWrapper" @click="changeProgress">
-        <div class="progress" ref="Progress"></div>
+      <div class="progressWrapper" ref="ProgressWrapper" @click="changeProgress">
+        <ul class="volumes">
+          <li class="volume" v-for="vol in message.payload.meta.volume" :style="`height: ${volumeHeight(vol)};`"></li>
+        </ul>
+        <div class="progress" ref="Progress">
+          <div class="progressLine" v-show="progress != 0"></div>
+        </div>
       </div>
     </div>
     <div class="afterBar">
@@ -33,7 +38,7 @@ export default {
 
   data() {
     return {
-      currentState: "pending", // pending | downloading | pause | playing
+      currentState: "pending", // pending | downloading | downloaded | pause | playing
       audioURL: null,
       progress: 0,
     }
@@ -54,17 +59,14 @@ export default {
     },
 
     getState() {
-      // 如果该语音被下载过，那么直接读取payload.meta.blob (currentState: pause)
+      // 如果该语音被下载过或直接传入，那么直接读取payload.meta.blob (currentState: downloaded)
       // 没有被下载过，则发送请求 (currentState: pending)
-
-      this.currentState = this.message.payload.meta.blob ? "pause" : "pending"
-      if (this.currentState === 'pause') {
-        this.audioURL = URL.createObjectURL(this.message.payload.meta.blob)
-      }
+      this.currentState = this.message.payload.meta.blob ? "downloaded" : "pending"
     },
 
     downloading() {
-      // 下载中和下载成功currentState为downloading
+      // 下载中currentState为downloading
+      // 下载成功currentState为downloaded
       // 下载失败currentState为pending
 
       this.currentState = "downloading"
@@ -83,6 +85,7 @@ export default {
           uuid: this.message.uuid,
           payload: payloadCopy
         })
+        this.currentState = "downloaded"
         this.audioURL = URL.createObjectURL(blob)
       }).catch(err => {
         ElMessage({
@@ -94,9 +97,8 @@ export default {
       })
     },
 
-    playAfterDownload() {
-      // 下载完后自动播放
-      if (this.currentState === "downloading") {
+    playAfterLoaded() {
+      if (this.currentState === 'downloaded') {
         this.currentState = "play"
         this.$refs.Audio.play()
       }
@@ -105,7 +107,10 @@ export default {
     clickHandler() {
       const mapping = {
         pending: this.downloading,
-        downloading: () => {},
+        downloading: () => { },
+        downloaded: () => {
+          this.audioURL = URL.createObjectURL(this.message.payload.meta.blob)
+        },
         pause: () => {
           this.currentState = "play"
           this.$refs.Audio.play()
@@ -119,7 +124,7 @@ export default {
     },
 
     audioPlaying() {
-      const progress = this.$refs.Audio.currentTime / this.message.payload.meta.length * 100
+      const progress = Math.min(this.$refs.Audio.currentTime / this.message.payload.meta.length * 100, 100)
       this.progress = progress ? progress : 0
     },
 
@@ -129,13 +134,21 @@ export default {
     },
 
     changeProgress(event) {
+      if (this.currentState === 'pending') { return }
+
       event.stopPropagation()
-      const clickPos = event.offsetX
-      const width = this.$refs.Bar.offsetWidth
+      const clickPos = event.clientX - this.$refs.ProgressWrapper.getBoundingClientRect().left
+      const width = this.$refs.ProgressWrapper.offsetWidth
       this.progress = clickPos / width * 100
       this.$refs.Audio.currentTime = this.message.payload.meta.length * this.progress / 100
+      if (this.currentState === 'pause') {
+        this.clickHandler()
+      }
     },
 
+    volumeHeight(volume) {
+      return `${volume * 0.16 + 8}px`
+    }
   },
 
   watch: {
@@ -156,9 +169,10 @@ export default {
 <style scoped>
 .audioMsg {
   display: flex;
-  height: 48px;
+  justify-content: center;
   max-width: 100%;
-  background-color: orangered;
+  height: 48px;
+  background-color: rgb(255, 69, 0);
   cursor: pointer;
 }
 
@@ -173,21 +187,45 @@ export default {
 
 .bar {
   width: 100%;
-  height: 8px;
-  margin: auto 8px;
+  height: 24px;
+  margin-left: 8px;
+  margin-right: 24px;
 }
 
 .progressWrapper {
+  position: relative;
   width: 100%;
   height: 100%;
-  background-color: #E5EAF3;
-  border-radius: 4px;
+}
+
+.volumes {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.volume {
+  width: 6px;
+  border-radius: 3px;
+  background-color: rgb(235, 235, 235)
 }
 
 .progress {
+  display: flex;
+  justify-content: right;
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 0;
-  height: 100%;
-  background-color: #409EFF;
-  border-radius: 4px;
+  height: 24px;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  background-color: rgba(255, 69, 0, 0.5);
+}
+
+.progressLine {
+  height: 48px;
+  border-right: 2px solid black;
+  transform: translateY(-12px);
 }
 </style>

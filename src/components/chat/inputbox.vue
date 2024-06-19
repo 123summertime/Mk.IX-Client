@@ -35,8 +35,9 @@
 
 
     <!-- 确认遮罩层 -->
-    <el-dialog v-model="visible" title="发送确认" width="30%" :show-close=false>
+    <el-dialog v-model="visible" title="发送确认" width="30%" :show-close="false" :destroy-on-close="true">
       <img class="previewImg" :src="payload.content" v-if="payload.type === 'image'" />
+      <audioMsg class="previewAudio" v-else-if="payload.type === 'audio'" :group="group" :message="audioMessagePreview"></audioMsg>
       <p class="previewFile" v-else>{{ payload.name.split(".").slice(-1)[0] + "文件" }}</p>
       <template #footer>
         <span class="footer">
@@ -59,6 +60,7 @@
 import axios from 'axios'
 
 import favorite from './favorite.vue'
+import audioMsg from './messageType/audioMsg.vue'
 
 export default {
   props: {
@@ -248,7 +250,7 @@ export default {
       this.recorder.recorder.start()
 
       this.recorder.timer = setInterval(() => {
-        if (this.recorder.time === 50 && this.recorder.recording) {
+        if (this.recorder.time === 50 - 1 && this.recorder.recording) {
           this.recorder.recording = false
           this.recorder.recorder.stop()
         }
@@ -302,10 +304,21 @@ export default {
       return this.payload.size + "B"
     },
 
+    audioMessagePreview() {
+      return {
+        payload: {
+          meta: {
+            length: this.recorder.time,
+            blob: this.payload.content
+          }
+        }
+      }
+    }
   },
 
   components: {
-    favorite
+    favorite,
+    audioMsg,
   },
 
 }
@@ -387,6 +400,13 @@ textarea::-webkit-scrollbar {
   max-width: 100%;
   max-height: 40vh;
   margin: 0 auto;
+}
+
+.previewAudio {
+  border-radius: 12px;
+  padding: 12px 16px;
+  background-color: rgb(200, 200, 200);
+  cursor: pointer;
 }
 
 .previewFile {

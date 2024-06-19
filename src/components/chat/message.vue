@@ -321,7 +321,6 @@ export default {
 }
 
 .payload {
-  /* max-width: 90%; */
   word-wrap: break-word;
   white-space: pre-wrap;
   border-radius: 12px;

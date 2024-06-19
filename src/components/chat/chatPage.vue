@@ -502,7 +502,8 @@ chatPage
   |- groupConfig
   |     |- eachMember
   |- inputBox
-  |     |-favorite
+  |     |- favorite
+  |     |- audioMsg
   |- chatItem
   |     |- message
   |     |     |- broadcast
