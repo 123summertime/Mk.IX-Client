@@ -3,10 +3,8 @@
     <message v-for="msg in messageList" :key="msg.time"
       :group="group"
       :message="msg"
-      :owner="owner"
-      :admin="admin"
+      :admins="admins"
       @deleteMsg="deleteMsg"
-      @forwardMsg="forwardMsg"
       @revokeMsg="revokeMsg"></message>
   </div>
 </template>
@@ -25,8 +23,7 @@ export default {
     avatar: String,
     group: String,
     name: String,
-    owner: Map,
-    admin: Map,
+    admins: Object,
     active: Boolean,
     deleted: Boolean,
   },
@@ -82,8 +79,8 @@ export default {
     },
 
     getGroupRequests() {
-      const account = this.$store.state['account']
-      if (!(this.owner.has(account) || this.admin.has(account))) { return }
+      const account = this.$store.state.account
+      if (!(this.admins.owner[account] || this.admins.admin[account])) { return }
 
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/verify/request`
       axios.get(URL, {
@@ -120,10 +117,6 @@ export default {
           type: "error",
         })
       })
-    },
-
-    forwardMsg(payload) {
-      this.$emit('forwardMsg', payload)
     },
 
     revokeMsg(time) {

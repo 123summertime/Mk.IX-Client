@@ -31,6 +31,10 @@
       @revokeMsg="revokeMsg">
     </messageMenu>
 
+    <groupSelector v-if="showGroupSelector" title="转发"
+      @groupSelectorSelected="groupSelectorSelected"
+      @groupSelectorCanceled="groupSelectorCanceled"></groupSelector>
+
     <el-dialog v-model="namecardVisible" :show-close="false" width="540px">
       <div class="namecard">
         <div class="namecardAvatar">
@@ -69,23 +73,19 @@ import imageMsg from './messageType/imageMsg.vue'
 import textMsg from './messageType/textMsg.vue'
 import audioMsg from './messageType/audioMsg.vue'
 import messageMenu from './messageMenu.vue'
+import groupSelector from './groupSelector.vue'
 
 export default {
   props: {
     group: String,
     message: Object,
-    owner: Object,
-    admin: Map,
+    admins: Object,
   },
 
   data() {
     return {
-      payload: {
-        name: "",
-        size: "",
-        content: "",
-        meta: "",
-      },
+
+      showGroupSelector: false,
 
       formatedTime: "",
       rightClicked: false,
@@ -99,13 +99,6 @@ export default {
   methods: {
     messageFrom() {
       return this.message.uuid === this.$store.state.account
-    },
-
-    getContent() {
-      this.payload.name = this.message.name
-      this.payload.size = this.message.size
-      this.payload.content = this.message.content
-      this.payload.meta = this.message.meta
     },
 
     computeTime(timeStamp) {
@@ -167,7 +160,7 @@ export default {
       }
     },
 
-    globalClick(event) {
+    globalClick() {
       // 删除消息时不存在ContextMenu, if防报错
       if (this.$refs.ContextMenu) {
         this.$refs.ContextMenu.$el.style.display = 'none'
@@ -195,14 +188,19 @@ export default {
     },
 
     forwardMsg() {
-      this.$emit('forwardMsg', {
+      this.showGroupSelector = true
+    },
+
+    groupSelectorSelected(groupID) {
+      this.$store.state.wsConnections[groupID].send(JSON.stringify({
         type: this.message.type === "file" ? "forwardFile" : this.message.type,
-        payload: {
-          "name": this.payload.name,
-          "size": this.payload.size,
-          "content": this.payload.content
-        }
-      })
+        payload: this.message.payload,
+      }))
+      this.showGroupSelector = false
+    },
+
+    groupSelectorCanceled() {
+      this.showGroupSelector = false
     },
 
     revokeMsg() {
@@ -215,7 +213,7 @@ export default {
       // 排除没有Nameplate的消息类型
       if (this.message.type === 'revoke') { return }
 
-      if (this.owner.has(this.message.uuid)) {
+      if (this.admins.owner[this.message.uuid]) {
         this.$nextTick(() => {
           this.$refs.Nameplate.style.display = "block"
           this.$refs.Nameplate.style.backgroundColor = "gold"
@@ -223,7 +221,7 @@ export default {
         return "群主"
       }
 
-      if (this.admin.has(this.message.uuid)) {
+      if (this.admins.admin[this.message.uuid]) {
         this.$nextTick(() => {
           this.$refs.Nameplate.style.display = "block"
           this.$refs.Nameplate.style.backgroundColor = "aqua"
@@ -239,17 +237,7 @@ export default {
 
   },
 
-  watch: {
-    // 撤回时watch props的变化
-    message: {
-      handler() {
-        this.getContent()
-      }
-    }
-  },
-
   async mounted() {
-    this.getContent()
     this.formatedTime = this.computeTime(this.message.time)
   },
 
@@ -260,6 +248,7 @@ export default {
     textMsg,
     audioMsg,
     messageMenu,
+    groupSelector,
   }
 
 }

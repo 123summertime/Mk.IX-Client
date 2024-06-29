@@ -19,17 +19,17 @@ export default createStore({
     async wsConnect(context, info) {
       const adress = localStorage.getItem('adress')
       const token = localStorage.getItem('token')
-      const URL = `ws://${adress}/ws/ws?userID=${info["uuid"]}&groupID=${info["groupID"]}`
+      const URL = `ws://${adress}/ws/ws?userID=${info.uuid}&groupID=${info.groupID}`
       const ws = new WebSocket(URL, [token])
 
       context.commit('newConnection', {
-        "groupID": info["groupID"],
+        "groupID": info.groupID,
         "ws": ws,
       })
 
       ws.onmessage = async function (event) {
         const data = JSON.parse(event.data)
-        const fullData = await queryInfo("Account", data["senderKey"], data["senderID"])
+        const fullData = await queryInfo("Account", data.senderKey, data.senderID)
         context.commit('getNewMessage', {
           "groupID": data.group,
           "payload": {
@@ -48,11 +48,11 @@ export default createStore({
     async sysConnection(context, info) {
       const adress = localStorage.getItem('adress')
       const token = localStorage.getItem('token')
-      const URL = `ws://${adress}/ws/wsSys?userID=${info["uuid"]}`
+      const URL = `ws://${adress}/ws/wsSys?userID=${info.uuid}`
       const ws = new WebSocket(URL, [token])
 
       ws.onmessage = async function (event) {
-        const data = JSON.parse(event["data"])
+        const data = JSON.parse(event.data)
         context.commit('getNewSysMessage', data)
       }
 
@@ -66,42 +66,51 @@ export default createStore({
     lastMessage(context, info) {
       context.commit('lastMessage', info)
     },
+
+    updateGroupInfo(context, info) {
+      context.commit('updateGroupInfo', info)
+    }
   },
 
   mutations: {
     newConnection(state, connect) {
-      state.wsConnections[connect["groupID"]] = connect["ws"]
-      state[connect["groupID"]] = ""
+      state.wsConnections[connect.groupID] = connect.ws
+      state[connect.groupID] = ""
     },
 
     sysConnection(state, ws) {
-      state["sys"] = ws
+      state.sys = ws
     },
 
     getNewMessage(state, payload) {
-      state[payload["groupID"]] = payload["payload"]
+      state[payload.groupID] = payload.payload
     },
 
     getNewSysMessage(state, payload) {
-      state["sysMsg"] = payload
+      state.sysMsg = payload
     },
 
     loginAs(state, info) {
-      state["account"] = info["account"]
-      state["userName"] = info["userName"]
+      state.account = info.account
+      state.userName = info.userName
     },
 
     lastMessage(state, info) {
-      state[`lastMessageOf${info["group"]}`] = info["payload"]
+      state["lastMessageOf" + info.group] = info.payload
     },
+
+    updateGroupInfo(state, info) {
+      state.groupList.push(info)
+    }
   },
 
   state: {
     account: "",
     userName: "",
     sysMsg: "",
+    groupList: [],
     favoriteDB: await favoriteDB(),
-    wsConnections: {},
+    wsConnections: {},  // K: groupID, V: Websocket
     // {group}: group新收到的消息
     // lastMessageOf{group}: group的最后一条消息
     // sys: 系统消息Websocket

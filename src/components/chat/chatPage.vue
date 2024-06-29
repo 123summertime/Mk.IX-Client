@@ -45,14 +45,12 @@
         <div class="conversationView">
           <chatItem v-for="item in groupList"
             :avatar="item['avatar']"
-            :owner="item['owner']"
-            :admin="item['admin']"
+            :admins="item['admins']"
             :group="item['group']"
             :name="item['name']"
             :active="item['group'] === currGroupID"
             :deleted="item['group'] === deleted"
             v-show="currGroupID === item['group']"
-            @forwardMsg="forwardMsg"
             class="conversation"></chatItem>
         </div>
         <splitter @splitter="inputSplitter" class="inputSplitter" ref="inputSplitter"></splitter>
@@ -109,7 +107,7 @@ export default {
       pinned: {},
       forwardPayload: {},
       forwardTo: ["", ""],  // [group, name]
-      groupList: [], // [{group:String, avatar:String, name:String, owner:Map, admin:Map}]
+      groupList: [], // [{group:String, avatar:String, name:String, admins: Object}]
     }
   },
 
@@ -143,18 +141,13 @@ export default {
       const groupInfo = await queryInfo("Group", lastUpdate, groupID)
       const adminInfo = await this.getAdminsInfo(groupID)
 
+      const owner = { [adminInfo.owner.uuid]: adminInfo.owner.lastUpdate }
+      const admin = {}
+      adminInfo.admin.forEach(i => { admin[`${i.uuid}`] = i.lastUpdate })
 
-      const ownerMap = new Map()
-      ownerMap.set(adminInfo["owner"]["uuid"], adminInfo["owner"]["lastUpdate"])
-      adminInfo["owner"] = ownerMap
-
-      const adminMap = new Map()
-      adminInfo["admin"].forEach(i => {
-        adminMap.set(i["uuid"], i["lastUpdate"])
-      })
-      adminInfo["admin"] = adminMap
-
-      this.groupList.push({ ...groupInfo, ...adminInfo })
+      const element = { ...groupInfo, admins: { owner, admin } }
+      this.groupList.push(element)
+      this.$store.dispatch('updateGroupInfo', element)
     },
 
     async getAdminsInfo(groupID) {
@@ -179,7 +172,7 @@ export default {
     },
 
     getPinnedGroups() {
-      const pinned = localStorage.getItem(`pinned`) || '{}'
+      const pinned = localStorage.getItem("pinned") || '{}'
       this.pinned = JSON.parse(pinned)
     },
 
@@ -189,7 +182,7 @@ export default {
     },
 
     groupSplitter(pos) {
-      const posX = pos["x"]
+      const posX = pos.x
       const rate = posX / window.innerWidth
       if (rate > 0.125 && rate < 0.5) {
         this.$refs.groupSplitter.$el.style.left = posX - 8 + "px"
@@ -199,7 +192,7 @@ export default {
     },
 
     inputSplitter(pos) {
-      const posY = pos["y"]
+      const posY = pos.y
       const rate = posY / window.innerHeight
       if (rate > 0.5 && rate < 0.8) {
         this.$refs.inputSplitter.$el.style.bottom = window.innerHeight - posY - 8 + "px"
@@ -209,7 +202,7 @@ export default {
     },
 
     groupNameModified(info) {
-      let { group, name } = info
+      const { group, name } = info
       if (this.currGroupID === group) {
         this.currGroupName = name
       }
@@ -223,7 +216,7 @@ export default {
     },
 
     groupAvatarModified(info) {
-      let { group, avatar } = info
+      const { group, avatar } = info
       this.groupList = this.groupList.map(item => {
         if (item.group === group) {
           return { ...item, avatar }
@@ -233,7 +226,7 @@ export default {
     },
 
     groupAdminModified(info) {
-      let { group, uuid, operation, lastUpdate } = info
+      const { group, uuid, operation, lastUpdate } = info
       const targetGroup = this.groupList.find(i => i.group === group)
       if (operation) {
         targetGroup.admin.set(uuid, lastUpdate)
@@ -249,7 +242,7 @@ export default {
 
     groupPinnedModified(info) {
       this.pinned[this.currGroupID] = info
-      localStorage.setItem(`pinned`, JSON.stringify(this.pinned))
+      localStorage.setItem("pinned", JSON.stringify(this.pinned))
     },
 
     joinGroupSuccess(info, autoChangeGroup) {
@@ -261,17 +254,6 @@ export default {
 
     deleteHistory(info) {
       this.deleted = info
-    },
-
-    forwardMsg(payload) {
-      this.visible = true
-      this.forwardPayload = payload
-    },
-
-    forwardSend() {
-      this.visible = false
-      this.forwardPayload['group'] = this.forwardTo[0]
-      this.$store.state.wsConnections[this.forwardTo[0]].send(JSON.stringify(this.forwardPayload))
     },
 
     logout() {
@@ -443,44 +425,6 @@ export default {
 
 .inputSplitter:hover {
   cursor: ns-resize;
-}
-
-/* forward layer */
-.forwardGroups {
-  display: flex;
-  flex-direction: column;
-  max-height: 40vh;
-  overflow: scroll;
-}
-
-.forwardGroups::-webkit-scrollbar {
-  display: none;
-}
-
-.forwardGroupItem {
-  display: flex;
-  padding: 8px;
-  border-radius: 16px;
-}
-
-.forwardGroupItemSelected {
-  background-color: lightblue !important;
-}
-
-.forwardGroupItem:hover {
-  background-color: lightcyan;
-  cursor: pointer;
-}
-
-.forwardGroupItem img {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-}
-
-.forwardGroupItem p {
-  line-height: 48px;
-  margin-left: 24px;
 }
 
 @media screen and (max-width: 480px) {

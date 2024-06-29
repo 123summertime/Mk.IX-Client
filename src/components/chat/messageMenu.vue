@@ -117,14 +117,15 @@ export default {
   },
 
   mounted() {
-    const displayMap = {
+    const displayMapping = {
       "text": { "favorite": false, "copy": true, "delete": true, "forward": true, "revoke": this.checkPermissions },
       "image": { "favorite": true, "copy": true, "delete": true, "forward": true, "revoke": this.checkPermissions },
       "file": { "favorite": false, "copy": false, "delete": true, "forward": true, "revoke": this.checkPermissions },
       "revoke": { "favorite": false, "copy": false, "delete": true, "forward": false, "revoke": false },
     }
-    this.display = displayMap[this.message.type] || displayMap["file"]
-  }
+    this.display = displayMapping[this.message.type] || displayMapping["file"]
+  },
+
 }
 </script>
 
