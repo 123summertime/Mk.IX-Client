@@ -22,18 +22,21 @@ import axios from 'axios'
 import { queryInfo } from '../../assets/queryDB.js'
 
 export default {
-  emits: ['groupAdminModified', 'userRemoved'],
+  emits: [
+    'groupAdminModified',
+    'userRemoved'
+  ],
 
   props: {
-    pair: Array,  // [uuid, lastUpdate]
-    role: String, // 'owner' or 'admin' or 'user'
-    group: String,
-    permission: String,
+    uuid: String, // 这个用户的uuid
+    lastUpdate: String, // 这个用户上次修改名字/头像时间
+    role: String, // 这个用户的身份 'owner' | 'admin' | 'user'
+    group: String,  // 当前群号
+    currentUserPermission: String, // 当前登录用户的身份 'owner' | 'admin' | 'user'
   },
 
   data() {
     return {
-      uuid: "",
       avatar: "",
       userName: "",
     }
@@ -41,36 +44,35 @@ export default {
 
   methods: {
     async getFullData() {
-      const info = await queryInfo('Account', this.pair[1], this.pair[0])
-      this.uuid = info["uuid"]
-      this.avatar = info["avatar"]
-      this.userName = info["userName"]
+      const info = await queryInfo('Account', this.lastUpdate, this.uuid)
+      this.avatar = info.avatar
+      this.userName = info.userName
     },
 
     adminModify() {
-      let isAdd = this.role === 'user'
+      const isAdd = this.role === 'user'
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/admin/${this.uuid}?operation=${isAdd}`
       axios.patch(URL, {}, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success(`已将${this.userName}${isAdd ? '添加为' : '移除'}管理员`)
-        this.$emit('groupAdminModified', {"group": this.group, "uuid": this.uuid, "operation": isAdd})
+        this.$emit('groupAdminModified', { "group": this.group, "uuid": this.uuid, "operation": isAdd })
       }).catch(err => {
         ElMessage({
-          message: `修改失败 ${err['response']['data']['detail']}`,
+          message: `修改失败 ${err}`,
           duration: 6000,
           type: "error",
         })
       })
     },
-    
+
     userRemoved() {
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}`
       axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success(`已将${this.userName}移除群聊`)
-        this.$emit('userRemoved', {"group": this.group, "uuid": this.uuid})
+        this.$emit('userRemoved', { "group": this.group, "uuid": this.uuid })
       }).catch(err => {
         ElMessage({
           message: `移除失败 ${err['response']['data']['detail']}`,
@@ -83,12 +85,14 @@ export default {
 
   computed: {
     getManagePermission() {
-      return this.permission === 'owner' && this.role != 'owner'
+      // 增删管理员的权限
+      return this.currentUserPermission === 'owner' && this.role != 'owner'
     },
 
     getRemovePermission() {
-      return (this.permission === 'owner' && this.role != 'owner') || 
-             (this.permission === 'admin' && this.role === 'user')
+      // 移除用户的权限
+      return (this.currentUserPermission === 'owner' && this.role != 'owner') ||
+        (this.currentUserPermission === 'admin' && this.role === 'user')
     }
   },
 

@@ -13,7 +13,7 @@
       </li>
       <li>
         <p>群ID</p>
-        <p>{{ info['group'] }}</p>
+        <p>{{ info.group }}</p>
       </li>
       <li>
         <p>群成员</p>
@@ -76,30 +76,33 @@
   <el-dialog v-model="membersVisible"
     class="memberInfo"
     width="540px"
-    :title="`${this.info['name']}(${this.membersCount})`"
+    :title="`${this.info.name}(${this.membersCount})`"
     style="max-height: 70vh; overflow-y: auto;">
     <ul class="list">
       <li>
         <p>群主</p>
       </li>
       <li>
-        <eachMember
-          :pair="getOwner"
+        <eachMember v-for="(lastUpdate, uuid) in (info.admins.owner)"
+          :key="uuid"
+          :uuid="uuid"
+          :lastUpdate="lastUpdate"
           :role="'owner'"
-          :group="group"
-          :permission="getRole"></eachMember>
+          :currentUserPermission="getRole"
+          :group="info.group"></eachMember>
       </li>
 
       <li>
         <p>管理员</p>
       </li>
-      <li v-if="getAdmin.length">
-        <eachMember v-for="pair in getAdmin"
-          :key="pair[0]"
-          :pair="pair"
+      <li v-if="info.admins.admin">
+        <eachMember v-for="(lastUpdate, uuid) in (info.admins.admin)"
+          :key="uuid"
+          :uuid="uuid"
+          :lastUpdate="lastUpdate"
           :role="'admin'"
-          :group="group"
-          :permission="getRole"
+          :group="info.group"
+          :currentUserPermission="getRole"
           @groupAdminModified="groupAdminModified"
           @userRemoved="userRemoved"></eachMember>
       </li>
@@ -110,13 +113,14 @@
       <li>
         <p>成员</p>
       </li>
-      <li v-if="membersInfo.length">
-        <eachMember v-for="pair in membersInfo"
-          :key="pair['uuid']"
-          :pair="[pair['uuid'], pair['lastUpdate']]"
+      <li v-if="membersInfo">
+        <eachMember v-for="(lastUpdate, uuid) in membersInfo"
+          :key="uuid"
+          :uuid="uuid"
+          :lastUpdate="lastUpdate"
           :role="'user'"
-          :group="group"
-          :permission="getRole"
+          :group="info.group"
+          :currentUserPermission="getRole"
           @groupAdminModified="groupAdminModified"
           @userRemoved="userRemoved"></eachMember>
       </li>
@@ -144,34 +148,33 @@ export default {
   ],
 
   props: {
-    group: String,
-    info: Object,
+    info: Object, // {time, group, name, avatar, admins}
     isPinned: Boolean,
   },
 
   data() {
     return {
-      groupName: this.info['name'],
+      groupName: this.info.name,
       visible: false,
       membersVisible: false,
       unsubscribeVisible: false,
       deleteHistoryVisible: false,
       currPinned: this.isPinned,
       membersCount: 0,
-      membersInfo: [],
+      membersInfo: {},
     }
   },
 
   methods: {
     groupNameModified(event) {
       if (event.key === 'Enter') {
-        const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/info/name`
-        const payload = { "note": this.groupName }
+        const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/name`
+        const payload = { note: this.groupName }
         axios.patch(URL, payload, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         }).then(res => {
           ElMessage.success("修改成功")
-          this.$emit('groupNameModified', { "group": this.group, "name": this.groupName })
+          this.$emit('groupNameModified', { group: this.info.group, name: this.groupName })
         }).catch(err => {
           ElMessage({
             message: `修改失败 ${err['response']['data']['detail']}`,
@@ -189,14 +192,14 @@ export default {
     },
 
     groupAvatarModified(info) {
-      const base64 = info["dataURL"]
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/info/avatar`
-      axios.patch(URL, { 'note': base64 }, {
+      const base64 = info.dataURL
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/avatar`
+      axios.patch(URL, { note: base64 }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         this.visible = false
         ElMessage.success("修改成功")
-        this.$emit('groupAvatarModified', { "group": this.group, "avatar": base64 })
+        this.$emit('groupAvatarModified', { group: this.info.group, avatar: base64 })
       }).catch(err => {
         ElMessage({
           message: `修改失败 ${err['response']['data']['detail']}`,
@@ -207,35 +210,39 @@ export default {
     },
 
     getMembersInfo() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members`
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/members`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        const users = res["data"]["users"]
+        const users = res.data.users
         this.membersCount = users.length
 
-        const owner = this.info['owner']
-        const admin = this.info['admin']
-        this.membersInfo = users.filter(i => !(owner.has(i.uuid) || admin.has(i.uuid)))
+        const owner = this.info.admins.owner
+        const admin = this.info.admins.admin
+        users.forEach(i => {
+          if (!(owner[i.uuid] || admin[i.uuid])) {
+            this.membersInfo[i.uuid] = i.lastUpdate
+          }
+        })
       }).catch(err => {
         console.log(err)
       })
     },
 
     groupAdminModified(info) {
-      if (info['operation']) {
-        const user = this.membersInfo.find(i => i.uuid == info['uuid'])
-        info['lastUpdate'] = user['lastUpdate']
-        this.membersInfo = this.membersInfo.filter(i => i.uuid != info['uuid'])
+      // 这里仅对membersInfo(普通用户)的对象进行处理，管理员对象的处理在chatPage.vue
+      if (info.operation) {
+        info.lastUpdate = this.membersInfo[info.uuid]
+        Reflect.deleteProperty(this.membersInfo, info.uuid)
       } else {
-        const lastUpdate = this.info['admin'].get(info['uuid'])
-        this.membersInfo.push({ "uuid": info['uuid'], "lastUpdate": lastUpdate })
+        const lastUpdate = this.info.admins.admin[info.uuid]
+        this.membersInfo[info.uuid] = lastUpdate
       }
       this.$emit('groupAdminModified', info)
     },
 
     userRemoved(info) {
-      this.membersInfo = this.membersInfo.filter(i => i.uuid != info['uuid'])
+      this.membersInfo = this.membersInfo.filter(i => i.uuid != info.uuid)
       this.$emit('userRemoved', info)
     },
 
@@ -244,14 +251,14 @@ export default {
     },
 
     async deleteHistory() {
-      this.$emit('deleteHistory', this.group)
+      this.$emit('deleteHistory', this.info.group)
       this.deleteHistoryVisible = false
     },
 
     unsubscribe() {
       const URL = this.getRole === 'owner'
-        ? `http://${localStorage.getItem('adress')}/v1/group/${this.group}`
-        : `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/me`
+        ? `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}`
+        : `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/members/me`
 
       axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -275,18 +282,10 @@ export default {
     },
 
     getRole() {
-      const account = this.$store.state["account"]
-      if (this.info['owner'].has(account)) return "owner"
-      if (this.info['admin'].has(account)) return "admin"
+      const account = this.$store.state.account
+      if (this.info.admins.owner[account]) return "owner"
+      if (this.info.admins.admin[account]) return "admin"
       return "user"
-    },
-
-    getOwner() {
-      return Array.from(this.info['owner'].entries())[0]
-    },
-
-    getAdmin() {
-      return Array.from(this.info['admin'].entries())
     },
   },
 

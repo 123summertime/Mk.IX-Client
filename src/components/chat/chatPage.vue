@@ -28,7 +28,6 @@
           <MoreFilled @click="drawer = !drawer"></MoreFilled>
           <el-drawer v-model="drawer" :with-header="false" :destroy-on-close="true" style="min-width: 400px;">
             <groupConfig
-              :group="currGroupID"
               :info="groupList.find(item => item.group === currGroupID)"
               :isPinned="pinned[currGroupID]"
               @groupNameModified="groupNameModified"
@@ -124,8 +123,8 @@ export default {
         this.avatar = userInfo["avatar"]
 
         this.$store.dispatch('loginAs', {
-          "account": this.uuid,
-          "userName": this.username,
+          account: this.uuid,
+          userName: this.username,
         })
         this.$store.dispatch('sysConnection', {
           "uuid": this.uuid,
@@ -226,12 +225,13 @@ export default {
     },
 
     groupAdminModified(info) {
+      // 更新群的管理员变化
       const { group, uuid, operation, lastUpdate } = info
       const targetGroup = this.groupList.find(i => i.group === group)
       if (operation) {
-        targetGroup.admin.set(uuid, lastUpdate)
+        targetGroup.admins.admin[uuid] = lastUpdate
       } else {
-        targetGroup.admin.delete(uuid)
+        Reflect.deleteProperty(targetGroup.admins.admin, uuid)
       }
     },
 
