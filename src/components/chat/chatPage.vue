@@ -33,7 +33,6 @@
               @groupNameModified="groupNameModified"
               @groupAvatarModified="groupAvatarModified"
               @groupAdminModified="groupAdminModified"
-              @userRemoved="userRemoved"
               @groupPinnedModified="groupPinnedModified"
               @deleteHistory="deleteHistory"></groupConfig>
           </el-drawer>
@@ -233,11 +232,6 @@ export default {
       } else {
         Reflect.deleteProperty(targetGroup.admins.admin, uuid)
       }
-    },
-
-    userRemoved(info) {
-      info["operation"] = false
-      this.groupAdminModified(info)
     },
 
     groupPinnedModified(info) {

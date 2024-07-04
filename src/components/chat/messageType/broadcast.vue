@@ -17,11 +17,12 @@ export default {
 .broadcast {
   max-width: calc(100% - 112px);
   margin: 0 auto;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   background-color: orangered;
 }
 
 .broadcast p {
+  font-size: 1rem;
   text-align: center;
 }
 </style>

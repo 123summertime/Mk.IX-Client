@@ -28,10 +28,10 @@ export default {
   ],
 
   props: {
-    uuid: String, // 这个用户的uuid
+    uuid: String,       // 这个用户的uuid
     lastUpdate: String, // 这个用户上次修改名字/头像时间
-    role: String, // 这个用户的身份 'owner' | 'admin' | 'user'
-    group: String,  // 当前群号
+    role: String,       // 这个用户的身份 'owner' | 'admin' | 'user'
+    group: String,      // 当前群号
     currentUserPermission: String, // 当前登录用户的身份 'owner' | 'admin' | 'user'
   },
 
@@ -44,6 +44,7 @@ export default {
 
   methods: {
     async getFullData() {
+      // 根据uuid和lastUpdate获取用户完整信息
       const info = await queryInfo('Account', this.lastUpdate, this.uuid)
       this.avatar = info.avatar
       this.userName = info.userName
@@ -56,7 +57,7 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success(`已将${this.userName}${isAdd ? '添加为' : '移除'}管理员`)
-        this.$emit('groupAdminModified', { "group": this.group, "uuid": this.uuid, "operation": isAdd })
+        this.$emit('groupAdminModified', { group: this.group, uuid: this.uuid, operation: isAdd })
       }).catch(err => {
         ElMessage({
           message: `修改失败 ${err}`,
@@ -72,10 +73,10 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success(`已将${this.userName}移除群聊`)
-        this.$emit('userRemoved', { "group": this.group, "uuid": this.uuid })
+        this.$emit('userRemoved', { group: this.group, uuid: this.uuid, role: this.role })
       }).catch(err => {
         ElMessage({
-          message: `移除失败 ${err['response']['data']['detail']}`,
+          message: `移除失败 ${err}`,
           duration: 6000,
           type: "error",
         })

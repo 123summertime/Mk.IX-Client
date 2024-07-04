@@ -31,8 +31,8 @@ export default createStore({
         const data = JSON.parse(event.data)
         const fullData = await queryInfo("Account", data.senderKey, data.senderID)
         context.commit('getNewMessage', {
-          "groupID": data.group,
-          "payload": {
+          groupID: data.group,
+          payload: {
             time: data.time,
             type: data.type,
             group: data.group,

@@ -68,6 +68,7 @@ export default {
       const mapping = {
         text: prefix + message.payload.content,
         revoke: message.payload.content,
+        system: message.payload.content,
         image: prefix + "[图片]",
         audio: prefix + "[语音]"
       }

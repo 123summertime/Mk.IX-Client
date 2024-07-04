@@ -1,7 +1,7 @@
 <template>
   <div class="messageRoot" ref="MessageRoot">
 
-    <div v-if="message.type === 'revoke'" @contextmenu.prevent="onRightClick">
+    <div v-if="message.type === 'revoke' || message.type === 'system'" @contextmenu.prevent="onRightClick">
       <broadcast class="payload" :group="group" :message="message"></broadcast>
     </div>
 
@@ -26,6 +26,7 @@
 
     <messageMenu class="contextMenu" ref="ContextMenu"
       :message="message"
+      :admins="admins"
       @deleteMsg="deleteMsg"
       @forwardMsg="forwardMsg"
       @revokeMsg="revokeMsg">

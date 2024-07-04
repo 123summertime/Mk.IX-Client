@@ -35,7 +35,7 @@
   </div>
 
   <!-- 修改群头像 -->
-  <el-dialog v-model="visible" width="540px">
+  <el-dialog v-model="editAvatarVisible" width="540px">
     <ImgCutter class="imgCutter"
       :isModal="false"
       :boxWidth="500"
@@ -143,19 +143,18 @@ export default {
     'groupAvatarModified',
     'groupAdminModified',
     'groupPinnedModified',
-    'userRemoved',
     'deleteHistory'
   ],
 
   props: {
-    info: Object, // {time, group, name, avatar, admins}
+    info: Object, // {time, group, name, avatar, admins: {owner, admin}}
     isPinned: Boolean,
   },
 
   data() {
     return {
       groupName: this.info.name,
-      visible: false,
+      editAvatarVisible: false,
       membersVisible: false,
       unsubscribeVisible: false,
       deleteHistoryVisible: false,
@@ -187,7 +186,7 @@ export default {
 
     beforeModifyAvatar() {
       if (this.checkPermissions) {
-        this.visible = true
+        this.editAvatarVisible = true
       }
     },
 
@@ -197,7 +196,7 @@ export default {
       axios.patch(URL, { note: base64 }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        this.visible = false
+        this.editAvatarVisible = false
         ElMessage.success("修改成功")
         this.$emit('groupAvatarModified', { group: this.info.group, avatar: base64 })
       }).catch(err => {
@@ -210,6 +209,7 @@ export default {
     },
 
     getMembersInfo() {
+      // 获取群员信息 以{uuid: lastUpdate}的形式存储在this.membersInfo中
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/members`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -230,6 +230,7 @@ export default {
     },
 
     groupAdminModified(info) {
+      // 处理更改管理员
       // 这里仅对membersInfo(普通用户)的对象进行处理，管理员对象的处理在chatPage.vue
       if (info.operation) {
         info.lastUpdate = this.membersInfo[info.uuid]
@@ -242,8 +243,12 @@ export default {
     },
 
     userRemoved(info) {
-      this.membersInfo = this.membersInfo.filter(i => i.uuid != info.uuid)
-      this.$emit('userRemoved', info)
+      // 处理移出用户
+      if (info.role === 'admin') {
+        this.$emit('groupAdminModified', { operation: false, ...info })
+      } else {
+        Reflect.deleteProperty(this.membersInfo, info.uuid)
+      }
     },
 
     groupPinnedModified() {

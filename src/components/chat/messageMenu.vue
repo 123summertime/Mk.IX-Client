@@ -27,8 +27,7 @@
 export default {
   props: {
     message: Object,
-    owner: Object,
-    admin: Map,
+    admins: Object,
   },
 
   data() {
@@ -105,11 +104,11 @@ export default {
         return true
       }
       // 群主
-      if (this.owner.has(account)) {
+      if (this.admins.owner[account]) {
         return true
       }
       // 管理员 但不能是群主发的
-      if (this.admin.has(account) && !this.owner.has(this.message.uuid)) {
+      if (this.admins.admin[account] && !this.admins.owner[this.message.uuid]) {
         return true
       }
       return false
