@@ -450,4 +450,5 @@ chatPage
   |     |     |- textMsg
   |     |     |- audioMsg
   |     |     |- messageMenu
+  |     |     |- namecard
  -->

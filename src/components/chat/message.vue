@@ -6,7 +6,7 @@
     </div>
 
     <div :class="messageFrom() ? 'message bySelf' : 'message'" v-else>
-      <div class="avatar" @click="showProfile">
+      <div class="avatar" @click="showNamecard">
         <img :src="message.avatar">
       </div>
       <div class="container">
@@ -36,38 +36,15 @@
       @groupSelectorSelected="groupSelectorSelected"
       @groupSelectorCanceled="groupSelectorCanceled"></groupSelector>
 
-    <el-dialog v-model="namecardVisible" :show-close="false" width="540px">
-      <div class="namecard">
-        <div class="namecardAvatar">
-          <img :src="message.avatar" />
-        </div>
-        <div class="namecardInfo">
-          <span>
-            <i>昵称:</i>
-            <i>{{ message.userName }}</i>
-          </span>
-          <span>
-            <i>uuid:</i>
-            <i>{{ message.uuid }}</i>
-          </span>
-          <span>
-            <i>个性签名:</i>
-            <i>{{ bio }}</i>
-          </span>
-          <span>
-            <i>最后访问:</i>
-            <i>{{ lastSeen === "Online" ? "在线" : computeTime(lastSeen) }}</i>
-          </span>
-        </div>
-      </div>
-    </el-dialog>
+    <namecard
+      :message="message"
+      :namecardTrigger="namecardTrigger">
+    </namecard>
 
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-
 import broadcast from './messageType/broadcast.vue'
 import fileMsg from './messageType/fileMsg.vue'
 import imageMsg from './messageType/imageMsg.vue'
@@ -75,6 +52,7 @@ import textMsg from './messageType/textMsg.vue'
 import audioMsg from './messageType/audioMsg.vue'
 import messageMenu from './messageMenu.vue'
 import groupSelector from './groupSelector.vue'
+import namecard from './namecard.vue'
 
 export default {
   props: {
@@ -85,15 +63,10 @@ export default {
 
   data() {
     return {
-
-      showGroupSelector: false,
-
+      namecardTrigger: 0,
       formatedTime: "",
       rightClicked: false,
-      namecardVisible: false,
-
-      bio: "",
-      lastSeen: "",
+      showGroupSelector: false,
     }
   },
 
@@ -133,8 +106,6 @@ export default {
       return year + "/" + month + "/" + date + " " + T
     },
 
-
-
     onRightClick(event) {
       const rect = this.$refs.MessageRoot.getBoundingClientRect()
       const ref = this.$refs.ContextMenu.$el.style
@@ -171,17 +142,8 @@ export default {
       window.removeEventListener('contextmenu', this.globalClick)
     },
 
-    showProfile() {
-      this.namecardVisible = true
-
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.message.uuid}`
-      axios.get(URL).then(res => {
-        const data = res["data"]
-        this.bio = data["bio"]
-        this.lastSeen = data["lastSeen"]
-      }).catch(err => {
-        console.log(err)
-      })
+    showNamecard() {
+      this.namecardTrigger += 1
     },
 
     deleteMsg() {
@@ -250,6 +212,7 @@ export default {
     audioMsg,
     messageMenu,
     groupSelector,
+    namecard,
   }
 
 }
@@ -333,41 +296,5 @@ export default {
 
 :deep(.el-dialog__body) {
   padding-top: 0;
-}
-
-.namecard {
-  display: flex;
-  width: 100%;
-}
-
-.namecardAvatar img {
-  width: 96px;
-  height: 96px;
-  border-radius: 16px;
-}
-
-.namecardInfo {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  margin-left: 32px;
-}
-
-.namecardInfo span {
-  display: flex;
-  margin: 12px 0;
-}
-
-.namecardInfo span:nth-child(1) {
-  margin-top: 0;
-}
-
-.namecardInfo span i:nth-child(1) {
-  width: 96px;
-}
-
-.namecardInfo span i:nth-child(2) {
-  width: calc(100% - 96px);
-  word-break: break-all;
 }
 </style>
