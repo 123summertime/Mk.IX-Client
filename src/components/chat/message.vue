@@ -1,12 +1,12 @@
 <template>
   <div class="messageRoot" ref="MessageRoot">
 
-    <div v-if="message.type === 'revoke' || message.type === 'system'" @contextmenu.prevent="onRightClick">
+    <div v-if=isBroadcastType @contextmenu.prevent="onRightClick">
       <broadcast class="payload" :group="group" :message="message"></broadcast>
     </div>
 
     <div :class="messageFrom() ? 'message bySelf' : 'message'" v-else>
-      <div class="avatar" @click="showNamecard">
+      <div class="avatar" @click="showNamecard" @contextmenu.prevent="newAt">
         <img :src="message.avatar">
       </div>
       <div class="container">
@@ -168,6 +168,15 @@ export default {
 
     revokeMsg() {
       this.$emit('revokeMsg', this.message.time)
+    },
+
+    newAt() {
+      if (!this.messageFrom()) {
+        this.$store.dispatch("getNewAt", {
+          uuid: this.message.uuid,
+          userName: this.message.userName,
+        })
+      }
     }
   },
 
@@ -198,6 +207,9 @@ export default {
       return ""
     },
 
+    isBroadcastType() {
+      return this.message.type === 'revoke' || this.message.type === 'system'
+    }
   },
 
   async mounted() {

@@ -5,6 +5,9 @@
       <p :class="role">{{ userName }}</p>
     </div>
     <div class="oper">
+      <div v-if="showAt" @click="newAt">
+        <p class="icon">@</p>
+      </div>
       <div v-if="getManagePermission" @click="adminModify" :title="role === 'user' ? '添加管理员' : '移除管理员'">
         <CirclePlus v-if="role === 'user'"></CirclePlus>
         <Remove v-else-if="role === 'admin'"></Remove>
@@ -81,6 +84,13 @@ export default {
           type: "error",
         })
       })
+    },
+
+    newAt() {
+      this.$store.dispatch("getNewAt", {
+        uuid: this.uuid,
+        userName: this.userName,
+      })
     }
   },
 
@@ -94,6 +104,10 @@ export default {
       // 移除用户的权限
       return (this.currentUserPermission === 'owner' && this.role != 'owner') ||
         (this.currentUserPermission === 'admin' && this.role === 'user')
+    },
+
+    showAt() {
+      return this.uuid != this.$store.state.account
     }
   },
 
@@ -150,8 +164,11 @@ export default {
   cursor: pointer;
 }
 
-.oper div svg {
+.oper div svg, 
+.oper div .icon {
   width: 100%;
   height: 100%;
+  font-size: 24px;
+  line-height: 24px;
 }
 </style>

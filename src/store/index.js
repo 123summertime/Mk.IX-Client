@@ -48,7 +48,7 @@ export default createStore({
     async sysConnection(context, info) {
       const adress = localStorage.getItem('adress')
       const token = localStorage.getItem('token')
-      const URL = `ws://${adress}/ws/wsSys?userID=${info.uuid}`
+      const URL = `ws://${adress}/ws/systemWS?userID=${info.uuid}`
       const ws = new WebSocket(URL, [token])
 
       ws.onmessage = async function (event) {
@@ -69,6 +69,10 @@ export default createStore({
 
     updateGroupInfo(context, info) {
       context.commit('updateGroupInfo', info)
+    },
+
+    getNewAt(context, info) {
+      context.commit('getNewAt', info)
     }
   },
 
@@ -101,6 +105,10 @@ export default createStore({
 
     updateGroupInfo(state, info) {
       state.groupList.push(info)
+    },
+
+    getNewAt(state, info) {
+      state.currentAt = info
     }
   },
 
@@ -110,6 +118,7 @@ export default createStore({
     sysMsg: "",
     groupList: [],
     favoriteDB: await favoriteDB(),
+    currentAt: {},  // {uuid, userName}
     wsConnections: {},  // K: groupID, V: Websocket
     // {group}: group新收到的消息
     // lastMessageOf{group}: group的最后一条消息

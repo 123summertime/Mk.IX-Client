@@ -37,7 +37,8 @@
     <!-- 确认遮罩层 -->
     <el-dialog v-model="visible" title="发送确认" width="30%" :show-close="false" :destroy-on-close="true">
       <img class="previewImg" :src="payload.content" v-if="payload.type === 'image'" />
-      <audioMsg class="previewAudio" v-else-if="payload.type === 'audio'" :group="group" :message="audioMessagePreview"></audioMsg>
+      <audioMsg class="previewAudio" v-else-if="payload.type === 'audio'" :group="group" :message="audioMessagePreview">
+      </audioMsg>
       <p class="previewFile" v-else>{{ payload.name.split(".").slice(-1)[0] + "文件" }}</p>
       <template #footer>
         <span class="footer">
@@ -83,6 +84,7 @@ export default {
       },
       visible: false,
       favorite: false,
+      atList: new Set(),  // 存储@其他人的JSON字符串，包含属性uuid, userName
     }
   },
 
@@ -311,6 +313,20 @@ export default {
             length: this.recorder.time,
             blob: this.payload.content
           }
+        }
+      }
+    },
+
+    getNewAt() {
+      return this.$store.state.currentAt
+    }
+  },
+
+  watch: {
+    getNewAt: {
+      handler(newVal) {
+        if (newVal) {
+          this.atList.add(JSON.stringify(newVal))
         }
       }
     }
