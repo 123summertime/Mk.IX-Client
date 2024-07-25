@@ -29,6 +29,7 @@
     </div>
 
     <div class="main">
+      <atBar class="atBar" :atList="atList" @deleteAt="deleteAt"></atBar>
       <textarea v-model=input @keydown="onKeyDown" v-on:paste="pasteImg"></textarea>
       <favorite class="favorite" v-if="favorite" @sendFavoriteImg="sendFavoriteImg"></favorite>
     </div>
@@ -60,6 +61,7 @@
 <script>
 import axios from 'axios'
 
+import atBar from './atBar.vue'
 import favorite from './favorite.vue'
 import audioMsg from './messageType/audioMsg.vue'
 
@@ -93,14 +95,18 @@ export default {
       if (!this.input) { return }
 
       this.$store.state.wsConnections[this.group].send(JSON.stringify({
-        "type": "text",
-        "payload": {
+        type: "text",
+        payload: {
           name: null,
           size: null,
           content: this.input,
+          meta: {
+            at: Array.from(this.atList).map(i => JSON.parse(i).uuid)
+          }
         }
       }))
       this.input = ""
+      this.atList = new Set()
     },
 
 
@@ -108,8 +114,8 @@ export default {
       if (!this.payload.content) { return }
 
       this.$store.state.wsConnections[this.group].send(JSON.stringify({
-        "type": this.payload.type,
-        "payload": {
+        type: this.payload.type,
+        payload: {
           name: this.payload.name,
           size: this.payload.size,
           content: this.payload.content,
@@ -291,6 +297,14 @@ export default {
 
       this.confirmedSending()
     },
+
+    deleteAt(target) {
+      this.atList.delete(target)
+    },
+
+    // sendAt() {
+    //   const 
+    // }
   },
 
   computed: {
@@ -333,6 +347,7 @@ export default {
   },
 
   components: {
+    atBar,
     favorite,
     audioMsg,
   },
@@ -381,15 +396,21 @@ input[type="file"] {
 
 .main {
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: calc(100% - 32px);
+}
+
+.atBar {
+  max-width: 100%;
 }
 
 textarea {
   display: block;
   width: 100%;
   height: 100%;
-  padding: 16px;
+  padding: 8px 16px 16px 16px;
   font-size: 1.2rem;
   font-family: Microsoft Yahei;
   resize: none;

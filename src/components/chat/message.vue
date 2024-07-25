@@ -6,7 +6,11 @@
     </div>
 
     <div :class="messageFrom() ? 'message bySelf' : 'message'" v-else>
-      <div class="avatar" @click="showNamecard" @contextmenu.prevent="newAt">
+      <div class="avatar"
+        @click="showNamecard"
+        @mousedown="newAt"
+        @mouseup="cancelAt"
+        @mouseleave="cancelAt">
         <img :src="message.avatar">
       </div>
       <div class="container">
@@ -67,6 +71,8 @@ export default {
       formatedTime: "",
       rightClicked: false,
       showGroupSelector: false,
+      isLongPress: false,
+      longPressTimer: null,
     }
   },
 
@@ -143,7 +149,9 @@ export default {
     },
 
     showNamecard() {
-      this.namecardTrigger += 1
+      if (!this.isLongPress) {
+        this.namecardTrigger += 1
+      }
     },
 
     deleteMsg() {
@@ -171,12 +179,21 @@ export default {
     },
 
     newAt() {
-      if (!this.messageFrom()) {
+      this.isLongPress = false
+      if (this.messageFrom()) { return }
+
+      const activeDelay = 400
+      this.longPressTimer = setTimeout(() => {
+        this.isLongPress = true
         this.$store.dispatch("getNewAt", {
           uuid: this.message.uuid,
           userName: this.message.userName,
         })
-      }
+      }, activeDelay)
+    },
+
+    cancelAt() {
+      clearTimeout(this.longPressTimer)
     }
   },
 

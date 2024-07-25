@@ -21,7 +21,7 @@
 
     <splitter @splitter="groupSplitter" class="groupSplitter" ref="groupSplitter"></splitter>
 
-    <div class="rightSide">
+    <div class="rightSide" ref="rightSide">
       <div class="header">
         <div class="groupToolBar" v-show="currGroupID">
           <p>{{ currGroupName }}</p>
@@ -185,6 +185,7 @@ export default {
       if (rate > 0.125 && rate < 0.5) {
         this.$refs.groupSplitter.$el.style.left = posX - 8 + "px"
         this.$refs.leftSide.style.width = posX + "px"
+        this.$refs.rightSide.style.width = window.innerWidth - posX + "px"
         localStorage.setItem('groupWidth', posX)
       }
     },
@@ -335,7 +336,6 @@ export default {
 /* rightSide */
 .rightSide {
   height: 100%;
-  flex-grow: 1;
 }
 
 .header {

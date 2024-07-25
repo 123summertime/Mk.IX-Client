@@ -8,13 +8,12 @@ const infoDB = new dbCRUD(info)
 export const queryInfo = async function (table, lastUpdate, uuid) {
   try {
     const queryConditions = {
-      Account: { uuid },
+      Account: { uuid: uuid },
       Group: { group: uuid }
     }
 
     const res = await infoDB.query(table, queryConditions[table]);
-
-    if (res && res["time"] === lastUpdate) {
+    if (res && (res.time === lastUpdate || !lastUpdate)) {
       return res
     }
 

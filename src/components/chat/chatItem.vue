@@ -49,7 +49,7 @@ export default {
     async getHistory() {
       const history = await this.DB.queryRange('History', this.page * this.step, this.step, true)
       for (const msg of history) {
-        const info = await queryInfo("Account", msg.senderKey, msg.uuid)
+        const info = await queryInfo("Account", null, msg.uuid)
         const message = {
           time: msg.time,
           type: msg.type,
