@@ -302,9 +302,6 @@ export default {
       this.atList.delete(target)
     },
 
-    // sendAt() {
-    //   const 
-    // }
   },
 
   computed: {

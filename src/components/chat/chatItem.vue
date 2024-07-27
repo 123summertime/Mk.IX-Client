@@ -130,6 +130,38 @@ export default {
       }))
     },
 
+    async newRevokeHandler(message) {
+      const revokeID = message.payload.content
+      const revokeMsg = await this.DB.query('History', { "time": revokeID })
+      const newPayload = {
+        name: null,
+        size: null,
+        content: `${message.userName} 撤回了一条${revokeMsg.uuid === message.uuid ? '' : '成员'}消息`,
+        meta: null,
+      }
+
+      revokeMsg.type = 'revoke'
+      revokeMsg.payload = newPayload
+      await this.DB.update('History', revokeMsg)
+
+      const idx = this.messageList.findIndex(i => i.time === revokeID)
+      if (idx != -1) {
+        this.messageList[idx].type = 'revoke'
+        this.messageList[idx].payload = newPayload
+      }
+    },
+
+    isAtMeHandler(message) {
+      const account = this.$store.state.account
+      const atList = message.payload.meta ? message.payload.meta.at : []
+      if (atList.includes(account)) {
+        this.$store.dispatch("getGroupAttention", {
+          type: "at",
+          group: this.group,
+        })
+      }
+    },
+
   },
 
   computed: {
@@ -140,47 +172,31 @@ export default {
 
   watch: {
     newMessage: {
-      async handler(newVal) {
-        if (newVal) {
-          if (newVal.type === 'revoke') {
-            const revokeID = newVal.payload.content
-            const revokeMsg = await this.DB.query('History', { "time": revokeID })
-            const newPayload = {
-              name: null,
-              size: null,
-              content: `${newVal.userName} 撤回了一条${revokeMsg.uuid === newVal.uuid ? '' : '成员'}消息`,
-              meta: null,
-            }
+      async handler(message) {
+        if (!message) { return }
 
-            revokeMsg.type = 'revoke'
-            revokeMsg.payload = newPayload
-            await this.DB.update('History', revokeMsg)
+        if (message.type === 'revoke') {
+          this.newRevokeHandler(message)
+          return
+        }
 
-            const idx = this.messageList.findIndex(i => i.time === revokeID)
-            if (idx != -1) {
-              this.messageList[idx].type = 'revoke'
-              this.messageList[idx].payload = newPayload
-            }
-            return
-          }
+        this.isAtMeHandler(message)
 
-          const storage = {
-            time: newVal.time,
-            type: newVal.type,
-            uuid: newVal.uuid,
-            payload: JSON.parse(JSON.stringify(newVal.payload))
-          }
-          this.messageList.push(newVal)
-          this.putHistory(storage)
+        const storage = {
+          time: message.time,
+          type: message.type,
+          uuid: message.uuid,
+          payload: JSON.parse(JSON.stringify(message.payload))
+        }
+        this.messageList.push(message)
+        this.putHistory(storage)
 
-          if (newVal["uuid"] === this.$store.state["account"] && newVal['type'] != 'revoke') {
-            this.$nextTick(() => {
-              requestAnimationFrame(() => {
-                this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
-              })
+        if (message.uuid === this.$store.state.account) {
+          this.$nextTick(() => {
+            requestAnimationFrame(() => {
+              this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
             })
-          }
-
+          })
         }
       }
     },

@@ -180,7 +180,7 @@ export default {
 
     newAt() {
       this.isLongPress = false
-      if (this.messageFrom()) { return }
+      // if (this.messageFrom()) { return }
 
       const activeDelay = 400
       this.longPressTimer = setTimeout(() => {

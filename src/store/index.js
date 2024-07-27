@@ -73,6 +73,10 @@ export default createStore({
 
     getNewAt(context, info) {
       context.commit('getNewAt', info)
+    },
+
+    getGroupAttention(context, info) {
+      context.commit('getGroupAttention', info)
     }
   },
 
@@ -109,6 +113,10 @@ export default createStore({
 
     getNewAt(state, info) {
       state.currentAt = info
+    },
+
+    getGroupAttention(state, info) {
+      state.groupAttentions.set(info.group, info.type)
     }
   },
 
@@ -117,9 +125,10 @@ export default createStore({
     userName: "",
     sysMsg: "",
     groupList: [],
+    groupAttentions: new Map(),  // group: String -> type: String, 
     favoriteDB: await favoriteDB(),
-    currentAt: {},  // {uuid, userName}
-    wsConnections: {},  // K: groupID, V: Websocket
+    currentAt: {},  // element: {uuid: String, userName: String}
+    wsConnections: {},  // element: {groupID: Websocket}
     // {group}: group新收到的消息
     // lastMessageOf{group}: group的最后一条消息
     // sys: 系统消息Websocket

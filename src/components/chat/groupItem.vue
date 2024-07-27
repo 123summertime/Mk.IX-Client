@@ -3,7 +3,7 @@
     <img class="groupAvatar" :src="avatar">
     <div class="groupInfo">
       <p class="groupName">{{ name }}</p>
-      <p class="currMessage">{{ lastMessage }}</p>
+      <p class="currMessage"><i v-if="showAttention">{{ this.attentionContent }}</i>{{ lastMessage }}</p>
     </div>
     <div class="information">
       <div :class="lastMessageTime ? 'time' : 'time hidden'">{{ lastMessageTime }}</div>
@@ -27,6 +27,8 @@ export default {
       unreadCount: 0,
       lastMessage: " ",
       lastMessageTime: "",
+      attentionContent: "",
+      showAttention: false,
     }
   },
 
@@ -113,12 +115,20 @@ export default {
         const lastMessageTime = -1 * this.$refs.groupInfoRoot.style.order
         this.$refs.groupInfoRoot.style.order = 2147483647 - lastMessageTime
       }
+    },
+
+    hasGroupAttention() {
+
     }
   },
 
   computed: {
     getLastMessage() {
       return this.$store.state[`lastMessageOf${this.group}`]
+    },
+
+    needAttention() {
+      return this.$store.state.groupAttentions
     }
   },
 
@@ -137,6 +147,7 @@ export default {
       handler(newVal) {
         if (newVal) {
           this.unreadCount = 0
+          this.showAttention = false
         }
       }
     },
@@ -146,6 +157,22 @@ export default {
         this.pinnedGroupModified()
       }
     },
+
+    needAttention: {
+      deep: true,
+      handler(attentions) {
+        if (!attentions.has(this.group)) {
+          this.showAttention = false
+          return
+        }
+
+        const content = {
+          at: "有人@你"
+        }
+        this.attentionContent = content[attentions.get(this.group)]
+        this.showAttention = true
+      }
+    }
 
   },
 
