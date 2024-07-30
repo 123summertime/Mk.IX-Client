@@ -400,7 +400,7 @@ input[type="file"] {
 }
 
 .atBar {
-  max-width: 100%;
+  width: 100%;
 }
 
 textarea {

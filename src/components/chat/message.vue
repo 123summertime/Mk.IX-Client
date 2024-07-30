@@ -180,7 +180,7 @@ export default {
 
     newAt() {
       this.isLongPress = false
-      // if (this.messageFrom()) { return }
+      if (this.messageFrom()) { return }
 
       const activeDelay = 400
       this.longPressTimer = setTimeout(() => {
@@ -250,6 +250,8 @@ export default {
 <style scoped>
 .messageRoot {
   position: relative;
+  padding: 12px;
+  border-radius: 24px;
 }
 
 .avatar img {
@@ -263,7 +265,6 @@ export default {
 
 .message {
   display: flex;
-  margin-bottom: 24px;
 }
 
 .bySelf {
@@ -313,7 +314,8 @@ export default {
 
 .time {
   font-size: 0.75rem;
-  margin: 0 8px;
+  margin: 0 4px;
+  white-space: nowrap;
   direction: ltr;
 }
 

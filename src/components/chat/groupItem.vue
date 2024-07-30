@@ -3,7 +3,10 @@
     <img class="groupAvatar" :src="avatar">
     <div class="groupInfo">
       <p class="groupName">{{ name }}</p>
-      <p class="currMessage"><i v-if="showAttention">{{ this.attentionContent }}</i>{{ lastMessage }}</p>
+      <p class="currMessage">
+        <i class="attention" v-if="showAttention">{{ `[${this.attentionContent}]` }}</i>
+        <i>{{ lastMessage }}</i>
+      </p>
     </div>
     <div class="information">
       <div :class="lastMessageTime ? 'time' : 'time hidden'">{{ lastMessageTime }}</div>
@@ -242,5 +245,15 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   color: gray;
+}
+
+.currMessage i {
+  font-size: 1rem;
+  line-height: 1rem;
+}
+
+.attention {
+  color: red;
+  margin-right: 4px;
 }
 </style>

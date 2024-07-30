@@ -1,11 +1,16 @@
 <template>
-  <div @scroll="onScroll" ref="messageView">
-    <message v-for="msg in messageList" :key="msg.time"
-      :group="group"
-      :message="msg"
-      :admins="admins"
-      @deleteMsg="deleteMsg"
-      @revokeMsg="revokeMsg"></message>
+  <div class="chatItemRoot" @scroll="onScroll" ref="messageView">
+    <div>
+      <message v-for="msg in messageList" :key="msg.time" ref='MessageList'
+        :group="group"
+        :message="msg"
+        :admins="admins"
+        @deleteMsg="deleteMsg"
+        @revokeMsg="revokeMsg"></message>
+    </div>
+    <div class="attentionButton" v-if="attentionVisible" @click="gotoAttention">
+      <p>↑有人@你</p>
+    </div>
   </div>
 </template>
 
@@ -32,7 +37,9 @@ export default {
       switch: false,  // 防止onScroll同一时间反复触发getHistory
       page: 0,
       step: 10,
-      messageList: []
+      messageList: [],
+      attentionVisible: false,
+      attentionTarget: "",
     }
   },
 
@@ -73,8 +80,8 @@ export default {
 
     async makeConnection() {
       this.$store.dispatch('wsConnect', {
-        "groupID": this.group,
-        "uuid": this.$store.state["account"]
+        groupID: this.group,
+        uuid: this.$store.state["account"]
       })
     },
 
@@ -151,16 +158,37 @@ export default {
       }
     },
 
-    isAtMeHandler(message) {
+    newAttentionHandler(message) {
       const account = this.$store.state.account
       const atList = message.payload.meta ? message.payload.meta.at : []
       if (atList.includes(account)) {
+        this.attentionVisible = true,
+        this.attentionTarget = message.time
         this.$store.dispatch("getGroupAttention", {
           type: "at",
           group: this.group,
         })
       }
     },
+
+    async gotoAttention() {
+      this.attentionVisible = false
+      const ref = this.$refs.MessageList
+      const idx = ref.findIndex(i => i.message.time === this.attentionTarget)
+
+      if (idx == -1) { return }
+
+      if (this.attentionTarget === this.messageList[0].time) {
+        await this.getHistory()
+      }
+
+      const element = ref[idx].$el
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      element.classList.add('flash')  // 闪烁动画
+      setTimeout(() => {
+        element.classList.remove('flash')
+      }, 2000)
+    }
 
   },
 
@@ -180,7 +208,7 @@ export default {
           return
         }
 
-        this.isAtMeHandler(message)
+        this.newAttentionHandler(message)
 
         const storage = {
           time: message.time,
@@ -241,4 +269,48 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+.chatItemRoot {
+  overflow: scroll;
+}
+
+.chatItemRoot::-webkit-scrollbar {
+  display: none;
+}
+
+.attentionButton {
+  position: fixed;
+  top: 25%;
+  right: 0px;
+  height: 48px;
+  padding: 8px 20px 8px 32px;
+  border-top-left-radius: 24px;
+  border-bottom-left-radius: 24px;
+  background-color: aliceblue;
+  cursor: pointer;
+}
+
+.attentionButton p {
+  height: 100%;
+  font-size: 1.25rem;
+  line-height: 32px;
+}
+
+@keyframes flash {
+  0% {
+    background-color: transparent;
+  }
+
+  50% {
+    background-color: #8b658f;
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+.flash {
+  animation: flash 0.6s ease-in-out 2;
+}
+</style>

@@ -336,6 +336,7 @@ export default {
 /* rightSide */
 .rightSide {
   height: 100%;
+  flex-grow: 1;
 }
 
 .header {
@@ -343,7 +344,7 @@ export default {
   width: 100%;
   height: 64px;
   background-color: aquamarine;
-  padding: 8px 16px;
+  padding: 8px 24px;
 }
 
 .groupToolBar {
@@ -384,11 +385,6 @@ export default {
   width: 100%;
   height: 100%;
   padding: 8px;
-  overflow: scroll;
-}
-
-.conversation::-webkit-scrollbar {
-  display: none;
 }
 
 .inputBox {
@@ -440,6 +436,7 @@ chatPage
   |- groupConfig
   |     |- eachMember
   |- inputBox
+  |     |- atBar
   |     |- favorite
   |     |- audioMsg
   |- chatItem
