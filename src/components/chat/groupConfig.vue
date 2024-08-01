@@ -15,7 +15,7 @@
         <p>群ID</p>
         <p>{{ info.group }}</p>
       </li>
-      <li>
+      <li v-if="available">
         <p>群成员</p>
         <div class="members" title="点击查看详细信息">
           <p @click="membersVisible = true">{{ membersCount + "人" }}</p>
@@ -28,7 +28,7 @@
       <li class="deleteHistory">
         <el-button type="danger" @click="deleteHistoryVisible = true">清空聊天记录</el-button>
       </li>
-      <li class="unsubscribe">
+      <li class="unsubscribe" v-if="available">
         <el-button type="danger" @click="unsubscribeVisible = true">{{ getRole === 'owner' ? '解散群' : '退出群' }}</el-button>
       </li>
     </ul>
@@ -147,8 +147,9 @@ export default {
   ],
 
   props: {
-    info: Object, // {time, group, name, avatar, admins: {owner, admin}}
+    info: Object, // {time, group, name, avatar, admins: {owner: {}, admin: {}}}
     isPinned: Boolean,
+    available: Boolean,
   },
 
   data() {
@@ -295,7 +296,9 @@ export default {
   },
 
   mounted() {
-    this.getMembersInfo()
+    if (this.available) {
+      this.getMembersInfo()
+    }
   },
 
   components: {

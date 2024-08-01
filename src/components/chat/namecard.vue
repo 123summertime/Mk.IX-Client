@@ -32,7 +32,7 @@ import axios from 'axios'
 export default {
   props: {
     message: Object,
-    namecardTrigger: Number,
+    namecardTrigger: Boolean,
   },
 
   data() {

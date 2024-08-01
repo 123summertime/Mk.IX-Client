@@ -8,12 +8,12 @@
       </div>
       <div class="groupItems">
         <groupItem v-for="item in groupList"
-          :avatar="item['avatar']"
-          :group="item['group']"
-          :name="item['name']"
-          :active="item['group'] === currGroupID"
-          :isPinned="pinned[item['group']] === true"
-          @click="currGroupChange(item['group'], item['name'])"
+          :avatar="item.avatar"
+          :group="item.group"
+          :name="item.name"
+          :active="item.group === currGroupID"
+          :isPinned="pinned[item.group] === true"
+          @click="currGroupChange(item.group, item.name, item.available)"
           class="groupItem"></groupItem>
       </div>
       <tools @joinGroupSuccess="joinGroupSuccess"></tools>
@@ -30,6 +30,7 @@
             <groupConfig
               :info="groupList.find(item => item.group === currGroupID)"
               :isPinned="pinned[currGroupID]"
+              :available="currGroupAvailable"
               @groupNameModified="groupNameModified"
               @groupAvatarModified="groupAvatarModified"
               @groupAdminModified="groupAdminModified"
@@ -42,39 +43,21 @@
       <div class="center" v-show="currGroupID">
         <div class="conversationView">
           <chatItem v-for="item in groupList"
-            :avatar="item['avatar']"
-            :admins="item['admins']"
-            :group="item['group']"
-            :name="item['name']"
+            :avatar="item.avatar"
+            :admins="item.admins"
+            :group="item.group"
+            :name="item.name"
+            :available="item.available"
             :active="item['group'] === currGroupID"
-            :deleted="item['group'] === deleted"
+            :deletedHistory="item['group'] === deletedHistory"
             v-show="currGroupID === item['group']"
             class="conversation"></chatItem>
         </div>
         <splitter @splitter="inputSplitter" class="inputSplitter" ref="inputSplitter"></splitter>
-        <inputBox :group="currGroupID" class="inputBox" ref="inputBox"></inputBox>
+        <inputBox :group="currGroupID" :available="currGroupAvailable" class="inputBox" ref="inputBox"></inputBox>
       </div>
       <div class="center" v-show="!currGroupID"></div>
     </div>
-
-    <!-- 转发遮罩层 -->
-    <el-dialog v-model="visible" :title="'转发至 ' + forwardTo[1]" width="540px" :show-close=false>
-      <div class="forwardGroups">
-        <div v-for="item in groupList" :key="item['group']" @click="forwardTo = [item['group'], item['name']]"
-          class="forwardGroupItem"
-          :class="{ 'forwardGroupItemSelected': forwardTo[0] === item['group'] }">
-          <img :src="item['avatar']" />
-          <p>{{ item['name'] }}</p>
-        </div>
-      </div>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button type="primary" :disabled="forwardTo[0] === ''" @click="forwardSend">发送</el-button>
-          <el-button @click="visible = false">取消</el-button>
-        </span>
-      </template>
-    </el-dialog>
-
   </div>
 </template>
 
@@ -99,13 +82,12 @@ export default {
       username: "",
       currGroupID: "",
       currGroupName: "",
-      deleted: "",
+      currGroupAvailable: true,
+      deletedHistory: "",
       visible: false,
       drawer: false,
       pinned: {},
-      forwardPayload: {},
-      forwardTo: ["", ""],  // [group, name]
-      groupList: [], // [{group:String, avatar:String, name:String, admins: Object}]
+      groupList: [], // [{group:String, avatar:String, name:String, admins: Object, available: Boolean}]
     }
   },
 
@@ -115,35 +97,46 @@ export default {
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(async res => {
-        const data = res["data"]
+        const data = res.data
         const userInfo = await queryInfo("Account", data["lastUpdate"], data["uuid"])
-        this.uuid = data["uuid"]
-        this.username = data["userName"]
-        this.avatar = userInfo["avatar"]
+        this.uuid = data.uuid
+        this.username = data.userName
+        this.avatar = userInfo.avatar
 
         this.$store.dispatch('loginAs', {
           account: this.uuid,
           userName: this.username,
         })
         this.$store.dispatch('sysConnection', {
-          "uuid": this.uuid,
+          uuid: this.uuid,
         })
 
-        data["groups"].forEach(id => {
-          this.getGroupInfo(id["lastUpdate"], id["group"])
+        const localGroups = await this.getLocalGroups(this.uuid)
+        data.groups.forEach(id => {
+          localGroups.delete(id.group)
+          this.getGroupInfo(id.lastUpdate, id.group, true)
         })
+        for (const id of localGroups) {
+          this.getGroupInfo(null, id, false)
+        }
       }).catch(err => { console.log(err) })
     },
 
-    async getGroupInfo(lastUpdate, groupID) {
+    async getGroupInfo(lastUpdate, groupID, available) {
       const groupInfo = await queryInfo("Group", lastUpdate, groupID)
+      if (!available) {
+        const element = {...groupInfo, admins: {owner: {}, admin: {}}, available}
+        this.groupList.push(element)
+        return
+      }
+
       const adminInfo = await this.getAdminsInfo(groupID)
 
       const owner = { [adminInfo.owner.uuid]: adminInfo.owner.lastUpdate }
       const admin = {}
       adminInfo.admin.forEach(i => { admin[`${i.uuid}`] = i.lastUpdate })
 
-      const element = { ...groupInfo, admins: { owner, admin } }
+      const element = { ...groupInfo, admins: { owner, admin }, available }
       this.groupList.push(element)
       this.$store.dispatch('updateGroupInfo', element)
     },
@@ -152,10 +145,19 @@ export default {
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${groupID}/members/admin`
       try {
         const res = await axios.get(URL)
-        return res["data"]
+        return res.data
       } catch (err) {
         console.log(err)
+        return []
       }
+    },
+
+    async getLocalGroups(uuid) {
+      const databases = await indexedDB.databases();
+      return new Set(databases
+        .map(db => db.name)
+        .filter(name => name.split("-")[0] === uuid)
+        .map(name => name.split("-")[1]))
     },
 
     readLayoutSettings() {
@@ -174,9 +176,10 @@ export default {
       this.pinned = JSON.parse(pinned)
     },
 
-    currGroupChange(id, name) {
+    currGroupChange(id, name, available) {
       this.currGroupID = id
       this.currGroupName = name
+      this.currGroupAvailable = available
     },
 
     groupSplitter(pos) {
@@ -248,7 +251,7 @@ export default {
     },
 
     deleteHistory(info) {
-      this.deleted = info
+      this.deletedHistory = info
     },
 
     logout() {

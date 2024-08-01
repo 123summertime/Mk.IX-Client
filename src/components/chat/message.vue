@@ -67,8 +67,8 @@ export default {
 
   data() {
     return {
-      namecardTrigger: 0,
       formatedTime: "",
+      namecardTrigger: false,
       rightClicked: false,
       showGroupSelector: false,
       isLongPress: false,
@@ -150,7 +150,7 @@ export default {
 
     showNamecard() {
       if (!this.isLongPress) {
-        this.namecardTrigger += 1
+        this.namecardTrigger = !this.namecardTrigger
       }
     },
 

@@ -17,7 +17,6 @@ export default {
 .broadcast {
   max-width: calc(100% - 112px);
   margin: 0 auto;
-  margin-bottom: 16px;
   background-color: orangered;
 }
 

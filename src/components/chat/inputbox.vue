@@ -30,7 +30,7 @@
 
     <div class="main">
       <atBar class="atBar" :atList="atList" @deleteAt="deleteAt"></atBar>
-      <textarea v-model=input @keydown="onKeyDown" v-on:paste="pasteImg"></textarea>
+      <textarea v-model=input @keydown="onKeyDown" v-on:paste="pasteImg" :disabled="!available"></textarea>
       <favorite class="favorite" v-if="favorite" @sendFavoriteImg="sendFavoriteImg"></favorite>
     </div>
 
@@ -68,6 +68,7 @@ import audioMsg from './messageType/audioMsg.vue'
 export default {
   props: {
     group: String,
+    available: Boolean,
   },
 
   data() {

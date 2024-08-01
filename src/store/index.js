@@ -20,29 +20,29 @@ export default createStore({
       const adress = localStorage.getItem('adress')
       const token = localStorage.getItem('token')
       const URL = `ws://${adress}/ws/ws?userID=${info.uuid}&groupID=${info.groupID}`
-      const ws = new WebSocket(URL, [token])
 
-      context.commit('newConnection', {
-        "groupID": info.groupID,
-        "ws": ws,
-      })
-
-      ws.onmessage = async function (event) {
-        const data = JSON.parse(event.data)
-        const fullData = await queryInfo("Account", data.senderKey, data.senderID)
-        context.commit('getNewMessage', {
-          groupID: data.group,
-          payload: {
-            time: data.time,
-            type: data.type,
-            group: data.group,
-            uuid: fullData.uuid,
-            userName: fullData.userName,
-            avatar: fullData.avatar,
-            payload: data.payload
-          }
+        const ws = new WebSocket(URL, [token])
+        context.commit('newConnection', {
+          groupID: info.groupID,
+          ws: ws,
         })
-      }
+  
+        ws.onmessage = async function (event) {
+          const data = JSON.parse(event.data)
+          const fullData = await queryInfo("Account", data.senderKey, data.senderID)
+          context.commit('getNewMessage', {
+            groupID: data.group,
+            payload: {
+              time: data.time,
+              type: data.type,
+              group: data.group,
+              uuid: fullData.uuid,
+              userName: fullData.userName,
+              avatar: fullData.avatar,
+              payload: data.payload
+            }
+          })
+        }
     },
 
     async sysConnection(context, info) {

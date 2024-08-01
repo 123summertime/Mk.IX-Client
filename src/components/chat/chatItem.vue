@@ -9,7 +9,7 @@
         @revokeMsg="revokeMsg"></message>
     </div>
     <div class="attentionButton" v-if="attentionVisible" @click="gotoAttention">
-      <p>↑有人@你</p>
+      <p>{{ attentionContent }}</p>
     </div>
   </div>
 </template>
@@ -31,6 +31,7 @@ export default {
     admins: Object,
     active: Boolean,
     deleted: Boolean,
+    available: Boolean,
   },
   data() {
     return {
@@ -40,6 +41,7 @@ export default {
       messageList: [],
       attentionVisible: false,
       attentionTarget: "",
+      attentionContent: "",
     }
   },
 
@@ -81,7 +83,7 @@ export default {
     async makeConnection() {
       this.$store.dispatch('wsConnect', {
         groupID: this.group,
-        uuid: this.$store.state["account"]
+        uuid: this.$store.state.account
       })
     },
 
@@ -128,8 +130,8 @@ export default {
 
     revokeMsg(time) {
       this.$store.state.wsConnections[this.group].send(JSON.stringify({
-        "type": 'revoke',
-        "payload": {
+        type: 'revoke',
+        payload: {
           name: null,
           size: null,
           content: time,
@@ -163,7 +165,8 @@ export default {
       const atList = message.payload.meta ? message.payload.meta.at : []
       if (atList.includes(account)) {
         this.attentionVisible = true,
-        this.attentionTarget = message.time
+          this.attentionTarget = message.time
+        this.attentionContent = "有人@你"
         this.$store.dispatch("getGroupAttention", {
           type: "at",
           group: this.group,
@@ -259,8 +262,10 @@ export default {
   async mounted() {
     this.buildOrGetDB()
     await this.getHistory()
-    await this.makeConnection()
-    this.getGroupRequests()
+    if (this.available) {
+      await this.makeConnection()
+      this.getGroupRequests()
+    }
   },
 
   components: {
