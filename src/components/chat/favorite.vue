@@ -26,9 +26,10 @@ export default {
 
   methods: {
     async getFavoriteDB() {
-      this.DB = await this.$store.state["favoriteDB"]
+      this.DB = await this.$store.state.favoriteDB
     },
 
+    // 获取收藏的表情包
     async getFavoriteImg() {
       let imgs = await this.DB.queryRange('Image', this.page * this.step, this.step, false)
       for (const img of imgs) {
@@ -37,6 +38,7 @@ export default {
       this.page += 1
     },
 
+    // 快滚动到底时，获取下一页表情包
     async onScroll() {
       const e = this.$refs.ImgsOuter
       if (e.scrollLeft + e.clientWidth >= e.scrollWidth - 50) {
@@ -49,22 +51,22 @@ export default {
 
       // 左键
       if (oper === 0) {
-        this.$emit('sendFavoriteImg', img['payload'])
+        this.$emit('sendFavoriteImg', img.payload)
         return
       }
 
       // 中键
       if (oper === 1) {
         this.favoriteImgs.splice(idx, 1)
-        this.DB.delete('Image', 'time', img['time'])
+        this.DB.delete('Image', 'time', img.time)
         return
       }
 
       // 右键
       if (oper === 2) {
         this.favoriteImgs.splice(idx, 1)
-        this.DB.delete('Image', 'time', img['time'])
-        img['time'] = -1 * Date.now() // 时间戳*-1实现放最前面
+        this.DB.delete('Image', 'time', img.time)
+        img.time = -1 * Date.now() // 时间戳*-1实现放最前面
         this.favoriteImgs.unshift(img)
         this.DB.add('Image', Object.assign({}, img))
         return

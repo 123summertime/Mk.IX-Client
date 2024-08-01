@@ -92,6 +92,7 @@ export default {
   },
 
   methods: {
+    // 发送text类型消息
     sendingText() {
       if (!this.input) { return }
 
@@ -110,7 +111,7 @@ export default {
       this.atList = new Set()
     },
 
-
+    // 发送非(text和消息)类型消息
     sendingMessage() {
       if (!this.payload.content) { return }
 
@@ -125,6 +126,7 @@ export default {
       this.payload.content = ""
     },
 
+    // 发送文件类型消息
     sendingFile() {
       const FD = new FormData()
       FD.append('file', this.payload.content)
@@ -142,6 +144,7 @@ export default {
       })
     },
 
+    // shift + enter也可以发送
     onKeyDown(event) {
       if (!this.input) { return }
 
@@ -151,6 +154,7 @@ export default {
       }
     },
 
+    // 用户选择了要上传的文件，如果是图片，改为webp再发送
     fileUpload(event) {
       const file = event.target.files[0]
 
@@ -174,6 +178,7 @@ export default {
       }
     },
 
+    // 图片改为webp，gif或已经是webp的跳过
     toWebpBase64(base64) {
       if (base64.includes('data:image/gif') || base64.includes('data:image/webp')) {
         this.payload.content = base64
@@ -203,6 +208,7 @@ export default {
       }
     },
 
+    // 粘贴图片到输入框
     pasteImg(event) {
       let items = (event.clipboardData || event.originalEvent.clipboardData).items;
 
@@ -227,6 +233,7 @@ export default {
       this.recorder.recorder = new MediaRecorder(stream)
     },
 
+    // 录音
     async audioRecorder() {
       if (!this.recorder.recorder) {
         await this.recorderBuilder()
@@ -286,6 +293,7 @@ export default {
       this.visible = false
     },
 
+    // 发送收藏的表情包
     sendFavoriteImg(img) {
       this.favorite = false
       this.payload.type = 'image'
@@ -318,6 +326,7 @@ export default {
       return this.payload.size + "B"
     },
 
+    // 语音消息发送前预览
     audioMessagePreview() {
       return {
         payload: {
@@ -328,7 +337,7 @@ export default {
         }
       }
     },
-
+    
     getNewAt() {
       return this.$store.state.currentAt
     }

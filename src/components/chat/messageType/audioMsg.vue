@@ -38,9 +38,9 @@ export default {
 
   data() {
     return {
-      currentState: "pending", // pending | downloading | downloaded | pause | playing
-      audioURL: null,
-      progress: 0,
+      currentState: "pending", // 语音的状态 为以下之一 pending(未下载) | downloading(下载中) | downloaded(已下载) | pause(暂停) | playing(播放中)
+      audioURL: null,          // 语音的blobURL
+      progress: 0,             // 播放百分比
     }
   },
 
@@ -53,22 +53,21 @@ export default {
       this.DB = new dbCRUD(db)
     },
 
+    // 计算该语音消息宽度，和语音长度正相关
     getMessageBoxWidth() {
       const width = 16 * this.message.payload.meta.length + 16
       this.$refs.Bar.style.width = width + 'px'
     },
 
+    // 获取当前状态
     getState() {
       // 如果该语音被下载过或直接传入，那么直接读取payload.meta.blob (currentState: downloaded)
       // 没有被下载过，则发送请求 (currentState: pending)
       this.currentState = this.message.payload.meta.blob ? "downloaded" : "pending"
     },
 
+    // 下载该语音
     downloading() {
-      // 下载中currentState为downloading
-      // 下载成功currentState为downloaded
-      // 下载失败currentState为pending
-
       this.currentState = "downloading"
       const url = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/download/${this.message.payload.content}`
       axios.get(url, {
@@ -97,6 +96,7 @@ export default {
       })
     },
 
+    // 语音加载完毕后播放
     playAfterLoaded() {
       if (this.currentState === 'downloaded') {
         this.currentState = "play"
@@ -123,16 +123,19 @@ export default {
       mapping[this.currentState]()
     },
 
+    // 播放时更新播放进度
     audioPlaying() {
       const progress = Math.min(this.$refs.Audio.currentTime / this.message.payload.meta.length * 100, 100)
       this.progress = progress ? progress : 0
     },
 
+    // 播放完成时
     audioEnd() {
       this.currentState = "pause"
       this.$refs.Audio.currentTime = 0
     },
 
+    // 点击进度条时，进行跳转
     changeProgress(event) {
       if (this.currentState === 'pending') { return }
 
@@ -146,6 +149,7 @@ export default {
       }
     },
 
+    // 计算音量条高度
     volumeHeight(volume) {
       return `${volume * 0.16 + 8}px`
     }

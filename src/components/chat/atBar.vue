@@ -12,14 +12,16 @@
 <script>
 export default {
   props: {
-    atList: Set,
+    atList: Set,  // @列表，元素是包含uuid和用户名的JSON字符串
   },
 
   methods: {
+    // 取消@某人
     deleteAt(user) {
       this.$emit("deleteAt", JSON.stringify(user))
     },
 
+    // 改为横向滚动
     onScroll(event) {
       this.$refs.AtListWrapper.scrollLeft += event.deltaY
     }

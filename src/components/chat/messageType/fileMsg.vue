@@ -36,14 +36,15 @@ export default {
   data() {
     return {
       download: {
-        state: "pending", // pending | downloading | success | failed
-        speed: 0,
-        rate: 0,
+        state: "pending", // 文件的状态 为以下之一 pending(未下载) | downloading(下载中) | success(成功) | failed(失败)
+        speed: 0,         // 下载速度
+        rate: 0,          // 下载进度
       },
     }
   },
 
   methods: {
+    // 下载文件，同时更新进度条
     downloading() {
       this.download.state = "downloading"
 
@@ -78,6 +79,7 @@ export default {
       })
     },
 
+    // 绘画进度条
     canvasDrawer(percentage, color1, color2) {
       const canvas = this.$refs.progress
 
@@ -102,6 +104,7 @@ export default {
       ctx.stroke()
     },
 
+    // 计算文件大小
     fileSize(size) {
       const mb = 2 ** 20
       const kb = 2 ** 10
@@ -116,6 +119,7 @@ export default {
       return size.toFixed(0) + "B"
     },
 
+    // 计算字体大小，从而正好匹配文件夹的图标大小
     dynamicFontsize() {
       if (!this.$refs.IconText) { return }
 
@@ -137,10 +141,12 @@ export default {
   },
 
   computed: {
+    // 计算下载速度
     downloadSPD() {
       return this.fileSize(this.download.speed) + '/s'
     },
 
+    // 计算剩余时间
     downloadETC() {
       const remain = this.message.payload.size * (100 - this.download.rate) / 100
       const speed = this.download.speed

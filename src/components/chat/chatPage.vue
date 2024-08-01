@@ -80,9 +80,11 @@ export default {
       avatar: "",
       uuid: "",
       username: "",
+
       currGroupID: "",
       currGroupName: "",
       currGroupAvailable: true,
+
       deletedHistory: "",
       visible: false,
       drawer: false,
@@ -92,6 +94,7 @@ export default {
   },
 
   methods: {
+    // 初始化，获取用户基本信息等
     async initialization() {
       const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/me`
       axios.get(URL, {
@@ -122,6 +125,7 @@ export default {
       }).catch(err => { console.log(err) })
     },
 
+    // 获取每个群的信息(群名，群主，管理员，是否可用)
     async getGroupInfo(lastUpdate, groupID, available) {
       const groupInfo = await queryInfo("Group", lastUpdate, groupID)
       if (!available) {
@@ -141,6 +145,7 @@ export default {
       this.$store.dispatch('updateGroupInfo', element)
     },
 
+    // 获取该群管理员信息
     async getAdminsInfo(groupID) {
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${groupID}/members/admin`
       try {
@@ -152,6 +157,7 @@ export default {
       }
     },
 
+    // 获取本地群聊(如已退出的群或被踢出的群)
     async getLocalGroups(uuid) {
       const databases = await indexedDB.databases();
       return new Set(databases
@@ -160,6 +166,7 @@ export default {
         .map(name => name.split("-")[1]))
     },
 
+    // 读取页面布局设置
     readLayoutSettings() {
       const groupWidth = localStorage.getItem('groupWidth')
       const inputTop = localStorage.getItem('inputTop')
@@ -171,17 +178,20 @@ export default {
       }
     },
 
+    // 获取置顶群列表
     getPinnedGroups() {
       const pinned = localStorage.getItem("pinned") || '{}'
       this.pinned = JSON.parse(pinned)
     },
 
+    // 当前在看的群改变了
     currGroupChange(id, name, available) {
       this.currGroupID = id
       this.currGroupName = name
       this.currGroupAvailable = available
     },
 
+    // 左边群列表和右边消息区的分割线设置
     groupSplitter(pos) {
       const posX = pos.x
       const rate = posX / window.innerWidth
@@ -193,6 +203,7 @@ export default {
       }
     },
 
+    // 上面消息区和下面输入区的分割线设置
     inputSplitter(pos) {
       const posY = pos.y
       const rate = posY / window.innerHeight
@@ -203,6 +214,7 @@ export default {
       }
     },
 
+    // 群名修改时
     groupNameModified(info) {
       const { group, name } = info
       if (this.currGroupID === group) {
@@ -217,6 +229,7 @@ export default {
       })
     },
 
+    // 群头像修改时
     groupAvatarModified(info) {
       const { group, avatar } = info
       this.groupList = this.groupList.map(item => {
@@ -227,8 +240,8 @@ export default {
       })
     },
 
+    // 更新群的管理员变化
     groupAdminModified(info) {
-      // 更新群的管理员变化
       const { group, uuid, operation, lastUpdate } = info
       const targetGroup = this.groupList.find(i => i.group === group)
       if (operation) {
@@ -238,18 +251,21 @@ export default {
       }
     },
 
+    // 更新群置顶变化
     groupPinnedModified(info) {
       this.pinned[this.currGroupID] = info
       localStorage.setItem("pinned", JSON.stringify(this.pinned))
     },
 
+    // 成功加入某群
     joinGroupSuccess(info, autoChangeGroup) {
-      this.getGroupInfo("", info["group"])
+      this.getGroupInfo("", info.group)
       if (autoChangeGroup) {
-        this.currGroupChange(info["group"], info["name"])
+        this.currGroupChange(info.group, info.name)
       }
     },
 
+    // 删除某群历史记录, chatItem.vue执行
     deleteHistory(info) {
       this.deletedHistory = info
     },

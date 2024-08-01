@@ -73,6 +73,7 @@ export default {
       this.page += 1
     },
 
+    // 快滚动到顶时，获取更早的历史记录
     async onScroll() {
       if (this.$refs.messageView.scrollTop <= 50 && !this.switch) {
         this.switch = true
@@ -80,6 +81,7 @@ export default {
       }
     },
 
+    // 建立ws连接
     async makeConnection() {
       this.$store.dispatch('wsConnect', {
         groupID: this.group,
@@ -87,6 +89,7 @@ export default {
       })
     },
 
+    // 获取群验证，仅作用于群主和管理员
     getGroupRequests() {
       const account = this.$store.state.account
       if (!(this.admins.owner[account] || this.admins.admin[account])) { return }
@@ -105,16 +108,19 @@ export default {
       })
     },
 
+    // 新增历史记录
     putHistory(message) {
       this.DB.add('History', message)
     },
 
+    // 删除一条消息(本地)
     deleteMsg(time) {
       const idx = this.messageList.findIndex(i => i.time === time)
       this.DB.delete("History", "time", time)
       this.messageList.splice(idx, 1)
     },
 
+    // 删除所有消息(本地)
     deleteAll() {
       this.DBroot.delete().then(() => {
         this.messageList = []
@@ -128,6 +134,7 @@ export default {
       })
     },
 
+    // 撤回一条消息
     revokeMsg(time) {
       this.$store.state.wsConnections[this.group].send(JSON.stringify({
         type: 'revoke',
@@ -139,6 +146,7 @@ export default {
       }))
     },
 
+    // 其他用户撤回了一条消息
     async newRevokeHandler(message) {
       const revokeID = message.payload.content
       const revokeMsg = await this.DB.query('History', { "time": revokeID })
@@ -160,12 +168,13 @@ export default {
       }
     },
 
+    // 其他用户@你
     newAttentionHandler(message) {
       const account = this.$store.state.account
       const atList = message.payload.meta ? message.payload.meta.at : []
       if (atList.includes(account)) {
         this.attentionVisible = true,
-          this.attentionTarget = message.time
+        this.attentionTarget = message.time
         this.attentionContent = "有人@你"
         this.$store.dispatch("getGroupAttention", {
           type: "at",
@@ -174,6 +183,7 @@ export default {
       }
     },
 
+    // 点击"有人@你"后, 滚动到该消息处
     async gotoAttention() {
       this.attentionVisible = false
       const ref = this.$refs.MessageList
@@ -182,7 +192,9 @@ export default {
       if (idx == -1) { return }
 
       if (this.attentionTarget === this.messageList[0].time) {
-        await this.getHistory()
+        // 如果滚动到的是messageList的第一条消息，onScroll会触发getHistory导致滚动不准确
+        // 所以在滚动前先getHistory一次
+        await this.getHistory() 
       }
 
       const element = ref[idx].$el
@@ -202,6 +214,7 @@ export default {
   },
 
   watch: {
+    // 获取该群最新消息
     newMessage: {
       async handler(message) {
         if (!message) { return }
@@ -232,6 +245,7 @@ export default {
       }
     },
 
+    // 更新本群最后一条消息，groupItem要用
     messageList: {
       deep: true,
       handler() {
@@ -242,6 +256,7 @@ export default {
       }
     },
 
+    // 切换群后，自动滚动到最底部
     active: {
       handler() {
         this.$nextTick(function () {
@@ -250,6 +265,7 @@ export default {
       }
     },
 
+    // 清除历史记录
     deleted: {
       handler(newVal) {
         if (newVal) {

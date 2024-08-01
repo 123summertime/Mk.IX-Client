@@ -18,7 +18,6 @@
     @newJoinRequest="newJoinRequest"
     @joined="joined"></sysMsgGetter>
 
-
   <!-- 群验证 -->
   <el-dialog v-model="mailVisible" title="群验证" width="540px">
     <ul class="GroupMails">
@@ -26,11 +25,11 @@
         <img :src="msg['senderAvatar']" />
         <div class="mailTexts">
           <p>{{ groupMailText(msg) }}</p>
-          <p>{{ '理由：' + msg['payload'] }}</p>
+          <p>{{ '理由：' + msg.payload }}</p>
         </div>
         <div class="mailOpers" v-if="msg['state'] === 0">
-          <Close @click="requestResponse(msg['group'], msg['time'], false)"></Close>
-          <Check @click="requestResponse(msg['group'], msg['time'], true)"></Check>
+          <Close @click="requestResponse(msg.group, msg.time, false)"></Close>
+          <Check @click="requestResponse(msg.group, msg.time, true)"></Check>
         </div>
         <div class="mailResponse" v-else>
           <p>{{ cvtState(msg['state']) }}</p>
@@ -157,6 +156,7 @@ export default {
       router.push('/setting')
     },
 
+    // 创建一个群聊
     makeGroup() {
       const QA = { Q: this.makeGroupQ, A: this.makeGroupA, name: this.makeGroupName}
       const URL = `http://${localStorage.getItem('adress')}/v1/group/register`
@@ -178,20 +178,22 @@ export default {
       })
     },
 
+    // 搜索群聊 获取入群问题
     searchGroup() {
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/question`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         this.searchState = 1
-        this.searchGroupName = res["data"]["name"]
-        this.searchGroupQ = res["data"]["question"]
+        this.searchGroupName = res.data.name
+        this.searchGroupQ = res.data.question
       }).catch(err => {
         this.searchState = 2
         this.searchFailedDetail = err['response']['data']['detail']
       })
     },
 
+    // 通过正确回答入群问题进入新群
     joinGroupByQA() {
       const A = { A: this.searchGroupA }
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/answer`
@@ -199,7 +201,7 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success("加入成功")
-        this.$emit('joinGroupSuccess', { "group": this.searchGroupID, "name": this.searchGroupName }, true)
+        this.$emit('joinGroupSuccess', { group: this.searchGroupID, name: this.searchGroupName }, true)
 
         this.searchVisible = false
         this.searchState = 0
@@ -215,6 +217,7 @@ export default {
       })
     },
 
+    // 发送入群申请
     joinGroupByReq() {
       const A = {note: this.searchGroupA}
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/request`
@@ -236,6 +239,7 @@ export default {
       })
     },
 
+    // 收到了新入群申请
     async newJoinRequest(joinRequset) {
       const { time, type, group, groupKey, state, senderID, senderKey, payload } = joinRequset
       const senderInfo = await queryInfo("Account", senderKey, senderID)
@@ -244,13 +248,14 @@ export default {
       const { avatar: groupAvatar, name: groupName } = groupInfo
 
       const idx = this.messageList.findIndex(i => i.time === time)
-      if (idx === -1) {  // new
+      if (idx === -1) {  // 新入群申请
         this.messageList.push({ time, type, group, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName })
-      } else {  // update
+      } else {  // 更新入群申请(其它管理员已审核过了)
         this.messageList[idx] = { time, type, group, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName }
       }
     },
 
+    // 获取群验证文本
     groupMailText(msg) {
       const { time, type, group, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName } = msg
       if (type === 'join') {
@@ -258,8 +263,9 @@ export default {
       }
     },
 
+    // 审核群验证
     requestResponse(group, time, verdict) {
-      const T = {"note": time}
+      const T = {note: time}
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${group}/verify/response?verdict=${verdict}`
       axios.post(URL, T, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -274,6 +280,7 @@ export default {
       })
     },
 
+    // 状态码转化为文本
     cvtState(state) {
       let map = {
         1: "群主已同意",
@@ -287,7 +294,7 @@ export default {
     },
 
     joined(msg) {
-      this.$emit('joinGroupSuccess', { "group": msg['group'], "name": msg['payload'] }, false)
+      this.$emit('joinGroupSuccess', { group: msg.group, name: msg.payload }, false)
     },
 
   },

@@ -46,13 +46,14 @@ export default {
   },
 
   methods: {
+    // 根据uuid和lastUpdate获取用户完整信息
     async getFullData() {
-      // 根据uuid和lastUpdate获取用户完整信息
       const info = await queryInfo('Account', this.lastUpdate, this.uuid)
       this.avatar = info.avatar
       this.userName = info.userName
     },
 
+    // 修改了管理员
     adminModify() {
       const isAdd = this.role === 'user'
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/admin/${this.uuid}?operation=${isAdd}`
@@ -70,6 +71,7 @@ export default {
       })
     },
 
+    // 移除了群员
     userRemoved() {
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}`
       axios.delete(URL, {
@@ -86,6 +88,7 @@ export default {
       })
     },
 
+    // at别人了
     newAt() {
       this.$store.dispatch("getNewAt", {
         uuid: this.uuid,
@@ -95,17 +98,18 @@ export default {
   },
 
   computed: {
+    // 确认增删管理员的权限
     getManagePermission() {
-      // 增删管理员的权限
       return this.currentUserPermission === 'owner' && this.role != 'owner'
     },
 
+    // 确认移除用户的权限
     getRemovePermission() {
-      // 移除用户的权限
       return (this.currentUserPermission === 'owner' && this.role != 'owner') ||
         (this.currentUserPermission === 'admin' && this.role === 'user')
     },
 
+    // 显示@图标，除自己以外
     showAt() {
       return this.uuid != this.$store.state.account
     }

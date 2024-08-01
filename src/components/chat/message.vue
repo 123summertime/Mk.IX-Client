@@ -77,10 +77,12 @@ export default {
   },
 
   methods: {
+    // 这条消息是自己发的吗?
     messageFrom() {
       return this.message.uuid === this.$store.state.account
     },
 
+    // 时间戳转化为可读的形式
     computeTime(timeStamp) {
       timeStamp = Math.round(Number(timeStamp.substring(0, 10)))  // 精确到秒的时间戳(10位)
       let todayMidnight = new Date().setHours(0, 0, 0, 0) / 1000
@@ -112,6 +114,7 @@ export default {
       return year + "/" + month + "/" + date + " " + T
     },
 
+    // 右键消息，打开菜单栏
     onRightClick(event) {
       const rect = this.$refs.MessageRoot.getBoundingClientRect()
       const ref = this.$refs.ContextMenu.$el.style
@@ -138,6 +141,7 @@ export default {
       }
     },
 
+    // 打开菜单栏后，在非菜单栏区域点击时，关闭菜单栏
     globalClick() {
       // 删除消息时不存在ContextMenu, if防报错
       if (this.$refs.ContextMenu) {
@@ -148,6 +152,7 @@ export default {
       window.removeEventListener('contextmenu', this.globalClick)
     },
 
+    // 单击打开用户的名片
     showNamecard() {
       if (!this.isLongPress) {
         this.namecardTrigger = !this.namecardTrigger
@@ -158,14 +163,19 @@ export default {
       this.$emit('deleteMsg', this.message.time)
     },
 
+    // 转发消息，打开群选择器(groupSelector.vue)
     forwardMsg() {
       this.showGroupSelector = true
     },
 
+    // 转发消息，选择了目标群，如果转发的是file类型，消息类型改为forwardFile
     groupSelectorSelected(groupID) {
+      const newPayload = JSON.parse(JSON.stringify(this.message.payload))
+      newPayload.meta = null
+
       this.$store.state.wsConnections[groupID].send(JSON.stringify({
         type: this.message.type === "file" ? "forwardFile" : this.message.type,
-        payload: this.message.payload,
+        payload: newPayload,
       }))
       this.showGroupSelector = false
     },
@@ -174,10 +184,12 @@ export default {
       this.showGroupSelector = false
     },
 
+    // 撤回一条消息
     revokeMsg() {
       this.$emit('revokeMsg', this.message.time)
     },
 
+    // 长按头像@别人
     newAt() {
       this.isLongPress = false
       if (this.messageFrom()) { return }

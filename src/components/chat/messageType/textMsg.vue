@@ -22,11 +22,12 @@ export default {
 
   data() {
     return {
-      atList: [],
+      atList: [], // 这条消息中@人的列表 元素: 用户名
     }
   },
 
   methods: {
+    // 把@列表的uuid转化为用户名
     async getAtNames() {
       this.atList = this.message.payload.meta ? this.message.payload.meta.at : []
       this.atList = await Promise.all(this.atList.map(async uuid => {

@@ -44,6 +44,7 @@ export default {
   },
 
   methods: {
+    // 获取用户详细信息(个人简介，最后登录等)
     showProfile() {
       const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.message.uuid}`
       axios.get(URL).then(res => {
@@ -88,6 +89,7 @@ export default {
   },
 
   watch: {
+    // 当namecardTrigger改变时，就说明要显示namecard了，跟它的值没有关系
     namecardTrigger: {
       handler() {
         this.namecardVisible = true

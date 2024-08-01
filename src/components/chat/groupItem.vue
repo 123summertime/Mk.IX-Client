@@ -36,6 +36,7 @@ export default {
   },
 
   methods: {
+    // 通过时间戳转化为可读的时间
     computeLastMessageTime(timeStamp) {
       timeStamp = Math.round(Number(timeStamp.substring(0, 10)))  // 精确到秒的时间戳(10位)
       let todayMidnight = new Date().setHours(0, 0, 0, 0) / 1000
@@ -80,6 +81,7 @@ export default {
       return mapping[type] || (prefix + "[文件]")
     },
 
+    // 计算最后一条消息的显示文本
     computeInfo(message) {
       if (!message) {
         this.lastMessage = " "
@@ -89,8 +91,10 @@ export default {
 
       const lastMessageTime = message.time.substring(0, 10)
       if (this.isPinned) {
+        // 对于置顶群(order值都<=0)，-1*时间戳设定order实现按最后消息的时间排序
         this.$refs.groupInfoRoot.style.order = -1 * lastMessageTime
       } else {
+        // 对于非置顶群(order值都>0) INT_MAX-时间戳实现按最后消息的时间排序
         this.$refs.groupInfoRoot.style.order = 2147483647 - lastMessageTime
       }
       this.lastMessage = this.getSummary(message)
@@ -108,7 +112,9 @@ export default {
       }
     },
 
+    // 更改了置顶群聊
     pinnedGroupModified() {
+      // 先还原为时间戳，再重新计算order
       if (this.isPinned) {
         this.$refs.groupInfoRoot.style.backgroundColor = 'lightyellow'
         const lastMessageTime = 2147483647 - this.$refs.groupInfoRoot.style.order
@@ -119,10 +125,6 @@ export default {
         this.$refs.groupInfoRoot.style.order = 2147483647 - lastMessageTime
       }
     },
-
-    hasGroupAttention() {
-
-    }
   },
 
   computed: {
@@ -136,6 +138,7 @@ export default {
   },
 
   watch: {
+    // 获取该群最后一条消息
     getLastMessage: {
       deep: true,
       handler(newVal) {
@@ -161,6 +164,7 @@ export default {
       }
     },
 
+    // 有人@你
     needAttention: {
       deep: true,
       handler(attentions) {

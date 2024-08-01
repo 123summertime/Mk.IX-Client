@@ -33,11 +33,11 @@ export default {
   data() {
     return {
       display: {
-        "favorite": false,
-        "copy": false,
-        "delete": false,
-        "forward": false,
-        "revoke": false,
+        favorite: false,
+        copy: false,
+        delete: false,
+        forward: false,
+        revoke: false,
       }
     }
   },
@@ -47,6 +47,7 @@ export default {
       this.DB = await this.$store.state["favoriteDB"]
     },
 
+    // 收藏图片
     async addToFavorite() {
       if (!this.DB) {
         await this.getFavoriteDB()
@@ -69,6 +70,17 @@ export default {
       const byteArray = new Uint8Array(byteNumbers)
       const blob = new Blob([byteArray], { type: fileType })
       return blob
+    },
+
+    // 根据消息类型显示不同的菜单选项
+    option() {
+      const displayMapping = {
+        text: { "favorite": false, "copy": true, "delete": true, "forward": true, "revoke": this.checkPermissions },
+        image: { "favorite": true, "copy": true, "delete": true, "forward": true, "revoke": this.checkPermissions },
+        file: { "favorite": false, "copy": false, "delete": true, "forward": true, "revoke": this.checkPermissions },
+        revoke: { "favorite": false, "copy": false, "delete": true, "forward": false, "revoke": false },
+      }
+      this.display = displayMapping[this.message.type] || displayMapping.file
     },
 
     copyMsg() {
@@ -116,13 +128,7 @@ export default {
   },
 
   mounted() {
-    const displayMapping = {
-      "text": { "favorite": false, "copy": true, "delete": true, "forward": true, "revoke": this.checkPermissions },
-      "image": { "favorite": true, "copy": true, "delete": true, "forward": true, "revoke": this.checkPermissions },
-      "file": { "favorite": false, "copy": false, "delete": true, "forward": true, "revoke": this.checkPermissions },
-      "revoke": { "favorite": false, "copy": false, "delete": true, "forward": false, "revoke": false },
-    }
-    this.display = displayMapping[this.message.type] || displayMapping["file"]
+    this.option()
   },
 
 }

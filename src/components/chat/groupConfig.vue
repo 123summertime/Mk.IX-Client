@@ -166,6 +166,7 @@ export default {
   },
 
   methods: {
+    // 群名修改后
     groupNameModified(event) {
       if (event.key === 'Enter') {
         const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/name`
@@ -185,12 +186,14 @@ export default {
       }
     },
 
+    // 群头像修改前验证权限
     beforeModifyAvatar() {
       if (this.checkPermissions) {
         this.editAvatarVisible = true
       }
     },
 
+    // 群头像修改后
     groupAvatarModified(info) {
       const base64 = info.dataURL
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/avatar`
@@ -209,8 +212,8 @@ export default {
       })
     },
 
+    // 获取群员信息 以{uuid: lastUpdate}的形式存储在this.membersInfo中
     getMembersInfo() {
-      // 获取群员信息 以{uuid: lastUpdate}的形式存储在this.membersInfo中
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/members`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -230,8 +233,8 @@ export default {
       })
     },
 
+    // 更改管理员
     groupAdminModified(info) {
-      // 处理更改管理员
       // 这里仅对membersInfo(普通用户)的对象进行处理，管理员对象的处理在chatPage.vue
       if (info.operation) {
         info.lastUpdate = this.membersInfo[info.uuid]
@@ -243,8 +246,8 @@ export default {
       this.$emit('groupAdminModified', info)
     },
 
+    // 处理移出用户
     userRemoved(info) {
-      // 处理移出用户
       if (info.role === 'admin') {
         this.$emit('groupAdminModified', { operation: false, ...info })
       } else {
@@ -252,15 +255,18 @@ export default {
       }
     },
 
+    // 处理置顶群的变化
     groupPinnedModified() {
       this.$emit('groupPinnedModified', this.currPinned)
     },
 
+    // 处理清空消息记录
     async deleteHistory() {
       this.$emit('deleteHistory', this.info.group)
       this.deleteHistoryVisible = false
     },
 
+    // 处理退出/解散群
     unsubscribe() {
       const URL = this.getRole === 'owner'
         ? `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}`
