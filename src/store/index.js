@@ -1,9 +1,11 @@
+import axios from 'axios'
 import Dexie from 'dexie'
 
 import { dbCRUD } from '../assets/dbCRUD.js'
 import { queryInfo } from '../assets/queryDB.js'
 
 import { createStore } from 'vuex'
+
 
 async function favoriteDB() {
   const db = new Dexie('Favorite')
@@ -21,28 +23,43 @@ export default createStore({
       const token = localStorage.getItem('token')
       const URL = `ws://${adress}/ws/ws?userID=${info.uuid}&groupID=${info.groupID}`
 
-        const ws = new WebSocket(URL, [token])
-        context.commit('newConnection', {
-          groupID: info.groupID,
-          ws: ws,
+      const ws = new WebSocket(URL, [token])
+      context.commit('newConnection', {
+        groupID: info.groupID,
+        ws: ws,
+      })
+
+      // 获取群验证，仅作用于群主和管理员
+      ws.onopen = async function () {
+        if (!info.admin) { return }
+
+        const URL = `http://${localStorage.getItem('adress')}/v1/group/${info.groupID}/verify/request`
+        axios.get(URL, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        }).then(res => {
+          // 结果会通过wsSys发送 sysMsgGetter.vue将对其作处理
+        }).catch(err => {
+          console.log("获取入群申请时失败", err)
         })
-  
-        ws.onmessage = async function (event) {
-          const data = JSON.parse(event.data)
-          const fullData = await queryInfo("Account", data.senderKey, data.senderID)
-          context.commit('getNewMessage', {
-            groupID: data.group,
-            payload: {
-              time: data.time,
-              type: data.type,
-              group: data.group,
-              uuid: fullData.uuid,
-              userName: fullData.userName,
-              avatar: fullData.avatar,
-              payload: data.payload
-            }
-          })
-        }
+      }
+
+      // 接收群消息
+      ws.onmessage = async function (event) {
+        const data = JSON.parse(event.data)
+        const fullData = await queryInfo("Account", data.senderKey, data.senderID)
+        context.commit('getNewMessage', {
+          groupID: data.group,
+          payload: {
+            time: data.time,
+            type: data.type,
+            group: data.group,
+            uuid: fullData.uuid,
+            userName: fullData.userName,
+            avatar: fullData.avatar,
+            payload: data.payload
+          }
+        })
+      }
     },
 
     async sysConnection(context, info) {
@@ -51,6 +68,19 @@ export default createStore({
       const URL = `ws://${adress}/ws/systemWS?userID=${info.uuid}`
       const ws = new WebSocket(URL, [token])
 
+      // 获取好友申请
+      ws.onopen = async function () {
+        const URL = `http://${localStorage.getItem('adress')}/v1/user/${info.uuid}/verify/request`
+        axios.get(URL, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        }).then(res => {
+          // 结果会通过wsSys发送 sysMsgGetter.vue将对其作处理
+        }).catch(err => {
+          console.log("获取好友申请时失败", err)
+        })
+      }
+
+      // 接收系统消息
       ws.onmessage = async function (event) {
         const data = JSON.parse(event.data)
         context.commit('getNewSysMessage', data)

@@ -47,7 +47,7 @@ export default {
 
   methods: {
     buildOrGetDB() {
-      const db = new Dexie(this.$store.state['account'] + '-' + this.group)
+      const db = new Dexie(this.$store.state.account + '-' + this.group)
       db.version(1).stores({
         History: "&time",
       })
@@ -83,28 +83,11 @@ export default {
 
     // 建立ws连接
     async makeConnection() {
+      const uuid = this.$store.state.account
       this.$store.dispatch('wsConnect', {
         groupID: this.group,
-        uuid: this.$store.state.account
-      })
-    },
-
-    // 获取群验证，仅作用于群主和管理员
-    getGroupRequests() {
-      const account = this.$store.state.account
-      if (!(this.admins.owner[account] || this.admins.admin[account])) { return }
-
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/verify/request`
-      axios.get(URL, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      }).then(res => {
-        // 结果会通过wsSys发送 sysMsgGetter.vue将对其作处理
-      }).catch(err => {
-        ElMessage({
-          message: `在获取${this.name}的群验证时发送错误 ${err['response']['data']['detail']}`,
-          duration: 6000,
-          type: "error",
-        })
+        uuid: uuid,
+        admin: this.admins.owner[uuid] || this.admins.admin[uuid] ? true : false,
       })
     },
 
@@ -280,7 +263,6 @@ export default {
     await this.getHistory()
     if (this.available) {
       await this.makeConnection()
-      this.getGroupRequests()
     }
   },
 

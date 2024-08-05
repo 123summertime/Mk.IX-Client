@@ -16,23 +16,24 @@
 
   <sysMsgGetter
     @newJoinRequest="newJoinRequest"
+    @newFriendRequest="newFriendRequest"
     @joined="joined"></sysMsgGetter>
 
   <!-- 群验证 -->
   <el-dialog v-model="mailVisible" title="群验证" width="540px">
     <ul class="GroupMails">
-      <li v-for="msg in messageList" :key="msg['time']" class="mail">
-        <img :src="msg['senderAvatar']" />
+      <li v-for="msg in messageList" :key="msg.time" class="mail">
+        <img :src="msg.senderAvatar" />
         <div class="mailTexts">
           <p>{{ groupMailText(msg) }}</p>
           <p>{{ '理由：' + msg.payload }}</p>
         </div>
-        <div class="mailOpers" v-if="msg['state'] === 0">
-          <Close @click="requestResponse(msg.group, msg.time, false)"></Close>
-          <Check @click="requestResponse(msg.group, msg.time, true)"></Check>
+        <div class="mailOpers" v-if="msg.state === 0">
+          <Close @click="requestResponse(msg.type, msg.group, msg.time, false)"></Close>
+          <Check @click="requestResponse(msg.type, msg.group, msg.time, true)"></Check>
         </div>
         <div class="mailResponse" v-else>
-          <p>{{ cvtState(msg['state']) }}</p>
+          <p>{{ cvtState(msg.state) }}</p>
         </div>
       </li>
     </ul>
@@ -241,30 +242,41 @@ export default {
 
     // 收到了新入群申请
     async newJoinRequest(joinRequset) {
-      const { time, type, group, groupKey, state, senderID, senderKey, payload } = joinRequset
+      const { time, type, target, targetKey, state, senderID, senderKey, payload } = joinRequset
       const senderInfo = await queryInfo("Account", senderKey, senderID)
-      const groupInfo = await queryInfo("Group", groupKey, group)
+      const groupInfo = await queryInfo("Group", targetKey, target)
       const { avatar: senderAvatar, userName } = senderInfo
       const { avatar: groupAvatar, name: groupName } = groupInfo
 
       const idx = this.messageList.findIndex(i => i.time === time)
       if (idx === -1) {  // 新入群申请
-        this.messageList.push({ time, type, group, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName })
+        this.messageList.push({ time, type, target, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName })
       } else {  // 更新入群申请(其它管理员已审核过了)
-        this.messageList[idx] = { time, type, group, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName }
+        this.messageList[idx] = { time, type, target, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName }
       }
+    },
+
+    // 收到了新的好友申请
+    async newFriendRequest(friendRequest) {
+      const { time, type, state, senderID, senderKey, payload } = friendRequest
+      const senderInfo = await queryInfo("Account", senderKey, senderID)
+      const { avatar: senderAvatar, userName } = senderInfo
+      this.messageList.push({time, type, state, senderID, payload, senderAvatar, userName})
     },
 
     // 获取群验证文本
     groupMailText(msg) {
-      const { time, type, group, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName } = msg
-      if (type === 'join') {
-        return `${userName} 申请加入 ${groupName}`
-      }
+      const {type, userName, groupName} = msg 
+      const mapping = {
+        join: `${userName} 申请加入 ${groupName}`,
+        friend: `${userName} 申请加你为好友`,
+      } 
+      
+      return mapping[type]
     },
 
     // 审核群验证
-    requestResponse(group, time, verdict) {
+    requestResponse(type, group, time, verdict) {
       const T = {note: time}
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${group}/verify/response?verdict=${verdict}`
       axios.post(URL, T, {
@@ -289,6 +301,8 @@ export default {
         4: "管理员已拒绝",
         5: "用户已同意",
         6: "用户已拒绝",
+        7: "已同意",
+        8: "已拒绝",
       }
       return map[state]
     },

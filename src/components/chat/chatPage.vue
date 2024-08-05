@@ -101,7 +101,7 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(async res => {
         const data = res.data
-        const userInfo = await queryInfo("Account", data["lastUpdate"], data["uuid"])
+        const userInfo = await queryInfo("Account", data.lastUpdate, data.uuid)
         this.uuid = data.uuid
         this.username = data.userName
         this.avatar = userInfo.avatar
@@ -122,14 +122,16 @@ export default {
         for (const id of localGroups) {
           this.getGroupInfo(null, id, false)
         }
-      }).catch(err => { console.log(err) })
+      }).catch(err => {
+        console.log(err)
+      })
     },
 
     // 获取每个群的信息(群名，群主，管理员，是否可用)
     async getGroupInfo(lastUpdate, groupID, available) {
       const groupInfo = await queryInfo("Group", lastUpdate, groupID)
       if (!available) {
-        const element = {...groupInfo, admins: {owner: {}, admin: {}}, available}
+        const element = { ...groupInfo, admins: { owner: {}, admin: {} }, available }
         this.groupList.push(element)
         return
       }

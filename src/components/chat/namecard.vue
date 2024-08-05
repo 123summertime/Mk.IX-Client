@@ -1,29 +1,32 @@
 <template>
   <el-dialog v-model="namecardVisible" width="540px">
-      <div class="namecard">
-        <div class="namecardAvatar">
-          <img :src="message.avatar" />
-        </div>
-        <div class="namecardInfo">
-          <span>
-            <i>昵称:</i>
-            <i>{{ message.userName }}</i>
-          </span>
-          <span>
-            <i>uuid:</i>
-            <i>{{ message.uuid }}</i>
-          </span>
-          <span>
-            <i>个性签名:</i>
-            <i>{{ bio }}</i>
-          </span>
-          <span>
-            <i>最后访问:</i>
-            <i>{{ lastSeen === "Online" ? "在线" : computeTime(lastSeen) }}</i>
-          </span>
-        </div>
+    <div class="namecard">
+      <div class="namecardAvatar">
+        <img :src="message.avatar" />
       </div>
-    </el-dialog>
+      <div class="namecardInfo">
+        <span>
+          <i>昵称:</i>
+          <i>{{ message.userName }}</i>
+        </span>
+        <span>
+          <i>uuid:</i>
+          <i>{{ message.uuid }}</i>
+        </span>
+        <span>
+          <i>个性签名:</i>
+          <i>{{ bio }}</i>
+        </span>
+        <span>
+          <i>最后访问:</i>
+          <i>{{ lastSeen === "Online" ? "在线" : computeTime(lastSeen) }}</i>
+        </span>
+        <span>
+          <el-button @click="friendRequest">1122</el-button>
+        </span>
+      </div>
+    </div>
+  </el-dialog>
 </template>
 
 <script>
@@ -85,6 +88,18 @@ export default {
         return month + "/" + date + " " + T
       }
       return year + "/" + month + "/" + date + " " + T
+    },
+
+    friendRequest() {
+      const reason = { note: "Ciallo" }
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.message.uuid}/friend`
+      axios.post(URL, reason, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        console.log(res)
+      }).catch(err => {
+        console.log(err)
+      })
     },
   },
 
