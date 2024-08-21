@@ -59,6 +59,7 @@ export default {
       })
     },
 
+    // 通过时间戳转化为可读的时间
     computeTime(timeStamp) {
       timeStamp = Math.round(Number(timeStamp.substring(0, 10)))  // 精确到秒的时间戳(10位)
       const todayMidnight = new Date().setHours(0, 0, 0, 0) / 1000

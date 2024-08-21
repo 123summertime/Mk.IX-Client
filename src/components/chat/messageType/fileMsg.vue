@@ -104,7 +104,7 @@ export default {
       ctx.stroke()
     },
 
-    // 计算文件大小
+    // 计算文件大小 转化为可读的形式
     fileSize(size) {
       const mb = 2 ** 20
       const kb = 2 ** 10

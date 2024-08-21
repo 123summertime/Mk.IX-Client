@@ -98,12 +98,12 @@ export default {
   },
 
   computed: {
-    // 确认增删管理员的权限
+    // 确认是否有增删管理员的权限
     getManagePermission() {
       return this.currentUserPermission === 'owner' && this.role != 'owner'
     },
 
-    // 确认移除用户的权限
+    // 确认是否有移除用户的权限
     getRemovePermission() {
       return (this.currentUserPermission === 'owner' && this.role != 'owner') ||
         (this.currentUserPermission === 'admin' && this.role === 'user')

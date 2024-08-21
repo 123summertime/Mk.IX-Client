@@ -3,7 +3,7 @@
     <ul class="groupItems">
       <li>
         <p>群头像</p>
-        <img class="groupAvatar" :src="info['avatar']" title="点击修改头像" @click="beforeModifyAvatar" />
+        <img class="groupAvatar" :src="info.avatar" title="点击修改头像" @click="beforeModifyAvatar" />
       </li>
       <li>
         <p>群名称</p>
@@ -67,7 +67,8 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="unsubscribeVisible = false">取消</el-button>
-        <el-button type="danger" @click="unsubscribe">{{ getRole === 'owner' ? '确认解散' : '确认退出' }}</el-button>
+        <el-button type="danger" @click="unsubscribe(false)">{{ getRole === 'owner' ? '确认解散' : '确认退出' }}</el-button>
+        <el-button type="danger" @click="unsubscribe(true)">{{ (getRole === 'owner' ? '确认解散' : '确认退出') + "并清空聊天记录" }}</el-button>
       </span>
     </template>
   </el-dialog>
@@ -212,7 +213,8 @@ export default {
       })
     },
 
-    // 获取群员信息 以{uuid: lastUpdate}的形式存储在this.membersInfo中
+    // 获取群员信息
+    // 以{uuid: lastUpdate}的形式存储在this.membersInfo中
     getMembersInfo() {
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/members`
       axios.get(URL, {
@@ -260,14 +262,14 @@ export default {
       this.$emit('groupPinnedModified', this.currPinned)
     },
 
-    // 处理清空消息记录
+    // 处理清空历史记录
     async deleteHistory() {
       this.$emit('deleteHistory', this.info.group)
       this.deleteHistoryVisible = false
     },
 
     // 处理退出/解散群
-    unsubscribe() {
+    unsubscribe(deleteHistory) {
       const URL = this.getRole === 'owner'
         ? `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}`
         : `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/members/me`
@@ -275,8 +277,12 @@ export default {
       axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        this.unsubscribeVisible = false
         ElMessage.success("退出成功")
+        this.unsubscribeVisible = false
+        this.$store.dispatch('disconnect', this.info.group)
+        if (deleteHistory) {
+          this.deleteHistory()
+        }
       }).catch(err => {
         ElMessage({
           message: `退出失败 ${err['response']['data']['detail']}`,

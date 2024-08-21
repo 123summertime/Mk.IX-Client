@@ -37,7 +37,7 @@ export default createStore({
         axios.get(URL, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         }).then(res => {
-          // 结果会通过wsSys发送 sysMsgGetter.vue将对其作处理
+          // 结果会通过systemWS发送 sysMsgGetter.vue将对其作处理
         }).catch(err => {
           console.log("获取入群申请时失败", err)
         })
@@ -74,7 +74,7 @@ export default createStore({
         axios.get(URL, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         }).then(res => {
-          // 结果会通过wsSys发送 sysMsgGetter.vue将对其作处理
+          // 结果会通过systemWS发送 sysMsgGetter.vue将对其作处理
         }).catch(err => {
           console.log("获取好友申请时失败", err)
         })
@@ -107,6 +107,14 @@ export default createStore({
 
     getGroupAttention(context, info) {
       context.commit('getGroupAttention', info)
+    },
+
+    buildGroupDB(context, info) {
+      context.commit('buildGroupDB', info)
+    },
+
+    disconnect(context, info) {
+      context.commit('disconnect', info)
     }
   },
 
@@ -147,6 +155,14 @@ export default createStore({
 
     getGroupAttention(state, info) {
       state.groupAttentions.set(info.group, info.type)
+    },
+
+    buildGroupDB(state, info) {
+      state.groupDB[info.group] = info.db
+    },
+
+    disconnect(state, info) {
+      Reflect.deleteProperty(state.wsConnections, info)
     }
   },
 
@@ -157,8 +173,9 @@ export default createStore({
     groupList: [],
     groupAttentions: new Map(),  // group: String -> type: String, 
     favoriteDB: await favoriteDB(),
-    currentAt: {},  // element: {uuid: String, userName: String}
-    wsConnections: {},  // element: {groupID: Websocket}
+    groupDB: {},    // group: dbCRUD实例对象
+    currentAt: {},  // {uuid: String, userName: String}
+    wsConnections: {},  // {groupID: Websocket}
     // {group}: group新收到的消息
     // lastMessageOf{group}: group的最后一条消息
     // sys: 系统消息Websocket

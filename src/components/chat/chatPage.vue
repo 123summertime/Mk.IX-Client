@@ -27,7 +27,7 @@
           <p>{{ currGroupName }}</p>
           <MoreFilled @click="drawer = !drawer"></MoreFilled>
           <el-drawer v-model="drawer" :with-header="false" :destroy-on-close="true" style="min-width: 400px;">
-            <groupConfig
+            <groupConfig v-if="currGroupID"
               :info="groupList.find(item => item.group === currGroupID)"
               :isPinned="pinned[currGroupID]"
               :available="currGroupAvailable"
@@ -48,9 +48,8 @@
             :group="item.group"
             :name="item.name"
             :available="item.available"
-            :active="item['group'] === currGroupID"
-            :deletedHistory="item['group'] === deletedHistory"
-            v-show="currGroupID === item['group']"
+            :active="item.group === currGroupID"
+            v-show="currGroupID === item.group"
             class="conversation"></chatItem>
         </div>
         <splitter @splitter="inputSplitter" class="inputSplitter" ref="inputSplitter"></splitter>
@@ -85,7 +84,6 @@ export default {
       currGroupName: "",
       currGroupAvailable: true,
 
-      deletedHistory: "",
       visible: false,
       drawer: false,
       pinned: {},
@@ -94,7 +92,7 @@ export default {
   },
 
   methods: {
-    // 初始化，获取用户基本信息等
+    // 初始化，获取用户/群基本信息，建立连接
     async initialization() {
       const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/me`
       axios.get(URL, {
@@ -216,7 +214,7 @@ export default {
       }
     },
 
-    // 群名修改时
+    // 群名修改后
     groupNameModified(info) {
       const { group, name } = info
       if (this.currGroupID === group) {
@@ -231,7 +229,7 @@ export default {
       })
     },
 
-    // 群头像修改时
+    // 群头像修改后
     groupAvatarModified(info) {
       const { group, avatar } = info
       this.groupList = this.groupList.map(item => {
@@ -242,7 +240,8 @@ export default {
       })
     },
 
-    // 更新群的管理员变化
+    // 群的管理员变化后
+    // operation为true为有人成为了管理员 false时有人被撤销了管理员
     groupAdminModified(info) {
       const { group, uuid, operation, lastUpdate } = info
       const targetGroup = this.groupList.find(i => i.group === group)
@@ -253,23 +252,33 @@ export default {
       }
     },
 
-    // 更新群置顶变化
+    // 群置顶变化后
     groupPinnedModified(info) {
       this.pinned[this.currGroupID] = info
       localStorage.setItem("pinned", JSON.stringify(this.pinned))
     },
 
-    // 成功加入某群
+    // 加入某群后
     joinGroupSuccess(info, autoChangeGroup) {
-      this.getGroupInfo("", info.group)
+      this.getGroupInfo("", info.group, true)
       if (autoChangeGroup) {
         this.currGroupChange(info.group, info.name)
       }
     },
 
-    // 删除某群历史记录, chatItem.vue执行
-    deleteHistory(info) {
-      this.deletedHistory = info
+    // 删除某群历史记录
+    deleteHistory(group) {
+      this.currGroupID = ""
+      this.groupList.splice(this.groupList.findIndex(i => i.group == group), 1)
+      this.$store.state.groupDB[group].deleteDB().then(() => {
+        ElMessage.success("清空聊天记录成功")
+      }).catch(err => {
+        ElMessage({
+          message: '删除失败',
+          duration: 6000,
+          type: "error",
+        })
+      })
     },
 
     logout() {

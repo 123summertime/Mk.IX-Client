@@ -109,7 +109,7 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button @click="searchVisible = false">取消</el-button>
-        <el-button type="primary" :disabled="searchState != 1" @click="joinGroupByReq"
+        <el-button type="primary" :disabled="searchState != 1" @click="joinGroupByRequest"
           v-if="searchGroupOption">申请</el-button>
         <el-button type="primary" :disabled="searchState != 1" @click="joinGroupByQA" v-else>加入</el-button>
       </span>
@@ -159,7 +159,7 @@ export default {
 
     // 创建一个群聊
     makeGroup() {
-      const QA = { Q: this.makeGroupQ, A: this.makeGroupA, name: this.makeGroupName}
+      const QA = { Q: this.makeGroupQ, A: this.makeGroupA, name: this.makeGroupName }
       const URL = `http://${localStorage.getItem('adress')}/v1/group/register`
       axios.post(URL, QA, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -219,8 +219,8 @@ export default {
     },
 
     // 发送入群申请
-    joinGroupByReq() {
-      const A = {note: this.searchGroupA}
+    joinGroupByRequest() {
+      const A = { note: this.searchGroupA }
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/request`
       axios.post(URL, A, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -251,7 +251,7 @@ export default {
       const idx = this.messageList.findIndex(i => i.time === time)
       if (idx === -1) {  // 新入群申请
         this.messageList.push({ time, type, target, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName })
-      } else {  // 更新入群申请(其它管理员已审核过了)
+      } else {  // 更新入群申请(自己/其它管理员已审核过了)
         this.messageList[idx] = { time, type, target, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName }
       }
     },
@@ -261,31 +261,46 @@ export default {
       const { time, type, state, senderID, senderKey, payload } = friendRequest
       const senderInfo = await queryInfo("Account", senderKey, senderID)
       const { avatar: senderAvatar, userName } = senderInfo
-      this.messageList.push({time, type, state, senderID, payload, senderAvatar, userName})
+
+      const idx = this.messageList.findIndex(i => i.time === time)
+      if (idx === -1) {
+        this.messageList.push({ time, type, state, senderID, payload, senderAvatar, userName })
+      } else {
+        this.messageList[idx] = { time, type, state, senderID, payload, senderAvatar, userName }
+      }
+      
     },
 
-    // 获取群验证文本
+    // 群验证的消息文本
     groupMailText(msg) {
-      const {type, userName, groupName} = msg 
+      const { type, userName, groupName } = msg
       const mapping = {
         join: `${userName} 申请加入 ${groupName}`,
         friend: `${userName} 申请加你为好友`,
-      } 
-      
+      }
+
       return mapping[type]
     },
 
-    // 审核群验证
+    // 审核验证消息
     requestResponse(type, group, time, verdict) {
-      const T = {note: time}
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${group}/verify/response?verdict=${verdict}`
-      axios.post(URL, T, {
+      console.log(type, group, time, verdict)
+      const uuid = this.$store.state.account
+      const URLmapping = {
+        join: `http://${localStorage.getItem('adress')}/v1/group/${group}/verify/response?verdict=${verdict}`,
+        friend: `http://${localStorage.getItem('adress')}/v1/user/${uuid}/verify/response?verdict=${verdict}`,
+      }
+
+      const url = URLmapping[type]
+      const T = { note: time }
+      axios.post(url, T, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success(verdict ? "已通过" : "已拒绝")
       }).catch(err => {
+        console.log(err)
         ElMessage({
-          message: `失败 ${err['response']['data']['detail']}`,
+          message: "操作失败",
           duration: 6000,
           type: "error",
         })
@@ -308,7 +323,7 @@ export default {
     },
 
     joined(msg) {
-      this.$emit('joinGroupSuccess', { group: msg.group, name: msg.payload }, false)
+      this.$emit('joinGroupSuccess', { group: msg.target, name: msg.payload }, false)
     },
 
   },

@@ -111,8 +111,8 @@ export default {
       this.atList = new Set()
     },
 
-    // 发送非(text和消息)类型消息
-    sendingMessage() {
+    // 发送图片类型消息，以base64的形式
+    sendingImage() {
       if (!this.payload.content) { return }
 
       this.$store.state.wsConnections[this.group].send(JSON.stringify({
@@ -208,7 +208,7 @@ export default {
       }
     },
 
-    // 粘贴图片到输入框
+    // 粘贴图片到输入框，尝试改为webp再发送
     pasteImg(event) {
       let items = (event.clipboardData || event.originalEvent.clipboardData).items;
 
@@ -233,7 +233,7 @@ export default {
       this.recorder.recorder = new MediaRecorder(stream)
     },
 
-    // 录音
+    // 录音时，有最大时长限制
     async audioRecorder() {
       if (!this.recorder.recorder) {
         await this.recorderBuilder()
@@ -282,7 +282,7 @@ export default {
       this.visible = false
       const callFunction = {
         "text": this.sendingText,
-        "image": this.sendingMessage,
+        "image": this.sendingImage,
         "audio": this.sendingFile,
         "file": this.sendingFile,
       }
@@ -293,12 +293,13 @@ export default {
       this.visible = false
     },
 
-    // 发送收藏的表情包
+    // 发送收藏的表情包，尝试改为webp后发送
     sendFavoriteImg(img) {
       this.favorite = false
       this.payload.type = 'image'
       this.payload.content = img
 
+      // webp的base64中包含'UklGR'
       const isWebp = img.substring(0, 30).indexOf('UklGR') >= 0
       if (!isWebp) {
         this.toWebpBase64(img)

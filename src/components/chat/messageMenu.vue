@@ -44,10 +44,10 @@ export default {
 
   methods: {
     async getFavoriteDB() {
-      this.DB = await this.$store.state["favoriteDB"]
+      this.DB = await this.$store.state.favoriteDB
     },
 
-    // 收藏图片
+    // 收藏图片，图片的base64加入DB
     async addToFavorite() {
       if (!this.DB) {
         await this.getFavoriteDB()

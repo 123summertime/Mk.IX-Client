@@ -29,7 +29,7 @@ export default {
       this.DB = await this.$store.state.favoriteDB
     },
 
-    // 获取收藏的表情包
+    // 从DB中获取收藏的表情包
     async getFavoriteImg() {
       let imgs = await this.DB.queryRange('Image', this.page * this.step, this.step, false)
       for (const img of imgs) {
@@ -40,8 +40,9 @@ export default {
 
     // 快滚动到底时，获取下一页表情包
     async onScroll() {
+      const threshold = 50
       const e = this.$refs.ImgsOuter
-      if (e.scrollLeft + e.clientWidth >= e.scrollWidth - 50) {
+      if (e.scrollLeft + e.clientWidth >= e.scrollWidth - threshold) {
         this.getFavoriteImg()
       }
     },

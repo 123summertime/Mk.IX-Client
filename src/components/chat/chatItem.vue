@@ -30,7 +30,6 @@ export default {
     name: String,
     admins: Object,
     active: Boolean,
-    deleted: Boolean,
     available: Boolean,
   },
   data() {
@@ -51,8 +50,12 @@ export default {
       db.version(1).stores({
         History: "&time",
       })
-      this.DBroot = db
+      // this.DBroot = db
       this.DB = new dbCRUD(db)
+      this.$store.dispatch("buildGroupDB", {
+        group: this.group,
+        db: this.DB,
+      })
     },
 
     async getHistory() {
@@ -75,13 +78,14 @@ export default {
 
     // 快滚动到顶时，获取更早的历史记录
     async onScroll() {
-      if (this.$refs.messageView.scrollTop <= 50 && !this.switch) {
+      const threshold = 50
+      if (this.$refs.messageView.scrollTop <= threshold && !this.switch) {
         this.switch = true
         await this.getHistory()
       }
     },
 
-    // 建立ws连接
+    // 建立这个群的ws连接
     async makeConnection() {
       const uuid = this.$store.state.account
       this.$store.dispatch('wsConnect', {
@@ -91,30 +95,16 @@ export default {
       })
     },
 
-    // 新增历史记录
+    // 新增一条历史记录(本地)
     putHistory(message) {
       this.DB.add('History', message)
     },
 
-    // 删除一条消息(本地)
+    // 删除一条历史记录(本地)
     deleteMsg(time) {
       const idx = this.messageList.findIndex(i => i.time === time)
       this.DB.delete("History", "time", time)
       this.messageList.splice(idx, 1)
-    },
-
-    // 删除所有消息(本地)
-    deleteAll() {
-      this.DBroot.delete().then(() => {
-        this.messageList = []
-        ElMessage.success("清空聊天记录成功")
-      }).catch(err => {
-        ElMessage({
-          message: '删除失败',
-          duration: 6000,
-          type: "error",
-        })
-      })
     },
 
     // 撤回一条消息
@@ -129,7 +119,7 @@ export default {
       }))
     },
 
-    // 其他用户撤回了一条消息
+    // 其他用户撤回了一条消息，修改历史记录
     async newRevokeHandler(message) {
       const revokeID = message.payload.content
       const revokeMsg = await this.DB.query('History', { "time": revokeID })
@@ -197,7 +187,7 @@ export default {
   },
 
   watch: {
-    // 获取该群最新消息
+    // 从Vuex中获取该群最新消息，加入messageList并存储
     newMessage: {
       async handler(message) {
         if (!message) { return }
@@ -217,7 +207,8 @@ export default {
         }
         this.messageList.push(message)
         this.putHistory(storage)
-
+        
+        // 如果是自己发的，自动滚动到底
         if (message.uuid === this.$store.state.account) {
           this.$nextTick(() => {
             requestAnimationFrame(() => {
@@ -228,7 +219,7 @@ export default {
       }
     },
 
-    // 更新本群最后一条消息，groupItem要用
+    // 更新本群最后一条消息，groupItem.vue要用
     messageList: {
       deep: true,
       handler() {
@@ -243,19 +234,12 @@ export default {
     active: {
       handler() {
         this.$nextTick(function () {
+          console.log(this.group, this.name)
           this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
         })
       }
     },
 
-    // 清除历史记录
-    deleted: {
-      handler(newVal) {
-        if (newVal) {
-          this.deleteAll()
-        }
-      }
-    }
   },
 
   async mounted() {

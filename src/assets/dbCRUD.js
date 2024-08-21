@@ -26,4 +26,8 @@ export class dbCRUD {
     }
     return await this.DB.table(table).offset(start).limit(limit).toArray()
   }
+
+  deleteDB() {
+    return this.DB.delete()
+  }
 }

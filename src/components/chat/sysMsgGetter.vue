@@ -32,7 +32,12 @@ export default {
           this.$emit('joined', msg)
         },
         // 新的好友申请
-        friend: () => { this.$emit('newFriendRequest', msg) }
+        friend: () => { this.$emit('newFriendRequest', msg) },
+        // 好友申请通过
+        friended: () => {
+          ElMessage.success(`你已成功加入 ${payload}`)
+          this.$emit('joined', msg)
+        }
       }
 
       mapping[type]()
