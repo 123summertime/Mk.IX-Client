@@ -64,7 +64,8 @@ export default {
     async login() {
       this.clicked = true
       const URL = `http://${this.adress}/v1/user/token?isBot=${this.asBot}`
-      const formData = `grant_type=password&username=${this.account}&password=${await this.hash(this.password)}`
+      const hashed = await this.hash(this.password)
+      const formData = `grant_type=password&username=${this.account}&password=${hashed}`
 
       axios.post(URL, formData, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }

@@ -138,7 +138,7 @@ export default {
 
       const owner = { [adminInfo.owner.uuid]: adminInfo.owner.lastUpdate }
       const admin = {}
-      adminInfo.admin.forEach(i => { admin[`${i.uuid}`] = i.lastUpdate })
+      adminInfo.admin.forEach(i => { admin[i.uuid] = i.lastUpdate })
 
       const element = { ...groupInfo, admins: { owner, admin }, available }
       this.groupList.push(element)
@@ -152,7 +152,7 @@ export default {
         const res = await axios.get(URL)
         return res.data
       } catch (err) {
-        console.log(err)
+        console.log("获取管理员信息时出现错误", err)
         return []
       }
     },
@@ -217,38 +217,29 @@ export default {
     // 群名修改后
     groupNameModified(info) {
       const { group, name } = info
+      const idx = this.groupList.findIndex(i => i.group === group)
+      this.groupList[idx].name = name
       if (this.currGroupID === group) {
         this.currGroupName = name
       }
-
-      this.groupList = this.groupList.map(item => {
-        if (item.group === group) {
-          return { ...item, name: name }
-        }
-        return item
-      })
     },
 
     // 群头像修改后
     groupAvatarModified(info) {
       const { group, avatar } = info
-      this.groupList = this.groupList.map(item => {
-        if (item.group === group) {
-          return { ...item, avatar }
-        }
-        return item
-      })
+      const idx = this.groupList.findIndex(i => i.group === group)
+      this.groupList[idx].avatar = avatar
     },
 
     // 群的管理员变化后
     // operation为true为有人成为了管理员 false时有人被撤销了管理员
     groupAdminModified(info) {
       const { group, uuid, operation, lastUpdate } = info
-      const targetGroup = this.groupList.find(i => i.group === group)
+      const idx = this.groupList.findIndex(i => i.group === group)
       if (operation) {
-        targetGroup.admins.admin[uuid] = lastUpdate
+        this.groupList[idx].admins.admin[uuid] = lastUpdate
       } else {
-        Reflect.deleteProperty(targetGroup.admins.admin, uuid)
+        Reflect.deleteProperty(this.groupList[idx].admins.admin, uuid)
       }
     },
 
@@ -478,4 +469,5 @@ chatPage
   |     |     |- audioMsg
   |     |     |- messageMenu
   |     |     |- namecard
+  |     |     |- groupSelector 
  -->

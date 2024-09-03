@@ -11,11 +11,13 @@
     <div class="information">
       <div :class="lastMessageTime ? 'time' : 'time hidden'">{{ lastMessageTime }}</div>
       <div :class="unreadCount ? 'unread' : 'unread hidden'">{{ unreadCount <= 99 ? unreadCount : "99+" }}</div>
-      </div>
     </div>
+  </div>
 </template>
 
 <script>
+import { computeTime } from './../../assets/utils'
+
 export default {
   props: {
     avatar: String,
@@ -36,36 +38,13 @@ export default {
   },
 
   methods: {
-    // 通过时间戳转化为可读的时间
     computeLastMessageTime(timeStamp) {
-      timeStamp = Math.round(Number(timeStamp.substring(0, 10)))  // 精确到秒的时间戳(10位)
-      let todayMidnight = new Date().setHours(0, 0, 0, 0) / 1000
-
-      const time = new Date(timeStamp * 1000)
-      const year = time.getFullYear()
-      const month = time.getMonth() + 1
-      const date = time.getDate()
-      let hours = time.getHours()
-      let minutes = time.getMinutes()
-
-      hours = (hours < 10) ? "0" + hours : hours
-      minutes = (minutes < 10) ? "0" + minutes : minutes
-      const T = hours + ":" + minutes
-
-      // 1d === 86400s
-      if (timeStamp >= todayMidnight) {
-        return T
+      let formatedTime = computeTime(timeStamp)
+      let idx = formatedTime.indexOf(" ")
+      if (idx != -1) {
+        formatedTime = formatedTime.split(" ")[0]
       }
-      if (timeStamp >= todayMidnight - 86400) {
-        return "昨天 " + T
-      }
-      if (timeStamp >= todayMidnight - 2 * 86400) {
-        return "前天 " + T
-      }
-      if (timeStamp >= todayMidnight - 364 * 86400) {
-        return month + "/" + date
-      }
-      return year + "/" + month + "/" + date
+      return formatedTime
     },
 
     getSummary(message) {
@@ -94,7 +73,7 @@ export default {
         // 对于置顶群(order值都<=0)，-1*时间戳设定order实现按最后消息的时间排序
         this.$refs.groupInfoRoot.style.order = -1 * lastMessageTime
       } else {
-        // 对于非置顶群(order值都>0) INT_MAX-时间戳实现按最后消息的时间排序
+        // 对于非置顶群(order值都>0) INT32_MAX-时间戳实现按最后消息的时间排序
         this.$refs.groupInfoRoot.style.order = 2147483647 - lastMessageTime
       }
       this.lastMessage = this.getSummary(message)
@@ -128,6 +107,10 @@ export default {
   },
 
   computed: {
+    getNewMessage() {
+      return this.$store.state[this.group]
+    },
+
     getLastMessage() {
       return this.$store.state[`lastMessageOf${this.group}`]
     },
@@ -138,6 +121,15 @@ export default {
   },
 
   watch: {
+    // 未读消息计数
+    getNewMessage: {
+      handler(newVal) {
+        if (!this.active && newVal) {
+          this.unreadCount += 1
+        }
+      }
+    },
+
     // 获取该群最后一条消息
     getLastMessage: {
       deep: true,

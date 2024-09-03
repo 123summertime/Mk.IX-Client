@@ -2,11 +2,11 @@
   <div class="favoriteRoot">
     <div class="imgsOuter" @scroll="onScroll" ref="ImgsOuter">
       <div class="imgs">
-        <div class="eachImg" v-for="img, idx in favoriteImgs" :key="img['time']"
+        <div class="eachImg" v-for="img, idx in favoriteImgs" :key="img.time"
           title="左键发送，中键删除，右键移至最前"
           @mouseup="operations($event, idx, img)"
           @contextmenu.prevent=" (e) => { e.preventDefault() }">
-          <img :src="img['payload']" />
+          <img :src="img.payload" />
         </div>
       </div>
     </div>

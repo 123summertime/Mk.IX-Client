@@ -15,10 +15,10 @@
       </div>
     </div>
     <template #footer>
-      <span class="dialog-footer">
+      <div>
         <el-button @click="canceled">取消</el-button>
         <el-button type="primary" :disabled="groupID === ''" @click="selected">确定</el-button>
-      </span>
+      </div>
     </template>
   </el-dialog>
 </template>

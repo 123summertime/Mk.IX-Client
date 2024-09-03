@@ -20,32 +20,32 @@ export const queryInfo = async function (table, lastUpdate, uuid) {
     if (table === "Account") {
       const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/${uuid}`
       const res = await axios.get(URL)
-      const data = res["data"]
+      const data = res.data
       
       infoDB.update("Account", {
-        "time": data["lastUpdate"],
-        "uuid": uuid,
-        "userName": data["userName"],
-        "avatar": data["avatar"]
+        time: data.lastUpdate,
+        uuid: uuid,
+        userName: data.userName,
+        avatar: data.avatar,
       })
       
-      data["uuid"] = uuid
+      data.uuid = uuid
       return data
     }
 
     if (table === "Group") {
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${uuid}/info`
       const res = await axios.get(URL)
-      const data = res["data"]
+      const data = res.data
 
       infoDB.update("Group", {
-        "time": data["lastUpdate"],
-        "group": uuid,
-        "name": data["name"],
-        "avatar": data["avatar"]
+        time: data.lastUpdate,
+        group: uuid,
+        name: data.name,
+        avatar: data.avatar,
       })
       
-      data["group"] = uuid
+      data.group = uuid
       return data
     }
   } catch (err) {

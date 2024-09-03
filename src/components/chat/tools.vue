@@ -29,8 +29,8 @@
           <p>{{ '理由：' + msg.payload }}</p>
         </div>
         <div class="mailOpers" v-if="msg.state === 0">
-          <Close @click="requestResponse(msg.type, msg.group, msg.time, false)"></Close>
-          <Check @click="requestResponse(msg.type, msg.group, msg.time, true)"></Check>
+          <Close @click="requestResponse(msg.type, msg.target, msg.time, false)"></Close>
+          <Check @click="requestResponse(msg.type, msg.target, msg.time, true)"></Check>
         </div>
         <div class="mailResponse" v-else>
           <p>{{ cvtState(msg.state) }}</p>
@@ -169,7 +169,7 @@ export default {
         this.makeGroupQ = ""
         this.makeGroupA = ""
         ElMessage.success("创建成功")
-        this.$emit('joinGroupSuccess', { "group": res["data"]["groupID"], "name": this.makeGroupName }, true)
+        this.$emit('joinGroupSuccess', { group: res.data.groupID, name: this.makeGroupName }, true)
       }).catch(err => {
         ElMessage({
           message: `创建失败 ${err['response']['data']['detail']}`,

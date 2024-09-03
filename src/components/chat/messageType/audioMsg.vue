@@ -25,10 +25,7 @@
 </template>
 
 <script>
-import Dexie from 'dexie'
 import axios from 'axios'
-
-import { dbCRUD } from '../../../assets/dbCRUD'
 
 export default {
   props: {
@@ -38,22 +35,18 @@ export default {
 
   data() {
     return {
-      currentState: "pending", // 语音的状态 为以下之一 pending(未下载) | downloading(下载中) | downloaded(已下载) | pause(暂停) | playing(播放中)
+      currentState: "pending", // 语音的状态 为以下之一 pending(未下载) | downloading(下载中) | downloaded(已下载) | pause(暂停) | play(播放中)
       audioURL: null,          // 语音的blobURL
       progress: 0,             // 播放百分比
     }
   },
 
   methods: {
-    buildOrGetDB() {
-      const db = new Dexie(this.$store.state.account + '-' + this.group)
-      db.version(1).stores({
-        History: "&time",
-      })
-      this.DB = new dbCRUD(db)
+    getDB() {
+      this.DB = this.$store.state.groupDB[this.group]
     },
 
-    // 计算该语音消息宽度，和语音长度正相关
+    // 计算该语音消息宽度，和语音长度成正比
     getMessageBoxWidth() {
       const width = 16 * this.message.payload.meta.length + 16
       this.$refs.Bar.style.width = width + 'px'
@@ -74,7 +67,7 @@ export default {
         responseType: 'blob',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       }).then(res => {
-        this.buildOrGetDB()
+        this.getDB()
         const blob = new Blob([res.data])
         const payloadCopy = JSON.parse(JSON.stringify(this.message.payload))
         payloadCopy.meta.blob = blob

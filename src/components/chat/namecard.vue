@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="namecardVisible" width="540px">
+  <el-dialog v-model="namecardVisible" width="540">
     <div class="namecard">
       <div class="namecardAvatar">
         <img :src="message.avatar" />
@@ -19,10 +19,21 @@
         </span>
         <span>
           <i>最后访问:</i>
-          <i>{{ lastSeen === "Online" ? "在线" : computeTime(lastSeen) }}</i>
+          <i>{{ lastSeen === "Online" ? "在线" : formatedTime(lastSeen) }}</i>
         </span>
         <span>
-          <el-button @click="friendRequest">1122</el-button>
+          <el-button @click="friendRequestVisible = true">发送好友申请</el-button>
+          <el-dialog v-model="friendRequestVisible" width="540" title="好友申请">
+            <div>
+              <el-input v-model="reason" placeholder="申请理由(选填)" />
+            </div>
+            <template #footer>
+              <div>
+                <el-button @click="friendRequestVisible = false">取消</el-button>
+                <el-button type="primary" @click="friendRequest">发送</el-button>
+              </div>
+            </template>
+          </el-dialog>
         </span>
       </div>
     </div>
@@ -31,6 +42,8 @@
 
 <script>
 import axios from 'axios'
+
+import { computeTime } from './../../assets/utils'
 
 export default {
   props: {
@@ -41,8 +54,10 @@ export default {
   data() {
     return {
       namecardVisible: false,
+      friendRequestVisible: false,
       bio: "",
       lastSeen: "",
+      reason: "",
     }
   },
 
@@ -59,48 +74,25 @@ export default {
       })
     },
 
-    // 通过时间戳转化为可读的时间
-    computeTime(timeStamp) {
-      timeStamp = Math.round(Number(timeStamp.substring(0, 10)))  // 精确到秒的时间戳(10位)
-      const todayMidnight = new Date().setHours(0, 0, 0, 0) / 1000
-
-      const time = new Date(timeStamp * 1000)
-      const year = time.getFullYear()
-      const month = time.getMonth() + 1
-      const date = time.getDate()
-      let hours = time.getHours()
-      let minutes = time.getMinutes()
-
-      hours = (hours < 10) ? "0" + hours : hours
-      minutes = (minutes < 10) ? "0" + minutes : minutes
-      const T = hours + ":" + minutes
-
-      // 1d === 86400s
-      if (timeStamp >= todayMidnight) {
-        return T
-      }
-      if (timeStamp >= todayMidnight - 86400) {
-        return "昨天 " + T
-      }
-      if (timeStamp >= todayMidnight - 2 * 86400) {
-        return "前天 " + T
-      }
-      if (timeStamp >= todayMidnight - 364 * 86400) {
-        return month + "/" + date + " " + T
-      }
-      return year + "/" + month + "/" + date + " " + T
+    formatedTime(time) {
+      return computeTime(time)
     },
 
     friendRequest() {
-      const reason = { note: "Ciallo" }
+      const reason = { note: this.reason }
       const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.message.uuid}/friend`
       axios.post(URL, reason, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        console.log(res)
+        ElMessage.success("发送成功")
       }).catch(err => {
-        console.log(err)
+        ElMessage({
+          message: err,
+          duration: 6000,
+          type: "error",
+        })
       })
+      friendRequestVisible = false
     },
   },
 
@@ -113,7 +105,6 @@ export default {
       }
     }
   },
-
 }
 </script>
 
@@ -152,5 +143,9 @@ export default {
 .namecardInfo span i:nth-child(2) {
   width: calc(100% - 96px);
   word-break: break-all;
+}
+
+:deep(.el-dialog__body) {
+  padding: 12px 20px;
 }
 </style>

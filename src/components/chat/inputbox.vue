@@ -210,11 +210,11 @@ export default {
 
     // 粘贴图片到输入框，尝试改为webp再发送
     pasteImg(event) {
-      let items = (event.clipboardData || event.originalEvent.clipboardData).items;
+      const items = (event.clipboardData || event.originalEvent.clipboardData).items;
 
       for (let i = 0; i < items.length; i++) {
         if (items[i].type.indexOf('image') !== -1) {
-          this.payload.name = 'Image.webp'
+          this.payload.name = 'Image'
           this.payload.type = 'image'
 
           let reader = new FileReader()
@@ -281,10 +281,10 @@ export default {
     confirmedSending() {
       this.visible = false
       const callFunction = {
-        "text": this.sendingText,
-        "image": this.sendingImage,
-        "audio": this.sendingFile,
-        "file": this.sendingFile,
+        text: this.sendingText,
+        image: this.sendingImage,
+        audio: this.sendingFile,
+        file: this.sendingFile,
       }
       callFunction[this.payload.type]()
     },

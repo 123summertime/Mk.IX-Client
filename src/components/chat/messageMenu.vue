@@ -64,7 +64,7 @@ export default {
 
       const bytes = atob(base64.split(',')[1])
       const byteNumbers = new Array(bytes.length)
-      for (var i = 0; i < bytes.length; i++) {
+      for (let i = 0; i < bytes.length; i++) {
         byteNumbers[i] = bytes.charCodeAt(i)
       }
       const byteArray = new Uint8Array(byteNumbers)
@@ -75,10 +75,10 @@ export default {
     // 根据消息类型显示不同的菜单选项
     option() {
       const displayMapping = {
-        text: { "favorite": false, "copy": true, "delete": true, "forward": true, "revoke": this.checkPermissions },
-        image: { "favorite": true, "copy": true, "delete": true, "forward": true, "revoke": this.checkPermissions },
-        file: { "favorite": false, "copy": false, "delete": true, "forward": true, "revoke": this.checkPermissions },
-        revoke: { "favorite": false, "copy": false, "delete": true, "forward": false, "revoke": false },
+        text: { favorite: false, copy: true, delete: true, forward: true, revoke: this.checkPermissions },
+        image: { favorite: true, copy: true, delete: true, forward: true, revoke: this.checkPermissions },
+        file: { favorite: false, copy: false, delete: true, forward: true, revoke: this.checkPermissions },
+        revoke: { favorite: false, copy: false, delete: true, forward: false, revoke: false },
       }
       this.display = displayMapping[this.message.type] || displayMapping.file
     },

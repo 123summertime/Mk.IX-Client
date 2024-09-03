@@ -29,19 +29,21 @@ export default {
     tryLogin() {
       const adress = localStorage.getItem("adress") ?? ""
       const token = localStorage.getItem("token") ?? ""
-
-      if (adress && token) {
-        const URL = `http://${adress}/v1/user/check`
-        axios.get(URL, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }).then(res => {
-          // 刷新token
-          if (res["data"]["refreshToken"] != "") {
-            localStorage.setItem("token", res["data"]["refreshToken"])
-          }
-          router.push('/chat')
-        }).catch(err => { console.log(err) })
+      
+      if (!adress || !token) {
+        return
       }
+
+      const URL = `http://${adress}/v1/user/check`
+      axios.get(URL, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).then(res => {
+        // 刷新token
+        if (res.data.refreshToken != "") {
+          localStorage.setItem("token", res.data.refreshToken)
+        }
+        router.push('/chat')
+      }).catch(err => { console.log(err) })
     },
 
     changeOption() {
@@ -110,12 +112,5 @@ export default {
 .bkgdItem3 {
   transform: translateX(11vw) translateY(72vh) rotateZ(43deg);
   --bkgdItem-size: 19vw;
-}
-
-@media screen and (max-width: 480px) {
-  .loginPageRoot {
-    width: 100vh;
-    height: 100vw;
-  }
 }
 </style>

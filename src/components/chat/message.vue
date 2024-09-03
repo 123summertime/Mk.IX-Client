@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import { computeTime } from './../../assets/utils'
+
 import broadcast from './messageType/broadcast.vue'
 import fileMsg from './messageType/fileMsg.vue'
 import imageMsg from './messageType/imageMsg.vue'
@@ -82,38 +84,6 @@ export default {
       return this.message.uuid === this.$store.state.account
     },
 
-    // 时间戳转化为可读的形式
-    computeTime(timeStamp) {
-      timeStamp = Math.round(Number(timeStamp.substring(0, 10)))  // 精确到秒的时间戳(10位)
-      let todayMidnight = new Date().setHours(0, 0, 0, 0) / 1000
-
-      const time = new Date(timeStamp * 1000)
-      const year = time.getFullYear()
-      const month = time.getMonth() + 1
-      const date = time.getDate()
-      let hours = time.getHours()
-      let minutes = time.getMinutes()
-
-      hours = (hours < 10) ? "0" + hours : hours
-      minutes = (minutes < 10) ? "0" + minutes : minutes
-      const T = hours + ":" + minutes
-
-      // 1d === 86400s
-      if (timeStamp >= todayMidnight) {
-        return T
-      }
-      if (timeStamp >= todayMidnight - 86400) {
-        return "昨天 " + T
-      }
-      if (timeStamp >= todayMidnight - 2 * 86400) {
-        return "前天 " + T
-      }
-      if (timeStamp >= todayMidnight - 364 * 86400) {
-        return month + "/" + date + " " + T
-      }
-      return year + "/" + month + "/" + date + " " + T
-    },
-
     // 右键消息，打开菜单栏
     onRightClick(event) {
       const rect = this.$refs.MessageRoot.getBoundingClientRect()
@@ -141,9 +111,9 @@ export default {
       }
     },
 
-    // 打开菜单栏后，在非菜单栏区域点击时，关闭菜单栏
+    // 打开菜单栏后，在非菜单栏区域点击(无论左键还是右键)时，关闭菜单栏
     globalClick() {
-      // 删除消息时不存在ContextMenu, if防报错
+      // 删除消息时不存在ContextMenu
       if (this.$refs.ContextMenu) {
         this.$refs.ContextMenu.$el.style.display = 'none'
       }
@@ -242,7 +212,7 @@ export default {
   },
 
   async mounted() {
-    this.formatedTime = this.computeTime(this.message.time)
+    this.formatedTime = computeTime(this.message.time)
   },
 
   components: {

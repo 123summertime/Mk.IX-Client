@@ -12,7 +12,6 @@ export default {
   },
 
   methods: {
-
     dragging(event) {
       if (event.clientX != 0) {
         this.currX = event.clientX

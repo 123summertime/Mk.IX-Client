@@ -16,7 +16,6 @@
 
 <script>
 import Dexie from 'dexie'
-import axios from 'axios'
 
 import message from './message.vue'
 
@@ -32,9 +31,10 @@ export default {
     active: Boolean,
     available: Boolean,
   },
+
   data() {
     return {
-      switch: false,  // 防止onScroll同一时间反复触发getHistory
+      lock: false,  // 防止onScroll同一时间反复触发getHistory
       page: 0,
       step: 10,
       messageList: [],
@@ -50,7 +50,6 @@ export default {
       db.version(1).stores({
         History: "&time",
       })
-      // this.DBroot = db
       this.DB = new dbCRUD(db)
       this.$store.dispatch("buildGroupDB", {
         group: this.group,
@@ -72,15 +71,15 @@ export default {
         }
         this.messageList.unshift(message)
       }
-      this.switch = false
+      this.lock = false
       this.page += 1
     },
 
     // 快滚动到顶时，获取更早的历史记录
     async onScroll() {
       const threshold = 50
-      if (this.$refs.messageView.scrollTop <= threshold && !this.switch) {
-        this.switch = true
+      if (this.$refs.messageView.scrollTop <= threshold && !this.lock) {
+        this.lock = true
         await this.getHistory()
       }
     },
@@ -102,8 +101,8 @@ export default {
 
     // 删除一条历史记录(本地)
     deleteMsg(time) {
-      const idx = this.messageList.findIndex(i => i.time === time)
       this.DB.delete("History", "time", time)
+      const idx = this.messageList.findIndex(i => i.time === time)
       this.messageList.splice(idx, 1)
     },
 
@@ -122,7 +121,7 @@ export default {
     // 其他用户撤回了一条消息，修改历史记录
     async newRevokeHandler(message) {
       const revokeID = message.payload.content
-      const revokeMsg = await this.DB.query('History', { "time": revokeID })
+      const revokeMsg = await this.DB.query('History', { time: revokeID })
       const newPayload = {
         name: null,
         size: null,
@@ -145,7 +144,7 @@ export default {
     newAttentionHandler(message) {
       const account = this.$store.state.account
       const atList = message.payload.meta ? message.payload.meta.at : []
-      if (atList.includes(account)) {
+      if (atList && atList.includes(account)) {
         this.attentionVisible = true,
         this.attentionTarget = message.time
         this.attentionContent = "有人@你"
@@ -234,7 +233,6 @@ export default {
     active: {
       handler() {
         this.$nextTick(function () {
-          console.log(this.group, this.name)
           this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
         })
       }
