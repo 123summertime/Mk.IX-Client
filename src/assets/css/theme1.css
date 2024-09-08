@@ -1,0 +1,85 @@
+html {
+  --bg-color: lightcoral;
+}
+
+/* common */
+:root {
+  --common-color-1: #edb1f1;
+  --common-color-2: #d59bf6;
+  --common-color-3: #9896f1;
+  --common-color-4: #8ef6e4;
+
+  --common-white-1: #fffefb;
+  --common-white-2: #f5f4f1;
+  --common-white-3: #cccbc8;
+
+  --common-black-1: #1d1c1c;
+  --common-black-2: #313d44;
+  --common-black-3: #808080;
+}
+
+
+/* chatPage */
+:root {
+  --chatPage-leftSide: var(--common-white-1);
+  --chatPage-userInfo: var(--common-white-2);
+  --chatPage-header: var(--common-white-2);
+  --chatPage-center: var(--common-white-2);
+  --chatPage-conversationView-border: var(--common-white-3);
+  --chatPage-inputBox-border: var(--common-white-3);
+}
+
+/* groupItem */
+:root {
+  --groupItem-hoverBg: var(--common-white-2);
+  --groupItem-pinnedBg: var(--common-white-2);
+  --groupItem-normalBg: var(--common-white-1);
+  --groupItem-activeBg: var(--common-color-2);
+  --groupItem-attention: var(--common-color-2);
+  --groupItem-groupName: var(--common-black-1);
+  --groupItem-groupNameActive: var(--common-white-1);
+  --groupItem-currMessageContext: var(--common-black-3);
+  --groupItem-currMessageContextActive: var(--common-white-2);
+  --groupItem-time: var(--common-black-1);
+  --groupItem-timeActive: var(--common-white-2);
+  --groupItem-unread: var(--common-color-2);
+  --groupItem-unreadText: var(--common-black-1);
+}
+
+/* chatItem */
+:root {
+  --chatItem-attentionButton: var(--common-color-3);
+  --chatItem-flash: var(--common-color-1);
+}
+
+/* inputBox */
+:root {
+  --inputBox-inputBoxRoot: transparent;
+  --inputBox-bar: transparent;
+  --inputBox-barItem: var(--common-black-1);
+  --inputBox-textarea: transparent;
+  --inputBox-previewAudio: var(--common-color-2);
+  --inputBox-iconDisabled: var(--common-black-3);
+}
+
+/* messageType */
+:root {
+  --message-commonBg: var(--common-color-2);
+  --message-fileBg: var(--common-color-3);
+  --message-atItem: var(--common-color-4);
+  --message-volume: var(--common-white-1);
+  --message-progress: var(--common-color-3);
+
+}
+
+/* atBar */
+:root {
+  --atBar-atCard: rgba(196, 196, 196, 0.7);
+  --atBar-atText: rgb(79, 134, 235);
+}
+
+/* favorite */
+:root { 
+  --favorite-favoriteRoot: transparent;
+  --favorite-eachImg-hover: var(--common-color-4);
+}

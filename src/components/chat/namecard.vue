@@ -21,7 +21,7 @@
           <i>最后访问:</i>
           <i>{{ lastSeen === "Online" ? "在线" : formatedTime(lastSeen) }}</i>
         </span>
-        <span>
+        <span v-if="!messageFrom()">
           <el-button @click="friendRequestVisible = true">发送好友申请</el-button>
           <el-dialog v-model="friendRequestVisible" width="540" title="好友申请">
             <div>
@@ -62,6 +62,10 @@ export default {
   },
 
   methods: {
+    messageFrom() {
+      return this.message.uuid === this.$store.state.account
+    },
+
     // 获取用户详细信息(个人简介，最后登录等)
     showProfile() {
       const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.message.uuid}`

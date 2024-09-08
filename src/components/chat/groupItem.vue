@@ -1,16 +1,16 @@
 <template>
-  <div class="groupInfoRoot" ref="groupInfoRoot">
+  <div :class="['groupInfoRoot', rootClasses]" ref="groupInfoRoot">
     <img class="groupAvatar" :src="avatar">
     <div class="groupInfo">
-      <p class="groupName">{{ name }}</p>
+      <p :class="['groupName', active ? 'groupNameActive' : '']">{{ name }}</p>
       <p class="currMessage">
-        <i class="attention" v-if="showAttention">{{ `[${this.attentionContent}]` }}</i>
-        <i>{{ lastMessage }}</i>
+        <p class='attention' v-if="showAttention">{{ `[${this.attentionContent}]` }}</p>
+        <p :class="['currMessageContext', active ? 'currMessageContextActive': '']">{{ lastMessage }}</p>
       </p>
     </div>
-    <div class="information">
-      <div :class="lastMessageTime ? 'time' : 'time hidden'">{{ lastMessageTime }}</div>
-      <div :class="unreadCount ? 'unread' : 'unread hidden'">{{ unreadCount <= 99 ? unreadCount : "99+" }}</div>
+    <div class="rightSide">
+      <p v-show="lastMessageTime" :class="['time', active ? 'timeActive': '']">{{ lastMessageTime }}</p>
+      <p v-show="unreadCount" class="unread">{{ unreadCount <= 99 ? unreadCount : "99+" }}</p>
     </div>
   </div>
 </template>
@@ -30,7 +30,7 @@ export default {
   data() {
     return {
       unreadCount: 0,
-      lastMessage: " ",
+      lastMessage: "",
       lastMessageTime: "",
       attentionContent: "",
       showAttention: false,
@@ -83,10 +83,8 @@ export default {
     pinnedGroupInit() {
       if (this.$refs.groupInfoRoot.style.order) { return }
       if (this.isPinned) {
-        this.$refs.groupInfoRoot.style.backgroundColor = 'lightyellow'
         this.$refs.groupInfoRoot.style.order = 0
       } else {
-        this.$refs.groupInfoRoot.style.backgroundColor = 'darkkhaki'
         this.$refs.groupInfoRoot.style.order = 2147483647
       }
     },
@@ -95,11 +93,9 @@ export default {
     pinnedGroupModified() {
       // 先还原为时间戳，再重新计算order
       if (this.isPinned) {
-        this.$refs.groupInfoRoot.style.backgroundColor = 'lightyellow'
         const lastMessageTime = 2147483647 - this.$refs.groupInfoRoot.style.order
         this.$refs.groupInfoRoot.style.order = -1 * lastMessageTime
       } else {
-        this.$refs.groupInfoRoot.style.backgroundColor = 'darkkhaki'
         const lastMessageTime = -1 * this.$refs.groupInfoRoot.style.order
         this.$refs.groupInfoRoot.style.order = 2147483647 - lastMessageTime
       }
@@ -107,6 +103,12 @@ export default {
   },
 
   computed: {
+    rootClasses() {
+      let cls = this.isPinned ? 'pinnedBg' : 'normalBg'
+      if (this.active) cls += " " + "activeBg"
+      return cls
+    },
+
     getNewMessage() {
       return this.$store.state[this.group]
     },
@@ -184,72 +186,110 @@ export default {
 <style scoped>
 .groupInfoRoot {
   display: flex;
-  padding: 8px 16px;
+  width: 100%;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.groupInfoRoot:hover {
+  background-color: var(--groupItem-hoverBg);
+}
+
+.pinnedBg {
+  background-color: var(--groupItem-pinnedBg);
+}
+
+.noramlBg {
+  background-color: var(--groupItem-normalBg);
+}
+
+.activeBg {
+  background-color: var(--groupItem-activeBg) !important;
 }
 
 .groupAvatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  margin: auto 0;
 }
 
 .groupInfo {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
+  height: 100%;
   flex-grow: 1;
-  padding: 6px 0;
-  margin-left: 12px;
+  padding: 0 8px 0 12px;
   overflow: hidden;
 }
 
 .groupName {
   width: 100%;
+  height: 24px;
   font-size: 1.2rem;
+  line-height: 24px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  color: var(--groupItem-groupName);
 }
 
-.information {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: flex-end;
-  padding: 6px 0;
-}
-
-.time {
-  white-space: nowrap;
-  font-size: 0.75rem;
-}
-
-.unread {
-  padding: 0 6px;
-  border-radius: 8px;
-  background-color: coral;
-}
-
-.hidden {
-  visibility: hidden;
+.groupNameActive {
+  color: var(--groupItem-groupNameActive)
 }
 
 .currMessage {
   width: 100%;
+  height: 24px;
+}
+
+.currMessage p {
+  display: inline-block;
+  height: 100%;
+  font-size: 1rem;
+  line-height: 24px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  color: gray;
-}
-
-.currMessage i {
-  font-size: 1rem;
-  line-height: 1rem;
 }
 
 .attention {
-  color: red;
+  color: var(--groupItem-attention);
   margin-right: 4px;
+}
+
+.currMessageContext {
+  color: var(--groupItem-currMessageContext);
+}
+
+.currMessageContextActive {
+  color: var(--groupItem-currMessageContextActive);
+}
+
+.rightSide { 
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+}
+
+.time {
+  height: 24px;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  line-height: 24px;
+  color: var(--groupItem-time);
+}
+
+.timeActive {
+  color: var(--groupItem-timeActive);
+}
+
+.unread {
+  height: 20px;
+  margin: 2px 0;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  line-height: 20px;
+  text-align: center;
+  background-color: var(--groupItem-unread);
+  color: var(--groupItem-unreadText);
 }
 </style>

@@ -46,11 +46,11 @@ export default {
 
 <style scoped>
 .textMsg {
-  background-color: orangered;
+  background-color: var(--message-commonBg);
 }
 
 .atItem {
-  color: #6a2c70;
+  color: var(--message-atItem);
   margin-right: 8px;
 }
 

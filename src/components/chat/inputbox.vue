@@ -23,8 +23,8 @@
           </template>
         </el-popover>
       </div>
-      <div class="barItem" title="发送(Shift+Enter)" @click="sendingText()">
-        <Promotion class="icon" :style="{ color: input ? 'black' : 'gray' }" />
+      <div :class="['barItem', input ? '' : 'barItemDisabled']" title="发送(Shift+Enter)" @click="sendingText()">
+        <Promotion class='icon' />
       </div>
     </div>
 
@@ -365,7 +365,7 @@ export default {
 
 <style scoped>
 .inputBoxRoot {
-  background-color: lightsalmon;
+  background-color: var(--inputBox-inputBoxRoot);
 }
 
 /* bar */
@@ -373,8 +373,9 @@ export default {
 .bar {
   display: flex;
   width: 100%;
-  height: 32px;
-  background-color: brown;
+  height: 48px;
+  padding: 8px 24px;
+  background-color: var(--inputBox-bar);
 }
 
 input[type="file"] {
@@ -382,15 +383,20 @@ input[type="file"] {
 }
 
 .barItem {
-  width: 64px;
   height: 100%;
   cursor: pointer;
   background-color: transparent;
-  color: black;
+  margin-right: 24px;
+  color: var(--inputBox-barItem);
 }
 
 .barItem label {
   cursor: pointer;
+}
+
+.barItemDisabled {
+  color: var(--inputBox-iconDisabled);
+  cursor: not-allowed;
 }
 
 .icon {
@@ -407,7 +413,7 @@ input[type="file"] {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: calc(100% - 32px);
+  height: calc(100% - 48px);
 }
 
 .atBar {
@@ -424,7 +430,7 @@ textarea {
   resize: none;
   border: none;
   outline: none;
-  background-color: transparent;
+  background-color: var(--inputBox-textarea);
 }
 
 textarea::-webkit-scrollbar {
@@ -450,7 +456,7 @@ textarea::-webkit-scrollbar {
 .previewAudio {
   border-radius: 12px;
   padding: 12px 16px;
-  background-color: rgb(200, 200, 200);
+  background-color: var(--inputBox-previewAudio);
   cursor: pointer;
 }
 

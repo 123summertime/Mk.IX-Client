@@ -86,7 +86,7 @@ export default {
 .favoriteRoot {
   width: 100%;
   height: 100%;
-  background-color: lightsalmon;
+  background-color: var(--favorite-favoriteRoot);
 }
 
 .imgsOuter {
@@ -111,7 +111,7 @@ export default {
 }
 
 .eachImg:hover {
-  background-color: lightcyan;
+  background-color: var(--favorite-eachImg-hover);
 }
 
 .eachImg img {

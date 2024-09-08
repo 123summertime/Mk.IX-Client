@@ -52,13 +52,13 @@ export default {
   align-items: center;
   padding: 4px 12px;
   margin-right: 8px;
-  background-color: rgba(196, 196, 196, 0.7);
+  background-color: var(--atBar-atCard);
   border-radius: 6px;
 }
 
 .atText {
   font-size: 1.2rem;
-  color: rgb(79, 134, 235);
+  color: var(--atBar-atText);
 }
 
 svg {

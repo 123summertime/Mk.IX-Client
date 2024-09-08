@@ -178,7 +178,7 @@ export default {
   justify-content: space-between;
   width: 300px;
   height: 100px;
-  background-color: beige;
+  background-color: var(--message-fileBg);
   cursor: pointer;
 }
 

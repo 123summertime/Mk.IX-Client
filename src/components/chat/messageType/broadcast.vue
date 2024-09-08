@@ -17,7 +17,7 @@ export default {
 .broadcast {
   max-width: calc(100% - 112px);
   margin: 0 auto;
-  background-color: orangered;
+  background-color: var(--message-commonBg);
 }
 
 .broadcast p {

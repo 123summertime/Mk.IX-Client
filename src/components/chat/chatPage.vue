@@ -6,7 +6,7 @@
         <img :src=avatar>
         <p>{{ username }}</p>
       </div>
-      <div class="groupItems">
+      <div class="groupList">
         <groupItem v-for="item in groupList"
           :avatar="item.avatar"
           :group="item.group"
@@ -72,6 +72,9 @@ import chatItem from './chatItem.vue'
 import inputBox from './inputbox.vue'
 import splitter from './splitter.vue'
 import groupConfig from './groupConfig.vue'
+
+import theme1 from './../../assets/css/theme1.css?inline'
+import theme2 from './../../assets/css/theme2.css?inline'
 
 export default {
   data() {
@@ -178,6 +181,14 @@ export default {
       }
     },
 
+    readThemeSettings() {
+      const currentTheme = localStorage.getItem("theme") || "theme1"
+      const mapping = { theme1, theme2 }
+      const style = document.createElement('style')
+      style.innerHTML = mapping[currentTheme]
+      document.head.appendChild(style)
+    },
+
     // 获取置顶群列表
     getPinnedGroups() {
       const pinned = localStorage.getItem("pinned") || '{}'
@@ -281,6 +292,7 @@ export default {
   async mounted() {
     await this.initialization()
     this.readLayoutSettings()
+    this.readThemeSettings()
     this.getPinnedGroups()
   },
 
@@ -301,6 +313,8 @@ export default {
   display: flex;
   width: 100vw;
   height: 100vh;
+  min-width: 600px;
+  min-height: 400px;
 }
 
 /* leftSide */
@@ -308,7 +322,7 @@ export default {
   position: relative;
   width: 20vw;
   height: 100%;
-  background-color: bisque;
+  background-color: var(--chatPage-leftSide);
 }
 
 .userInfo {
@@ -316,6 +330,7 @@ export default {
   width: 100%;
   height: 64px;
   padding: 8px 16px;
+  background-color: var(--chatPage-userInfo);
 }
 
 .userInfo img {
@@ -334,23 +349,20 @@ export default {
   overflow: hidden;
 }
 
-.groupItems {
+.groupList {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: calc(100% - 64px);
-  padding-bottom: 48px;
+  height: calc(100% - 64px - 48px); /* .userInfo 64px tools 48px */
   overflow: scroll;
 }
 
-.groupItems::-webkit-scrollbar {
+.groupList::-webkit-scrollbar {
   display: none;
 }
 
 .groupItem {
   width: 100%;
-  height: 80px;
-  background-color: darkkhaki;
   order: 2147483647;
 }
 
@@ -364,7 +376,7 @@ export default {
   display: flex;
   width: 100%;
   height: 64px;
-  background-color: aquamarine;
+  background-color: var(--chatPage-header);
   padding: 8px 24px;
 }
 
@@ -392,25 +404,26 @@ export default {
   flex-direction: column;
   width: 100%;
   height: calc(100% - 64px);
-  background-color: coral;
+  background-color: var(--chatPage-center);
 }
 
 .conversationView {
   position: relative;
   width: 100%;
   flex-grow: 1;
+  border-top: 1px solid var(--chatPage-conversationView-border);
 }
 
 .conversation {
   position: absolute;
   width: 100%;
   height: 100%;
-  padding: 8px;
 }
 
 .inputBox {
   width: 100%;
   height: 25%;
+  border-top: 1px solid var(--chatPage-inputBox-border);
 }
 
 /* splitter */

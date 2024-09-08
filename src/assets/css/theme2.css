@@ -1,0 +1,8 @@
+html {
+  --bg-color: rgb(99, 149, 144);
+}
+
+/* chatPage */
+:root {
+  --chatPage-header-bgcolor: aqua;
+}

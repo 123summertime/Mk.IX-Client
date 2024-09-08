@@ -41,7 +41,11 @@
       :boxWidth="500"
       fileType="webp"
       rate="1:1"
-      @cutDown="groupAvatarModified"></ImgCutter>
+      @cutDown="groupAvatarModified">
+    <template #cancel>
+      <el-button @click="editAvatarVisible = false">取消</el-button>
+    </template>
+    </ImgCutter>
   </el-dialog>
 
   <!-- 清空聊天记录确认 -->

@@ -91,13 +91,13 @@ export default {
   border-radius: 16px;
 }
 
-.selected {
-  background-color: lightblue !important;
-}
-
 .groupItem:hover {
   background-color: lightcyan;
   cursor: pointer;
+}
+
+.selected {
+  background-color: lightblue !important;
 }
 
 .groupItem img {

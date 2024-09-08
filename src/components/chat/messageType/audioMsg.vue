@@ -169,7 +169,7 @@ export default {
   justify-content: center;
   max-width: 100%;
   height: 48px;
-  background-color: rgb(255, 69, 0);
+  background-color: var(--message-commonBg);
   cursor: pointer;
 }
 
@@ -204,7 +204,7 @@ export default {
 .volume {
   width: 6px;
   border-radius: 3px;
-  background-color: rgb(235, 235, 235)
+  background-color: var(--message-volume);
 }
 
 .progress {
@@ -217,7 +217,8 @@ export default {
   height: 24px;
   border-top-left-radius: 6px;
   border-bottom-left-radius: 6px;
-  background-color: rgba(255, 69, 0, 0.5);
+  background-color: var(--message-progress);
+  opacity: 0.5;
 }
 
 .progressLine {

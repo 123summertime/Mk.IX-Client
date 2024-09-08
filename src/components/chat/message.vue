@@ -232,8 +232,7 @@ export default {
 <style scoped>
 .messageRoot {
   position: relative;
-  padding: 12px;
-  border-radius: 24px;
+  padding: 12px 24px;
 }
 
 .avatar img {

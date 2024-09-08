@@ -340,18 +340,12 @@ export default {
 
 <style scoped>
 .toolsRoot {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-}
-
-.toolsRoot {
   display: flex;
   justify-content: space-between;
   width: 100%;
   height: 48px;
   padding: 8px 16px;
-  background: linear-gradient(rgba(245, 245, 245, 0), rgba(245, 245, 245, 0.2));
+  background: transparent;
   backdrop-filter: blur(8px);
 }
 

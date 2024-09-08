@@ -271,7 +271,7 @@ export default {
   padding: 8px 20px 8px 32px;
   border-top-left-radius: 24px;
   border-bottom-left-radius: 24px;
-  background-color: aliceblue;
+  background-color: var(--chatItem-attentionButton);
   cursor: pointer;
 }
 
@@ -287,7 +287,7 @@ export default {
   }
 
   50% {
-    background-color: #8b658f;
+    background-color: var(--chatItem-flash);
   }
 
   100% {
