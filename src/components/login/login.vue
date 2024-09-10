@@ -34,6 +34,7 @@
 <script>
 import axios from 'axios'
 
+import { md5 } from './../../assets/utils'
 import router from './../../router/index.js'
 
 export default {
@@ -54,11 +55,7 @@ export default {
 
   methods: {
     async hash(input) {
-      const data = new TextEncoder().encode(input)
-      const buffer = await crypto.subtle.digest('SHA-256', data)
-      const array = Array.from(new Uint8Array(buffer))
-      const hex = array.map(char => char.toString(16).padStart(2, '0')).join('')
-      return hex
+      return md5(input)
     },
 
     async login() {

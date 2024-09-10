@@ -15,7 +15,7 @@
       </div>
       <div class="container">
         <div class="upper">
-          <p class="nameplate" ref="Nameplate">{{ getNameplate }}</p>
+          <p :class="['nameplate', getNameplate == '群主' ? 'ownerNameplate' : 'adminNameplate']" v-if=getNameplate>{{ getNameplate }}</p>
           <p class="userName">{{ message.userName }}</p>
         </div>
         <div class="lower" @contextmenu.prevent="onRightClick">
@@ -182,27 +182,9 @@ export default {
   computed: {
     getNameplate() {
       // 排除没有Nameplate的消息类型
-      if (this.message.type === 'revoke') { return }
-
-      if (this.admins.owner[this.message.uuid]) {
-        this.$nextTick(() => {
-          this.$refs.Nameplate.style.display = "block"
-          this.$refs.Nameplate.style.backgroundColor = "gold"
-        })
-        return "群主"
-      }
-
-      if (this.admins.admin[this.message.uuid]) {
-        this.$nextTick(() => {
-          this.$refs.Nameplate.style.display = "block"
-          this.$refs.Nameplate.style.backgroundColor = "aqua"
-        })
-        return "管理员"
-      }
-
-      this.$nextTick(() => {
-        this.$refs.Nameplate.style.display = "none"
-      })
+      if (this.message.type === 'revoke') { return "" }
+      if (this.admins.owner[this.message.uuid]) { return "群主" }
+      if (this.admins.admin[this.message.uuid]) { return "管理员" }
       return ""
     },
 
@@ -274,6 +256,14 @@ export default {
   border-radius: 10px;
 }
 
+.ownerNameplate {
+  background-color: var(--owner);
+}
+
+.adminNameplate {
+  background-color: var(--admin);
+}
+
 .userName {
   line-height: 30px;
 }
@@ -304,9 +294,5 @@ export default {
   display: none;
   position: absolute;
   direction: ltr;
-}
-
-:deep(.el-dialog__body) {
-  padding-top: 0;
 }
 </style>

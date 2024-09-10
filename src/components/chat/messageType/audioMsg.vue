@@ -48,7 +48,7 @@ export default {
 
     // 计算该语音消息宽度，和语音长度成正比
     getMessageBoxWidth() {
-      const width = 16 * this.message.payload.meta.length + 16
+      const width = 12 * this.message.payload.meta.length + 16
       this.$refs.Bar.style.width = width + 'px'
     },
 
@@ -167,7 +167,7 @@ export default {
 .audioMsg {
   display: flex;
   justify-content: center;
-  max-width: 100%;
+  max-width: 90%;
   height: 48px;
   background-color: var(--message-commonBg);
   cursor: pointer;
@@ -175,7 +175,7 @@ export default {
 
 .audioMsg p {
   font-size: 1.2rem;
-  line-height: 1.5rem;
+  line-height: 24px;
 }
 
 .beforeBar svg {
@@ -186,7 +186,7 @@ export default {
   width: 100%;
   height: 24px;
   margin-left: 8px;
-  margin-right: 24px;
+  margin-right: 12px;
 }
 
 .progressWrapper {
@@ -215,15 +215,19 @@ export default {
   top: 0;
   width: 0;
   height: 24px;
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
   background-color: var(--message-progress);
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .progressLine {
   height: 48px;
   border-right: 2px solid black;
   transform: translateY(-12px);
+}
+
+@media screen and (max-width: 1200px) {
+  .volumes {
+    display: none;
+  }
 }
 </style>

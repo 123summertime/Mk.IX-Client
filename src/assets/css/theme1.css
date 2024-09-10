@@ -1,85 +1,132 @@
-html {
-  --bg-color: lightcoral;
-}
-
-/* common */
+/* basic */
 :root {
-  --common-color-1: #edb1f1;
-  --common-color-2: #d59bf6;
-  --common-color-3: #9896f1;
-  --common-color-4: #8ef6e4;
+  --basic-0-0: #edb1f1;
+  --basic-1-0: #d59bf6;
+  --basic-1-1: #e0c3f0;
+  --basic-1-2: #ebd1f4;
+  --basic-1-3: #f6dff8;
+  --basic-1-4: #fef0fc;
+  --basic-2-0: #9896f1;
+  --basic-3-0: #ffd900;
+  --basic-4-0: #3eede7;
+  --basic-5-0: #c9171e;
 
-  --common-white-1: #fffefb;
-  --common-white-2: #f5f4f1;
-  --common-white-3: #cccbc8;
-
-  --common-black-1: #1d1c1c;
-  --common-black-2: #313d44;
-  --common-black-3: #808080;
+  --neutral-0: #fffefb;
+  --neutral-1: #f5f4f1;
+  --neutral-2: #cccbc8;
+  --neutral-3: #808080;
+  --neutral-4: #313d44; 
+  --neutral-5: #1d1c1c;
 }
 
+:root {
+  --owner: var(--basic-3-0);
+  --admin: var(--basic-4-0);
+  --text: var(--neutral-5);
+  --text-alt: var(--neutral-1);
+  --check: var(--basic-1-0);
+  --warn: var(--basic-5-0);
+}
 
 /* chatPage */
 :root {
-  --chatPage-leftSide: var(--common-white-1);
-  --chatPage-userInfo: var(--common-white-2);
-  --chatPage-header: var(--common-white-2);
-  --chatPage-center: var(--common-white-2);
-  --chatPage-conversationView-border: var(--common-white-3);
-  --chatPage-inputBox-border: var(--common-white-3);
+  --chatPage-leftSide: var(--neutral-0);
+  --chatPage-userInfo: var(--neutral-1);
+  --chatPage-header: var(--neutral-1);
+  --chatPage-center: var(--neutral-1);
+  --chatPage-conversationView-border: var(--neutral-2);
+  --chatPage-inputBox-border: var(--neutral-2);
 }
 
 /* groupItem */
 :root {
-  --groupItem-hoverBg: var(--common-white-2);
-  --groupItem-pinnedBg: var(--common-white-2);
-  --groupItem-normalBg: var(--common-white-1);
-  --groupItem-activeBg: var(--common-color-2);
-  --groupItem-attention: var(--common-color-2);
-  --groupItem-groupName: var(--common-black-1);
-  --groupItem-groupNameActive: var(--common-white-1);
-  --groupItem-currMessageContext: var(--common-black-3);
-  --groupItem-currMessageContextActive: var(--common-white-2);
-  --groupItem-time: var(--common-black-1);
-  --groupItem-timeActive: var(--common-white-2);
-  --groupItem-unread: var(--common-color-2);
-  --groupItem-unreadText: var(--common-black-1);
+  --groupItem-hoverBg: var(--neutral-1);
+  --groupItem-pinnedBg: var(--neutral-1);
+  --groupItem-normalBg: var(--neutral-0);
+  --groupItem-activeBg: var(--basic-1-0);
+  --groupItem-attention: var(--basic-1-0);
+  --groupItem-groupName: var(--neutral-5);
+  --groupItem-groupNameActive: var(--neutral-0);
+  --groupItem-currMessageContext: var(--neutral-3);
+  --groupItem-currMessageContextActive: var(--neutral-1);
+  --groupItem-time: var(--neutral-5);
+  --groupItem-timeActive: var(--neutral-1);
+  --groupItem-unread: var(--basic-1-0);
+  --groupItem-unreadText: var(--neutral-5);
 }
 
 /* chatItem */
 :root {
-  --chatItem-attentionButton: var(--common-color-3);
-  --chatItem-flash: var(--common-color-1);
+  --chatItem-attentionButton: var(--basic-2-0);
+  --chatItem-flash: var(--basic-0-0);
 }
 
 /* inputBox */
 :root {
   --inputBox-inputBoxRoot: transparent;
   --inputBox-bar: transparent;
-  --inputBox-barItem: var(--common-black-1);
+  --inputBox-barItem: var(--neutral-5);
   --inputBox-textarea: transparent;
-  --inputBox-previewAudio: var(--common-color-2);
-  --inputBox-iconDisabled: var(--common-black-3);
+  --inputBox-previewAudio: var(--basic-1-0);
+  --inputBox-iconDisabled: var(--neutral-3);
 }
 
 /* messageType */
 :root {
-  --message-commonBg: var(--common-color-2);
-  --message-fileBg: var(--common-color-3);
-  --message-atItem: var(--common-color-4);
-  --message-volume: var(--common-white-1);
-  --message-progress: var(--common-color-3);
-
+  --message-commonBg: var(--basic-1-0);
+  --message-fileBg: var(--basic-1-0);
+  --message-atItem: var(--neutral-1);
+  --message-content: var(--neutral-5);
+  --message-volume: var(--neutral-1);
+  --message-progress: var(--basic-1-0);
 }
 
 /* atBar */
 :root {
-  --atBar-atCard: rgba(196, 196, 196, 0.7);
-  --atBar-atText: rgb(79, 134, 235);
+  --atBar-atCard: var(--basic-1-0);
+  --atBar-atText: var(--neutral-1);
 }
 
 /* favorite */
 :root { 
-  --favorite-favoriteRoot: transparent;
-  --favorite-eachImg-hover: var(--common-color-4);
+  --favorite-favoriteRoot: var(--neutral-1);
+  --favorite-eachImg-hover: transparent;
+}
+
+/* eachMember */
+:root {
+  --eachMember-hover: var(--basic-0-0);
+}
+
+/* groupSelector */
+:root { 
+  --groupSelector-hover: var(--basic-0-0);
+  --groupSelector-selected: var(--basic-1-0);
+}
+
+/* messageMenu */
+:root {
+  --messageMenu-msgMenuRoot: var(--neutral-1);
+  --messageMenu-msgMenuRoot-hover: var(--basic-1-0);
+}
+
+/* tools */
+:root {
+  --tools-toolsRoot: var(--neutral-0);
+}
+
+/* cover */
+.el-dialog, .i-dialog-footer, .dialogMain {
+  background-color: var(--neutral-0) !important;
+}
+
+:root {
+  --el-color-primary: var(--basic-1-0) !important;
+  --el-color-primary-light-3: var(--basic-1-1) !important;
+  --el-color-primary-light-5: var(--basic-1-2) !important;
+  --el-color-primary-light-7: var(--basic-1-3) !important;
+  --el-color-primary-light-8: var(--basic-1-4) !important;
+  --el-color-primary-light-9: var(--basic-1-4) !important;
+  --el-button-hover-text-color: var(--neutral-0) !important;
+  --el-fill-color-blank: var(--neutral-0) !important;
 }

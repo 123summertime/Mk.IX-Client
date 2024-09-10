@@ -55,7 +55,7 @@ export default {
 
       this.DB.add('Image', {
         time: Date.now(),
-        payload: this.message.content
+        payload: this.message.payload.content
       })
     },
 
@@ -141,9 +141,9 @@ export default {
   width: 144px;
   padding: 8px;
   border-radius: 8px;
-  background-color: rgba(245, 245, 245, 0.5);
-  backdrop-filter: blur(20px);
+  background-color: var(--messageMenu-msgMenuRoot);
   z-index: 10000;
+  opacity: 0.9;
 }
 
 .msgMenuRoot div {
@@ -168,7 +168,6 @@ export default {
 
 .msgMenuRoot div:hover {
   border-radius: 8px;
-  background-color: rgba(96, 96, 96, 0.5);
-  backdrop-filter: blur(20px);
+  background-color: var(--messageMenu-msgMenuRoot-hover);
 }
 </style>

@@ -22,7 +22,7 @@
           <i>{{ lastSeen === "Online" ? "在线" : formatedTime(lastSeen) }}</i>
         </span>
         <span v-if="!messageFrom()">
-          <el-button @click="friendRequestVisible = true">发送好友申请</el-button>
+          <el-button type="primary" @click="friendRequestVisible = true">发送好友申请</el-button>
           <el-dialog v-model="friendRequestVisible" width="540" title="好友申请">
             <div>
               <el-input v-model="reason" placeholder="申请理由(选填)" />

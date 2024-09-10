@@ -11,7 +11,7 @@
         class="groupItem"
         :class="{ 'selected': groupID === item.group }">
         <img :src="item.avatar" />
-        <p>{{ item.name }}</p>
+        <p class="groupName">{{ item.name }}</p>
       </div>
     </div>
     <template #footer>
@@ -88,16 +88,20 @@ export default {
 .groupItem {
   display: flex;
   padding: 8px;
-  border-radius: 16px;
+  border-radius: 8px;
 }
 
 .groupItem:hover {
-  background-color: lightcyan;
+  background-color: var(--groupSelector-hover);
   cursor: pointer;
 }
 
+.groupName {
+  color: var(--text);
+}
+
 .selected {
-  background-color: lightblue !important;
+  background-color: var(--groupSelector-selected) !important;
 }
 
 .groupItem img {

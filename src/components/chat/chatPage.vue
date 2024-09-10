@@ -321,6 +321,7 @@ export default {
 .leftSide {
   position: relative;
   width: 20vw;
+  max-width: 50%;
   height: 100%;
   background-color: var(--chatPage-leftSide);
 }
@@ -368,6 +369,7 @@ export default {
 
 /* rightSide */
 .rightSide {
+  min-width: 400px;
   height: 100%;
   flex-grow: 1;
 }
@@ -423,6 +425,7 @@ export default {
 .inputBox {
   width: 100%;
   height: 25%;
+  max-height: 50%;
   border-top: 1px solid var(--chatPage-inputBox-border);
 }
 
@@ -449,13 +452,6 @@ export default {
 
 .inputSplitter:hover {
   cursor: ns-resize;
-}
-
-@media screen and (max-width: 480px) {
-  .chatPageRoot {
-    width: 100vh;
-    height: 100vw;
-  }
 }
 </style>
 

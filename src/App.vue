@@ -16,8 +16,7 @@
   font-size: 16px;
 }
 
-em,
-i {
+em, i {
   font-style: normal;
 }
 
@@ -31,15 +30,5 @@ img {
 
 a {
   text-decoration: none;
-}
-
-/* teleport */
-
-.el-overlay-dialog {
-  overflow: hidden;
-}
-
-.memberInfo .el-dialog__body {
-  padding: 20px;
 }
 </style>

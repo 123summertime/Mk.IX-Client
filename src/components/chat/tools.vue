@@ -345,8 +345,7 @@ export default {
   width: 100%;
   height: 48px;
   padding: 8px 16px;
-  background: transparent;
-  backdrop-filter: blur(8px);
+  background: var(--tools-toolsRoot);
 }
 
 .toolsRoot div svg {
@@ -401,11 +400,11 @@ export default {
 }
 
 .mail .mailOpers svg:nth-child(1):hover {
-  color: red;
+  color: var(--warn);
 }
 
 .mail .mailOpers svg:nth-child(2):hover {
-  color: green;
+  color: var(--check);
 }
 
 .mailResponse {
@@ -451,6 +450,6 @@ export default {
 }
 
 .searchFailed {
-  color: red;
+  color: var(--warn);
 }
 </style>

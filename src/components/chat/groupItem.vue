@@ -162,7 +162,7 @@ export default {
     needAttention: {
       deep: true,
       handler(attentions) {
-        if (!attentions.has(this.group)) {
+        if (!attentions.has(this.group) || this.active) {
           this.showAttention = false
           return
         }
@@ -236,6 +236,7 @@ export default {
 }
 
 .currMessage {
+  display: flex;
   width: 100%;
   height: 24px;
 }

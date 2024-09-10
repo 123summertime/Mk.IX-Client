@@ -32,7 +32,7 @@ export default {
   },
 
   mounted() {
-    this.fir()
+    // this.fir()
   }
 };
 </script>

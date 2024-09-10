@@ -177,6 +177,7 @@ export default {
   display: flex;
   justify-content: space-between;
   width: 300px;
+  max-width: 90%;
   height: 100px;
   background-color: var(--message-fileBg);
   cursor: pointer;

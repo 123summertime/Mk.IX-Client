@@ -5,20 +5,25 @@
         <p>群头像</p>
         <img class="groupAvatar" :src="info.avatar" title="点击修改头像" @click="beforeModifyAvatar" />
       </li>
-      <li>
+      <li @click="checkPermissions ? this.editGroupNameVisible = true : ''">
         <p>群名称</p>
         <div class="groupName">
-          <input v-model="groupName" :disabled="!checkPermissions" @keydown="groupNameModified" />
+          <p>{{ this.info.name }}</p>
+          <ArrowRight class="arrow" v-if="checkPermissions" />
         </div>
       </li>
       <li>
         <p>群ID</p>
-        <p>{{ info.group }}</p>
+        <div class="groupID">
+          <p>{{ info.group }}</p>
+          <ArrowRight class="arrow" />
+        </div>
       </li>
-      <li v-if="available">
+      <li v-if="available" @click="membersVisible = true">
         <p>群成员</p>
         <div class="members" title="点击查看详细信息">
-          <p @click="membersVisible = true">{{ membersCount + "人" }}</p>
+          <p>{{ membersCount + "人" }}</p>
+          <ArrowRight class="arrow" />
         </div>
       </li>
       <li>
@@ -46,6 +51,17 @@
       <el-button @click="editAvatarVisible = false">取消</el-button>
     </template>
     </ImgCutter>
+  </el-dialog>
+
+  <!-- 修改群名 -->
+  <el-dialog title="修改群名" v-model="editGroupNameVisible" width="540px">
+    <el-input v-model="groupName" placeholder="新群名" />
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="editGroupNameVisible = false">取消</el-button>
+        <el-button type="primary" @click="groupNameModified">确认修改</el-button>
+      </span>
+    </template>
   </el-dialog>
 
   <!-- 清空聊天记录确认 -->
@@ -81,12 +97,9 @@
   <el-dialog v-model="membersVisible"
     class="memberInfo"
     width="540px"
-    :title="`${this.info.name}(${this.membersCount})`"
+    :title="`${this.info.name} (${this.membersCount})`"
     style="max-height: 70vh; overflow-y: auto;">
     <ul class="list">
-      <li>
-        <p>群主</p>
-      </li>
       <li>
         <eachMember v-for="(lastUpdate, uuid) in (info.admins.owner)"
           :key="uuid"
@@ -95,10 +108,6 @@
           :role="'owner'"
           :currentUserPermission="getRole"
           :group="info.group"></eachMember>
-      </li>
-
-      <li>
-        <p>管理员</p>
       </li>
       <li v-if="info.admins.admin">
         <eachMember v-for="(lastUpdate, uuid) in (info.admins.admin)"
@@ -111,13 +120,6 @@
           @groupAdminModified="groupAdminModified"
           @userRemoved="userRemoved"></eachMember>
       </li>
-      <li class="empty" v-else>
-        <p>无</p>
-      </li>
-
-      <li>
-        <p>成员</p>
-      </li>
       <li v-if="membersInfo">
         <eachMember v-for="(lastUpdate, uuid) in membersInfo"
           :key="uuid"
@@ -128,9 +130,6 @@
           :currentUserPermission="getRole"
           @groupAdminModified="groupAdminModified"
           @userRemoved="userRemoved"></eachMember>
-      </li>
-      <li class="empty" v-else>
-        <p>无</p>
       </li>
     </ul>
   </el-dialog>
@@ -159,8 +158,9 @@ export default {
 
   data() {
     return {
-      groupName: this.info.name,
+      groupName: "",
       editAvatarVisible: false,
+      editGroupNameVisible: false,
       membersVisible: false,
       unsubscribeVisible: false,
       deleteHistoryVisible: false,
@@ -172,23 +172,22 @@ export default {
 
   methods: {
     // 群名修改后
-    groupNameModified(event) {
-      if (event.key === 'Enter') {
-        const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/name`
-        const payload = { note: this.groupName }
-        axios.patch(URL, payload, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        }).then(res => {
-          ElMessage.success("修改成功")
-          this.$emit('groupNameModified', { group: this.info.group, name: this.groupName })
-        }).catch(err => {
-          ElMessage({
-            message: `修改失败 ${err['response']['data']['detail']}`,
-            duration: 6000,
-            type: "error",
-          })
+    groupNameModified() {
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/name`
+      const payload = { note: this.groupName }
+      axios.patch(URL, payload, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        this.editGroupNameVisible = false
+        ElMessage.success("修改成功")
+        this.$emit('groupNameModified', { group: this.info.group, name: this.groupName })
+      }).catch(err => {
+        ElMessage({
+          message: `修改失败 ${err['response']['data']['detail']}`,
+          duration: 6000,
+          type: "error",
         })
-      }
+      })
     },
 
     // 群头像修改前验证权限
@@ -329,8 +328,8 @@ export default {
   display: flex;
   justify-content: space-between;
   height: 48px;
-  margin: 8px 0;
   line-height: 48px;
+  margin: 8px 0;
 }
 
 .groupItems li:nth-of-type(1) {
@@ -345,73 +344,38 @@ export default {
   cursor: pointer;
 }
 
-.groupName {
-  position: relative;
-  height: 36px;
-}
-
-.groupName input {
-  height: 36px;
-  padding: 0 6px;
-  text-align: right;
-  border: 1px black solid;
-}
-
-.groupName input:focus {
-  outline: none;
-  border: 1px var(--el-color-danger) solid;
-}
-
-.groupName::before {
-  display: block;
-  position: absolute;
-  content: "Enter键确认修改";
-  width: 112px;
-  font-size: 0.75rem;
-  right: 100%;
-  opacity: 0;
-}
-
-.groupName:focus-within::before {
-  opacity: 1;
-}
-
-.members {
-  width: 33%;
+.groupName, .groupID, .members {
+  display: flex;
+  height: 100%;
   cursor: pointer;
 }
 
-.members p {
-  text-align: right;
+.arrow {
+  width: 24px;
+  height: 24px;
+  margin: 12px 0 12px 8px;
+}
+
+.groupID {
+  cursor: default;
+}
+.groupID .arrow {
+  visibility: hidden;
 }
 
 .list {
   display: flex;
   flex-direction: column;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
 }
 
 .list li {
   margin: 4px 0;
-}
-
-.list li:nth-of-type(2n - 1) {
-  height: 36px;
-  line-height: 36px;
-  font-weight: 700;
-  margin-bottom: 0;
-}
-
-.list li:nth-of-type(1) {
-  color: gold;
-}
-
-.list li:nth-of-type(3) {
-  color: aqua;
-}
-
-.list .empty {
-  height: 36px;
-  line-height: 36px;
 }
 
 li .el-switch {

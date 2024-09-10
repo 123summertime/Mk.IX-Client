@@ -36,7 +36,7 @@ export default {
     return {
       lock: false,  // 防止onScroll同一时间反复触发getHistory
       page: 0,
-      step: 10,
+      step: 20,
       messageList: [],
       attentionVisible: false,
       attentionTarget: "",
@@ -266,7 +266,7 @@ export default {
 .attentionButton {
   position: fixed;
   top: 25%;
-  right: 0px;
+  right: 0;
   height: 48px;
   padding: 8px 20px 8px 32px;
   border-top-left-radius: 24px;

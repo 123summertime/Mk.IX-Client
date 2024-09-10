@@ -454,6 +454,7 @@ textarea::-webkit-scrollbar {
 }
 
 .previewAudio {
+  display: inline-flex;
   border-radius: 12px;
   padding: 12px 16px;
   background-color: var(--inputBox-previewAudio);
@@ -503,5 +504,10 @@ textarea::-webkit-scrollbar {
 
 .buttons button:nth-child(2) {
   margin-left: 16px;
+}
+
+:deep(.el-dialog__body){ 
+  display: flex;
+  justify-content: center;
 }
 </style>

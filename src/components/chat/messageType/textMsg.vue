@@ -54,8 +54,12 @@ export default {
   margin-right: 8px;
 }
 
+.content {
+  color: var(--message-content);
+}
+
 .textMsg p i{
   font-size: 1.2rem;
-  line-height: 1.5rem;
+  line-height: 24px;
 }
 </style>

@@ -2,7 +2,8 @@
   <div class="eachMemberRoot">
     <div class="info">
       <img :src="avatar" />
-      <p :class="role">{{ userName }}</p>
+      <p :class="['nameplate', role + 'Nameplate']" v-if="this.role != 'user'">{{ role == 'owner' ? '群主' : '管理员' }}</p>
+      <p class="name">{{ userName }}</p>
     </div>
     <div class="oper">
       <div v-if="showAt" @click="newAt">
@@ -126,12 +127,12 @@ export default {
   display: flex;
   height: 64px;
   padding: 8px;
-  border-radius: 16px;
+  border-radius: 8px;
   justify-content: space-between;
 }
 
 .eachMemberRoot:hover {
-  background-color: lightsalmon;
+  background-color: var(--eachMember-hover);
 }
 
 .info {
@@ -144,17 +145,25 @@ export default {
   border-radius: 50%;
 }
 
-.info p {
+.nameplate {
+  margin: 12px 0 12px 12px;
+  line-height: 24px;
+  padding: 0 6px;
+  border-radius: 10px;
+}
+
+.name {
   line-height: 48px;
-  margin-left: 16px;
+  margin-left: 12px;
+  color: var(--text);
 }
 
-.owner {
-  color: gold;
+.ownerNameplate {
+  background-color: var(--owner);
 }
 
-.admin {
-  color: aqua;
+.adminNameplate {
+  background-color: var(--admin);
 }
 
 .oper {
@@ -174,5 +183,6 @@ export default {
   height: 100%;
   font-size: 24px;
   line-height: 24px;
+  color: var(--text);
 }
 </style>
