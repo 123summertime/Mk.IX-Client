@@ -39,7 +39,6 @@
     </ul>
   </el-dialog>
 
-
   <!-- 创建群 -->
   <el-dialog v-model="makeVisible" title="创建群" width="540px">
     <div class="groupOpersItem">
@@ -61,60 +60,69 @@
       </span>
     </template>
   </el-dialog>
-
-
-  <!-- 搜索群 -->
-  <el-dialog v-model="searchVisible" title="搜索群" width="540px">
-    <div class="searchGroupID">
-      <p>群号</p>
-      <div class="searchOpers">
-        <el-input v-model="searchGroupID"></el-input>
-        <el-button type="primary" @click="searchGroup">搜索</el-button>
-      </div>
-    </div>
-
-    <div v-if="searchState == 1">
-      <div class="groupOpersItem">
-        <p>群名</p>
-        <p>{{ searchGroupName }}</p>
-      </div>
-
-      <el-switch
-        class="searchGroupOption"
-        v-model="searchGroupOption"
-        active-text="通过发送入群申请"
-        inactive-text="通过回答验证问题" />
-
-      <div v-if="searchGroupOption">
-        <div class="groupOpersItem">
-          <p>申请理由</p>
-          <el-input v-model="searchGroupA"></el-input>
+  
+  <!-- 搜索 -->
+  <el-dialog v-model="searchVisible" class="searchDialog" width="540px">
+    <el-tabs v-model="searchTab">
+      <el-tab-pane label="搜索群" name="searchGroup">
+        <div class="searchInputBox">
+          <el-input v-model="searchGroupID" placeholder='群号'></el-input>
+          <el-button type="primary" @click="searchGroup">搜索</el-button>
         </div>
-      </div>
-      <div v-else>
-        <div class="groupOpersItem">
-          <p>入群问题</p>
-          <p>{{ searchGroupQ }}</p>
+        <div v-if="searchGroupVisible" class="searchResult">
+          <div class="searchResultL">
+            <img :src="searchGroupAvatar">
+            <div class="searchResultM">
+              <p>{{ searchGroupName }}</p>
+              <p>{{ `共${searchGroupMember}人` }}</p>
+            </div>
+          </div>
+          <div class="searchResultR">
+            <el-button type="primary" class="searchResultOper" @click="byQuestionVisible = true">回答入群问题</el-button>
+            <el-button type="primary" class="searchResultOper" @click="byRequsetVisible = true">发送申请</el-button>
+          </div>
         </div>
-        <div class="groupOpersItem">
-          <p>答案</p>
-          <el-input v-model="searchGroupA"></el-input>
+      </el-tab-pane>
+      <el-tab-pane label="搜索人" name="searchUser">
+        <div class="searchInputBox">
+          <el-input v-model="searchUserID" placeholder='用户ID'></el-input>
+          <el-button type="primary" @click="searchUser">搜索</el-button>
         </div>
-      </div>
-    </div>
-
-    <div v-else-if="searchState == 2">
-      <p class="searchFailed">{{ searchFailedDetail }}</p>
-    </div>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="searchVisible = false">取消</el-button>
-        <el-button type="primary" :disabled="searchState != 1" @click="joinGroupByRequest"
-          v-if="searchGroupOption">申请</el-button>
-        <el-button type="primary" :disabled="searchState != 1" @click="joinGroupByQA" v-else>加入</el-button>
-      </span>
-    </template>
+        <div v-if="searchUserVisible" class="searchResult">
+          <div class="searchResultL">
+            <img :src="searchUserAvatar">
+            <div class="searchResultM">
+              <p>{{ searchUserName }}</p>
+              <p>{{ searchUserBio }}</p>
+            </div>
+          </div>
+          <div class="searchResultR">
+            <el-button type="primary" class="searchResultOper" @click="byRequsetVisible = true">发送申请</el-button>
+          </div>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
   </el-dialog>
+
+  <!-- 搜索群-回答入群问题 -->
+  <el-dialog v-model="byQuestionVisible" class="searchDialog" width="540px">
+    <div>
+      <p>{{ "问题: " + searchGroupQ }}</p>
+    </div>
+    <div class="searchInputBox">
+      <el-input v-model="searchGroupA"></el-input>
+      <el-button type="primary" @click="joinGroupByQA">验证</el-button>
+    </div>
+  </el-dialog>
+
+  <!-- 搜索群/人-发送申请 -->
+  <el-dialog v-model="byRequsetVisible" class="searchDialog" width="540px">
+    <div class="searchInputBox">
+      <el-input v-model="searchGroupA" placeholder="申请理由(选填)"></el-input>
+      <el-button type="primary" @click="searchGroupVisible ? joinGroupByRequest() : makeFriendByRequest()">申请</el-button>
+    </div>
+  </el-dialog>
+
 </template>
 
 <script>
@@ -136,19 +144,26 @@ export default {
       makeGroupQ: "",
       makeGroupA: "",
       makeVisible: false,
+      mailVisible: false,
+      messageList: [],
 
-      searchState: 0,
+      // 搜索相关
+      searchVisible: false,
+      searchTab: "searchGroup",      
+      searchGroupVisible: false,
       searchGroupID: "",
       searchGroupName: "",
+      searchGroupAvatar: "",
+      searchGroupMember: 0,
       searchGroupQ: "",
       searchGroupA: "",
-      searchFailedDetail: "",
-      searchGroupOption: false,
-      searchVisible: false,
-
-      mailVisible: false,
-
-      messageList: [],
+      byQuestionVisible: false,
+      byRequsetVisible: false,
+      searchUserVisible: false,
+      searchUserID: "",
+      searchUserName: "",
+      searchUserAvatar: "",
+      searchUserBio: "",
     }
   },
 
@@ -164,33 +179,58 @@ export default {
       axios.post(URL, QA, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
+        ElMessage.success("创建成功")
         this.makeVisible = false
         this.makeGroupName = ""
         this.makeGroupQ = ""
         this.makeGroupA = ""
-        ElMessage.success("创建成功")
         this.$emit('joinGroupSuccess', { group: res.data.groupID, name: this.makeGroupName }, true)
       }).catch(err => {
         ElMessage({
-          message: `创建失败 ${err['response']['data']['detail']}`,
+          message: `创建失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
       })
     },
 
-    // 搜索群聊 获取入群问题
+    // 搜索群聊 获取群名/入群问题/群人数
     searchGroup() {
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/question`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      }).then(res => {
-        this.searchState = 1
-        this.searchGroupName = res.data.name
+      }).then(async res => {
+        const info = await queryInfo("Group", res.data.lastUpdate, this.searchGroupID)
+        this.searchGroupAvatar = info.avatar
+        this.searchGroupName = info.name
         this.searchGroupQ = res.data.question
+        this.searchGroupMember = res.data.member
+        this.searchGroupVisible = true
       }).catch(err => {
-        this.searchState = 2
-        this.searchFailedDetail = err['response']['data']['detail']
+        ElMessage({
+          message: err.response.data.detail,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+
+    searchUser() {
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.searchUserID}`
+      axios.get(URL, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(async res => {
+        const info = await queryInfo("Account", res.data.lastUpdate, this.searchUserID)
+        this.searchUserName = info.userName
+        this.searchUserAvatar = info.avatar
+        this.searchUserBio = res.data.bio
+        this.searchUserVisible = true
+      }).catch(err => {
+        ElMessage({
+          message: err.response.data.detail,
+          duration: 6000,
+          type: "error",
+        })
       })
     },
 
@@ -203,15 +243,15 @@ export default {
       }).then(res => {
         ElMessage.success("加入成功")
         this.$emit('joinGroupSuccess', { group: this.searchGroupID, name: this.searchGroupName }, true)
-
         this.searchVisible = false
-        this.searchState = 0
-        this.searchGroupQ = ""
+        this.byQuestionVisible = false
+        this.searchGroupVisible = false
         this.searchGroupA = ""
         this.searchGroupID = ""
       }).catch(err => {
+        this.searchGroupA = ""
         ElMessage({
-          message: `加入失败 ${err['response']['data']['detail']}`,
+          message: `加入失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
@@ -225,15 +265,35 @@ export default {
       axios.post(URL, A, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        ElMessage.success("申请已发送")
+        ElMessage.success("发送成功")
         this.searchVisible = false
-        this.searchState = 0
-        this.searchGroupQ = ""
+        this.byRequsetVisible = false
+        this.searchGroupVisible = false
         this.searchGroupA = ""
         this.searchGroupID = ""
       }).catch(err => {
+        this.searchGroupA = ""
         ElMessage({
-          message: `申请失败 ${err['response']['data']['detail']}`,
+          message: `申请失败 ${err.response.data.detail}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+
+    makeFriendByRequest() {
+      const A = { note: this.searchGroupA }
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.searchUserID}/friend`
+      axios.post(URL, A, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        ElMessage.success("发送成功")
+        this.searchVisible = false
+        this.byRequsetVisible = false
+        this.searchUserVisible = false
+      }).catch(err => {
+        ElMessage({
+          message: `申请失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
@@ -325,7 +385,6 @@ export default {
     joined(msg) {
       this.$emit('joinGroupSuccess', { group: msg.target, name: msg.payload }, false)
     },
-
   },
 
   mounted() {
@@ -427,29 +486,61 @@ export default {
   width: 60%;
 }
 
-.searchGroupOption {
-  width: 100%;
-  justify-content: center;
-  margin: 4px 0;
-}
-
-.searchGroupID {
+.searchInputBox {
   display: flex;
   justify-content: space-between;
-  margin: 8px 0;
+  margin: 20px 0;
 }
 
-.searchOpers {
+.searchInputBox .el-input {
+  width: 75%;
+}
+
+
+.searchResult {
+  width: 100%;
   display: flex;
-  width: 60%;
-  height: 32px;
+  justify-content: space-between;
+  border-top: 1px solid var(--tools-searchResult);
+  padding-top: 20px;
 }
 
-.searchOpers .el-button {
-  margin-left: 12px;
+.searchResultL {
+  display: flex ;
 }
 
-.searchFailed {
-  color: var(--warn);
+.searchResultL img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  margin-right: 32px;
+}
+
+.searchResultM {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.searchResultM p:first-child {
+  font-size: 1.25rem;
+}
+
+.searchResultR { 
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+</style>
+
+
+<style>
+.searchDialog .el-dialog__header {
+  display: none;
+}
+
+.searchDialog .el-dialog__body {
+  padding-top: 20px;
 }
 </style>

@@ -180,7 +180,7 @@ export default {
 
     // 图片改为webp，gif或已经是webp的跳过
     toWebpBase64(base64) {
-      if (base64.includes('data:image/gif') || base64.includes('data:image/webp')) {
+      if (base64.includes('data:image/gif') || base64.includes('data:image/webp')) {  
         this.payload.content = base64
         return
       }

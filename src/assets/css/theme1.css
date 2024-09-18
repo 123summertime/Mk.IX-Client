@@ -46,11 +46,11 @@
   --groupItem-activeBg: var(--basic-1-0);
   --groupItem-attention: var(--basic-1-0);
   --groupItem-groupName: var(--neutral-5);
-  --groupItem-groupNameActive: var(--neutral-0);
+  --groupItem-groupNameActive: var(--text-alt);
   --groupItem-currMessageContext: var(--neutral-3);
-  --groupItem-currMessageContextActive: var(--neutral-1);
+  --groupItem-currMessageContextActive: var(--text-alt);
   --groupItem-time: var(--neutral-5);
-  --groupItem-timeActive: var(--neutral-1);
+  --groupItem-timeActive: var(--text-alt);
   --groupItem-unread: var(--basic-1-0);
   --groupItem-unreadText: var(--neutral-5);
 }
@@ -75,7 +75,7 @@
 :root {
   --message-commonBg: var(--basic-1-0);
   --message-fileBg: var(--basic-1-0);
-  --message-atItem: var(--neutral-1);
+  --message-atItem: var(--text-alt);
   --message-content: var(--neutral-5);
   --message-volume: var(--neutral-1);
   --message-progress: var(--basic-1-0);
@@ -84,7 +84,7 @@
 /* atBar */
 :root {
   --atBar-atCard: var(--basic-1-0);
-  --atBar-atText: var(--neutral-1);
+  --atBar-atText: var(--text-alt);
 }
 
 /* favorite */
@@ -113,9 +113,11 @@
 /* tools */
 :root {
   --tools-toolsRoot: var(--neutral-0);
+  --tools-searchResult: var(--neutral-2);
+  --tools-searchResultOper: var(--basic-1-0);
 }
 
-/* cover */
+/* 覆盖el原有样式 */
 .el-dialog, .i-dialog-footer, .dialogMain {
   background-color: var(--neutral-0) !important;
 }

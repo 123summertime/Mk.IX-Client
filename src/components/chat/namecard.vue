@@ -19,7 +19,7 @@
         </span>
         <span>
           <i>最后访问:</i>
-          <i>{{ lastSeen === "Online" ? "在线" : formatedTime(lastSeen) }}</i>
+          <i>{{ lastSeen === "在线" ? lastSeen : formatedTime(lastSeen) }}</i>
         </span>
         <span v-if="!messageFrom()">
           <el-button type="primary" @click="friendRequestVisible = true">发送好友申请</el-button>

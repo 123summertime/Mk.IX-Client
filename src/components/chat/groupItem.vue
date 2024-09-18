@@ -4,8 +4,10 @@
     <div class="groupInfo">
       <p :class="['groupName', active ? 'groupNameActive' : '']">{{ name }}</p>
       <p class="currMessage">
-        <p class='attention' v-if="showAttention">{{ `[${this.attentionContent}]` }}</p>
-        <p :class="['currMessageContext', active ? 'currMessageContextActive': '']">{{ lastMessage }}</p>
+        <p :class="['currMessageContext', active ? 'currMessageContextActive': '']">
+          <i class='attention' v-if="showAttention">{{ `[${this.attentionContent}]` }}</i>
+          {{ lastMessage }}
+        </p>
       </p>
     </div>
     <div class="rightSide">
@@ -235,20 +237,11 @@ export default {
   color: var(--groupItem-groupNameActive)
 }
 
-.currMessage {
-  display: flex;
+.currMessage i {
   width: 100%;
-  height: 24px;
-}
-
-.currMessage p {
-  display: inline-block;
   height: 100%;
   font-size: 1rem;
   line-height: 24px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
 }
 
 .attention {
@@ -257,6 +250,9 @@ export default {
 }
 
 .currMessageContext {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
   color: var(--groupItem-currMessageContext);
 }
 
