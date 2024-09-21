@@ -1,8 +1,7 @@
 <template>
   <div class="loginPageRoot">
     <div class="view">
-      <login v-if="option == 0" @option="changeOption"></login>
-      <register v-else @option="changeOption"></register>
+      <loginANDregister></loginANDregister>
     </div>
     <div class="bkgdItem bkgdItem1"></div>
     <div class="bkgdItem bkgdItem2"></div>
@@ -15,13 +14,12 @@ import axios from 'axios'
 
 import router from './../../router/index.js'
 
-import login from './login.vue'
-import register from './register.vue'
+import loginANDregister from './loginANDregister.vue'
 
 export default {
   data() {
     return {
-      option: 0,
+
     }
   },
 
@@ -29,26 +27,17 @@ export default {
     tryLogin() {
       const adress = localStorage.getItem("adress") ?? ""
       const token = localStorage.getItem("token") ?? ""
-      
-      if (!adress || !token) {
-        return
-      }
+      if (!adress || !token) { return }
 
       const URL = `http://${adress}/v1/user/check`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${token}` }
       }).then(res => {
         // 刷新token
-        if (res.data.refreshToken != "") {
-          localStorage.setItem("token", res.data.refreshToken)
-        }
+        localStorage.setItem("token", res.data.refreshToken)
         router.push('/chat')
-      }).catch(err => { console.log(err) })
+      }).catch(err => { })
     },
-
-    changeOption() {
-      this.option = !this.option
-    }
   },
 
   mounted() {
@@ -56,8 +45,7 @@ export default {
   },
 
   components: {
-    login,
-    register
+    loginANDregister,
   }
 }
 </script>
@@ -67,21 +55,20 @@ export default {
   position: relative;
   width: 100vw;
   height: 100vh;
-  padding: 10vh 0;
+  padding: 10vh 0 5vh 0;
   background-image: linear-gradient(45deg, #fbc2eb, #a6c1ee);
   overflow: hidden;
 }
 
 .view {
-  width: 50%;
-  min-width: 450px;
-  max-width: 750px;
-  height: 80vh;
+  width: 33%;
+  min-width: 300px;
+  max-width: 450px;
+  max-height: 100%;
   margin: 0 auto;
   padding: 32px;
   border-radius: 32px;
-  background-color: rgba(245, 245, 245, 0.5);
-  backdrop-filter: blur(16px);
+  background-color: rgba(245, 245, 245, 0.2);
   overflow: scroll;
   z-index: 10;
 }
@@ -92,21 +79,20 @@ export default {
 
 .bkgdItem {
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border-radius: 7.5%;
+  background-color: rgba(245, 245, 245, 0.2);
+  border-radius: 16px;
   width: var(--bkgdItem-size);
   height: var(--bkgdItem-size);
 }
 
 .bkgdItem1 {
   transform: translateX(-3vw) translateY(3vh) rotateZ(40deg);
-  --bkgdItem-size: 17vw;
+  --bkgdItem-size: 15vw;
 }
 
 .bkgdItem2 {
   transform: translateX(82vw) translateY(6vh) rotateZ(-17deg);
-  --bkgdItem-size: 21vw;
+  --bkgdItem-size: 23vw;
 }
 
 .bkgdItem3 {

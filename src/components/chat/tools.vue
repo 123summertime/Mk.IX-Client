@@ -28,12 +28,12 @@
           <p>{{ groupMailText(msg) }}</p>
           <p>{{ '理由：' + msg.payload }}</p>
         </div>
-        <div class="mailOpers" v-if="msg.state === 0">
+        <div class="mailOpers" v-if="msg.state === '等待审核'">
           <Close @click="requestResponse(msg.type, msg.target, msg.time, false)"></Close>
           <Check @click="requestResponse(msg.type, msg.target, msg.time, true)"></Check>
         </div>
         <div class="mailResponse" v-else>
-          <p>{{ cvtState(msg.state) }}</p>
+          <p>{{ msg.state }}</p>
         </div>
       </li>
     </ul>
@@ -88,18 +88,6 @@
           <el-input v-model="searchUserID" placeholder='用户ID'></el-input>
           <el-button type="primary" @click="searchUser">搜索</el-button>
         </div>
-        <div v-if="searchUserVisible" class="searchResult">
-          <div class="searchResultL">
-            <img :src="searchUserAvatar">
-            <div class="searchResultM">
-              <p>{{ searchUserName }}</p>
-              <p>{{ searchUserBio }}</p>
-            </div>
-          </div>
-          <div class="searchResultR">
-            <el-button type="primary" class="searchResultOper" @click="byRequsetVisible = true">发送申请</el-button>
-          </div>
-        </div>
       </el-tab-pane>
     </el-tabs>
   </el-dialog>
@@ -115,13 +103,23 @@
     </div>
   </el-dialog>
 
-  <!-- 搜索群/人-发送申请 -->
+  <!-- 搜索群-发送申请 -->
   <el-dialog v-model="byRequsetVisible" class="searchDialog" width="540px">
     <div class="searchInputBox">
       <el-input v-model="searchGroupA" placeholder="申请理由(选填)"></el-input>
-      <el-button type="primary" @click="searchGroupVisible ? joinGroupByRequest() : makeFriendByRequest()">申请</el-button>
+      <el-button type="primary" @click="joinGroupByRequest">申请</el-button>
     </div>
   </el-dialog>
+
+  <!-- 搜索用户 -->
+  <namecard
+    :uuid="searchUserID"
+    :userName="searchUserName"
+    :avatar="searchUserAvatar"
+    :bio_="searchUserBio"
+    :lastSeen_="searchUserLastSeen"
+    :namecardTrigger="searchUserTrigger">
+  </namecard>
 
 </template>
 
@@ -130,6 +128,7 @@ import axios from 'axios'
 
 import router from './../../router/index.js'
 import sysMsgGetter from './sysMsgGetter.vue'
+import namecard from './namecard.vue'
 
 import { queryInfo } from '../../assets/queryDB.js'
 
@@ -159,11 +158,12 @@ export default {
       searchGroupA: "",
       byQuestionVisible: false,
       byRequsetVisible: false,
-      searchUserVisible: false,
+      searchUserTrigger: false,
       searchUserID: "",
       searchUserName: "",
       searchUserAvatar: "",
       searchUserBio: "",
+      searchUserLastSeen: "",
     }
   },
 
@@ -208,7 +208,7 @@ export default {
         this.searchGroupVisible = true
       }).catch(err => {
         ElMessage({
-          message: err.response.data.detail,
+          message: `搜索失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
@@ -224,10 +224,11 @@ export default {
         this.searchUserName = info.userName
         this.searchUserAvatar = info.avatar
         this.searchUserBio = res.data.bio
-        this.searchUserVisible = true
+        this.searchUserLastSeen = res.data.lastSeen
+        this.searchUserTrigger = !this.searchUserTrigger
       }).catch(err => {
         ElMessage({
-          message: err.response.data.detail,
+          message: `搜索失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
@@ -290,7 +291,6 @@ export default {
         ElMessage.success("发送成功")
         this.searchVisible = false
         this.byRequsetVisible = false
-        this.searchUserVisible = false
       }).catch(err => {
         ElMessage({
           message: `申请失败 ${err.response.data.detail}`,
@@ -328,7 +328,6 @@ export default {
       } else {
         this.messageList[idx] = { time, type, state, senderID, payload, senderAvatar, userName }
       }
-      
     },
 
     // 群验证的消息文本
@@ -344,7 +343,6 @@ export default {
 
     // 审核验证消息
     requestResponse(type, group, time, verdict) {
-      console.log(type, group, time, verdict)
       const uuid = this.$store.state.account
       const URLmapping = {
         join: `http://${localStorage.getItem('adress')}/v1/group/${group}/verify/response?verdict=${verdict}`,
@@ -358,28 +356,12 @@ export default {
       }).then(res => {
         ElMessage.success(verdict ? "已通过" : "已拒绝")
       }).catch(err => {
-        console.log(err)
         ElMessage({
-          message: "操作失败",
+          message: `操作失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
       })
-    },
-
-    // 状态码转化为文本
-    cvtState(state) {
-      let map = {
-        1: "群主已同意",
-        2: "群主已拒绝",
-        3: "管理员已同意",
-        4: "管理员已拒绝",
-        5: "用户已同意",
-        6: "用户已拒绝",
-        7: "已同意",
-        8: "已拒绝",
-      }
-      return map[state]
     },
 
     joined(msg) {
@@ -392,7 +374,8 @@ export default {
   },
 
   components: {
-    sysMsgGetter
+    sysMsgGetter,
+    namecard,
   }
 }
 </script>

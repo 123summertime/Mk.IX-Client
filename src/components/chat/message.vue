@@ -41,7 +41,9 @@
       @groupSelectorCanceled="groupSelectorCanceled"></groupSelector>
 
     <namecard
-      :message="message"
+      :uuid="message.uuid"
+      :avatar="message.avatar"
+      :userName="message.userName"
       :namecardTrigger="namecardTrigger">
     </namecard>
 
@@ -224,6 +226,7 @@ export default {
   height: 48px;
   border-radius: 50%;
   transform: translateY(8px);
+  cursor: pointer;
 }
 
 .message {

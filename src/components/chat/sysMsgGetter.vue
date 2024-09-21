@@ -11,7 +11,6 @@ export default {
   methods: {
     // 获取系统消息(群验证等)
     sysMessageHandler(msg) {
-      console.log(msg)
       const { time, type, target, targetKey, state, senderID, senderKey, payload } = msg
       const mapping = {
         // fail类型，如上传的图片过大等不符合服务器限制的错误

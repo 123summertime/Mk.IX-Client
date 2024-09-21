@@ -2,16 +2,16 @@
   <el-dialog v-model="namecardVisible" width="540">
     <div class="namecard">
       <div class="namecardAvatar">
-        <img :src="message.avatar" />
+        <img :src="avatar" />
       </div>
       <div class="namecardInfo">
         <span>
           <i>昵称:</i>
-          <i>{{ message.userName }}</i>
+          <i>{{ userName }}</i>
         </span>
         <span>
           <i>uuid:</i>
-          <i>{{ message.uuid }}</i>
+          <i>{{ uuid }}</i>
         </span>
         <span>
           <i>个性签名:</i>
@@ -47,7 +47,11 @@ import { computeTime } from './../../assets/utils'
 
 export default {
   props: {
-    message: Object,
+    uuid: String,
+    userName: String,
+    avatar: String,
+    bio_: String,       // 可选 如果传入了就不执行showProfile() 下同
+    lastSeen_: String,  // 可选
     namecardTrigger: Boolean,
   },
 
@@ -63,12 +67,12 @@ export default {
 
   methods: {
     messageFrom() {
-      return this.message.uuid === this.$store.state.account
+      return this.uuid === this.$store.state.account
     },
 
     // 获取用户详细信息(个人简介，最后登录等)
-    showProfile() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.message.uuid}`
+    getProfileInfo() {
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.uuid}`
       axios.get(URL).then(res => {
         const data = res.data
         this.bio = data.bio
@@ -84,7 +88,7 @@ export default {
 
     friendRequest() {
       const reason = { note: this.reason }
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.message.uuid}/friend`
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/friend`
       axios.post(URL, reason, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -96,7 +100,8 @@ export default {
           type: "error",
         })
       })
-      friendRequestVisible = false
+      this.namecardVisible = false
+      this.friendRequestVisible = false
     },
   },
 
@@ -105,10 +110,17 @@ export default {
     namecardTrigger: {
       handler() {
         this.namecardVisible = true
-        this.showProfile()
+        // 如果已经传入了就避免不必要的请求
+        if (this.bio_ && this.lastSeen_) {
+          this.bio = this.bio_
+          this.lastSeen = this.lastSeen_
+        } else {
+          this.getProfileInfo()
+        } 
       }
     }
   },
+
 }
 </script>
 

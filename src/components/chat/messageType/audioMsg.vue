@@ -216,7 +216,6 @@ export default {
   width: 0;
   height: 24px;
   background-color: var(--message-progress);
-  opacity: 0.6;
 }
 
 .progressLine {

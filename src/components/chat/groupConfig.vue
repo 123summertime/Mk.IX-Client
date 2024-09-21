@@ -109,7 +109,7 @@
           :currentUserPermission="getRole"
           :group="info.group"></eachMember>
       </li>
-      <li v-if="info.admins.admin">
+      <li v-if="Object.keys(info.admins.admin).length">
         <eachMember v-for="(lastUpdate, uuid) in (info.admins.admin)"
           :key="uuid"
           :uuid="uuid"

@@ -1,7 +1,7 @@
 <template>
   <div class="eachMemberRoot">
     <div class="info">
-      <img :src="avatar" />
+      <img :src="avatar" @click="namecardTrigger = !namecardTrigger" />
       <p :class="['nameplate', role + 'Nameplate']" v-if="this.role != 'user'">{{ role == 'owner' ? '群主' : '管理员' }}</p>
       <p class="name">{{ userName }}</p>
     </div>
@@ -9,19 +9,42 @@
       <div v-if="showAt" @click="newAt">
         <p class="icon">@</p>
       </div>
-      <div v-if="getManagePermission" @click="adminModify" :title="role === 'user' ? '添加管理员' : '移除管理员'">
+      <div v-if="getManagePermission" @click="beforeRequestCheck(adminModify, modifyAdminCheckerText)" :title="role === 'user' ? '添加管理员' : '移除管理员'">
         <CirclePlus v-if="role === 'user'"></CirclePlus>
         <Remove v-else-if="role === 'admin'"></Remove>
       </div>
-      <div v-if="getRemovePermission" @click="userRemoved" title="移除群聊">
+      <div v-if="getRemovePermission" @click="beforeRequestCheck(userRemoved, modifyMemberCheckerText)" title="移除群聊">
         <Close></Close>
       </div>
     </div>
+
+    <namecard 
+      :uuid="uuid"
+      :avatar="avatar"
+      :userName="userName"
+      :namecardTrigger="namecardTrigger">
+    </namecard>
+
+    <el-dialog v-model="checkerVisible" width="540px">
+    <div class="checker">
+      <WarningFilled></WarningFilled>
+      <p>{{ checkerText }}</p>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="checkerVisible = false">取消</el-button>
+        <el-button type="danger" @click="checked()">确认</el-button>
+      </span>
+    </template>
+  </el-dialog>
+
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+
+import namecard from './namecard.vue'
 
 import { queryInfo } from '../../assets/queryDB.js'
 
@@ -43,6 +66,10 @@ export default {
     return {
       avatar: "",
       userName: "",
+      namecardTrigger : false,
+      checkerVisible: false,
+      invokeFunc: null, // Function
+      checkerText: "",
     }
   },
 
@@ -54,18 +81,31 @@ export default {
       this.userName = info.userName
     },
 
+    beforeRequestCheck(invoke, checkerText) {
+      this.checkerVisible = true
+      this.checkerText = checkerText
+      this.invokeFunc = invoke
+    },
+
+    checked() {
+      this.invokeFunc.call()
+      this.checkerVisible = false
+    },
+
     // 修改了管理员
     adminModify() {
       const isAdd = this.role === 'user'
+      this.checkerText = `确认将 ${this.userName} ${isAdd ? '添加为' : '移除'}管理员?`
+
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/admin/${this.uuid}?operation=${isAdd}`
       axios.patch(URL, {}, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        ElMessage.success(`已将${this.userName}${isAdd ? '添加为' : '移除'}管理员`)
+        ElMessage.success(`已将 ${this.userName} ${isAdd ? '添加为' : '移除'}管理员`)
         this.$emit('groupAdminModified', { group: this.group, uuid: this.uuid, operation: isAdd })
       }).catch(err => {
         ElMessage({
-          message: `修改失败 ${err}`,
+          message: `修改失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
@@ -73,16 +113,16 @@ export default {
     },
 
     // 移除了群员
-    userRemoved() {
+    userRemoved() { 
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}`
       axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        ElMessage.success(`已将${this.userName}移除群聊`)
+        ElMessage.success(`已将 ${this.userName} 移除群聊`)
         this.$emit('userRemoved', { group: this.group, uuid: this.uuid, role: this.role })
       }).catch(err => {
         ElMessage({
-          message: `移除失败 ${err}`,
+          message: `移除失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
@@ -91,6 +131,7 @@ export default {
 
     // at别人了
     newAt() {
+      ElMessage.success(`已@${this.userName}`)
       this.$store.dispatch("getNewAt", {
         uuid: this.uuid,
         userName: this.userName,
@@ -113,7 +154,19 @@ export default {
     // 显示@图标，除自己以外
     showAt() {
       return this.uuid != this.$store.state.account
+    },
+
+    modifyAdminCheckerText() {
+      return `确认将 ${this.userName} ${this.role === 'user' ? '添加为' : '移除'}管理员?`
+    },
+
+    modifyMemberCheckerText() {
+      return `确认将 ${this.userName} 移除群聊?`
     }
+  },
+
+  components: {
+    namecard,
   },
 
   async mounted() {
@@ -143,6 +196,7 @@ export default {
   width: 48px;
   height: 48px;
   border-radius: 50%;
+  cursor: pointer;
 }
 
 .nameplate {
@@ -184,5 +238,21 @@ export default {
   font-size: 24px;
   line-height: 24px;
   color: var(--text);
+}
+
+.checker {
+  display: flex;
+  width: 100%;
+  height: 48px;
+}
+
+.checker svg {
+  width: 48px;
+  height: 48px;
+}
+
+.checker p {
+  line-height: 48px;
+  margin-left: 16px;
 }
 </style>

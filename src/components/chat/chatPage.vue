@@ -53,7 +53,10 @@
             class="conversation"></chatItem>
         </div>
         <splitter @splitter="inputSplitter" class="inputSplitter" ref="inputSplitter"></splitter>
-        <inputBox :group="currGroupID" :available="currGroupAvailable" class="inputBox" ref="inputBox"></inputBox>
+        <inputBox class="inputBox" ref="inputBox"
+          :group="currGroupID" 
+          :available="currGroupAvailable">
+        </inputBox>
       </div>
       <div class="center" v-show="!currGroupID"></div>
     </div>
@@ -465,6 +468,7 @@ chatPage
   |     |- sysMsgGetter
   |- groupConfig
   |     |- eachMember
+  |     |     |- namecard
   |- inputBox
   |     |- atBar
   |     |- favorite

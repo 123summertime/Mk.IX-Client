@@ -137,7 +137,7 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).catch(err => {
         ElMessage({
-          message: `上传文件失败 ${err['response']['data']['detail']}`,
+          message: `上传文件失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
@@ -350,6 +350,13 @@ export default {
         if (newVal) {
           this.atList.add(JSON.stringify(newVal))
         }
+      }
+    },
+
+    // 切换群时，清空at列表，不清空输入框
+    group: {
+      handler() {
+        this.atList = new Set()
       }
     }
   },
