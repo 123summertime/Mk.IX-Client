@@ -137,7 +137,7 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).catch(err => {
         ElMessage({
-          message: `上传文件失败 ${err.response.data.detail}`,
+          message: `上传失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })

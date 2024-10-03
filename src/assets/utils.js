@@ -31,6 +31,7 @@ export const computeTime = function (timeStamp) {
 
 // https://stackoverflow.com/questions/1655769/fastest-md5-implementation-in-javascript
 export const md5 = function (inputString) {
+  // const SALT = "7PLq48KlRSElzbt0pId3CverjEfQt1jY"
   var hc="0123456789abcdef";
   function rh(n) {var j,s="";for(j=0;j<=3;j++) s+=hc.charAt((n>>(j*8+4))&0x0F)+hc.charAt((n>>(j*8))&0x0F);return s;}
   function ad(x,y) {var l=(x&0xFFFF)+(y&0xFFFF);var m=(x>>16)+(y>>16)+(l>>16);return (m<<16)|(l&0xFFFF);}

@@ -174,7 +174,7 @@ export default {
     // 群名修改后
     groupNameModified() {
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/name`
-      const payload = { note: this.groupName }
+      const payload = { name: this.groupName }
       axios.patch(URL, payload, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -183,7 +183,7 @@ export default {
         this.$emit('groupNameModified', { group: this.info.group, name: this.groupName })
       }).catch(err => {
         ElMessage({
-          message: `修改失败 ${err['response']['data']['detail']}`,
+          message: `修改失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
@@ -201,7 +201,7 @@ export default {
     groupAvatarModified(info) {
       const base64 = info.dataURL
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/avatar`
-      axios.patch(URL, { note: base64 }, {
+      axios.patch(URL, { avatar: base64 }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         this.editAvatarVisible = false
@@ -209,7 +209,7 @@ export default {
         this.$emit('groupAvatarModified', { group: this.info.group, avatar: base64 })
       }).catch(err => {
         ElMessage({
-          message: `修改失败 ${err['response']['data']['detail']}`,
+          message: `修改失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })
@@ -288,7 +288,7 @@ export default {
         }
       }).catch(err => {
         ElMessage({
-          message: `退出失败 ${err['response']['data']['detail']}`,
+          message: `退出失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })

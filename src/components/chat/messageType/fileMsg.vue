@@ -72,7 +72,7 @@ export default {
         this.canvasDrawer(0, '#F56C6C', '#114514')
         this.download.state = "failed"
         ElMessage({
-          message: `下载文件失败 ${err}`,
+          message: `下载文件失败`,
           duration: 6000,
           type: "error",
         })

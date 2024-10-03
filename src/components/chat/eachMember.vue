@@ -97,10 +97,10 @@ export default {
       const isAdd = this.role === 'user'
       this.checkerText = `确认将 ${this.userName} ${isAdd ? '添加为' : '移除'}管理员?`
 
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/admin/${this.uuid}?operation=${isAdd}`
-      axios.patch(URL, {}, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      }).then(res => {
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/admin/${this.uuid}`
+      const headers = { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }
+      const method = this.operation ? axios.post(URL, {}, headers) : axios.delete(URL, headers)
+      method.then(res => {
         ElMessage.success(`已将 ${this.userName} ${isAdd ? '添加为' : '移除'}管理员`)
         this.$emit('groupAdminModified', { group: this.group, uuid: this.uuid, operation: isAdd })
       }).catch(err => {

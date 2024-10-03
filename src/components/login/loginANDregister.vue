@@ -89,7 +89,7 @@ export default {
     },
 
     async register() {
-      const register = {userName: this.accountORusername, password: md5(this.password)}
+      const register = {name: this.accountORusername, password: md5(this.password)}
       const URL = `http://${this.adress}/v1/user/register`
       axios.post(URL, register).then(res => {
         this.registerSuccessVisible = true

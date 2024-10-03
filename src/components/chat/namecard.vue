@@ -72,13 +72,17 @@ export default {
 
     // 获取用户详细信息(个人简介，最后登录等)
     getProfileInfo() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.uuid}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/current`
       axios.get(URL).then(res => {
         const data = res.data
         this.bio = data.bio
         this.lastSeen = data.lastSeen
       }).catch(err => {
-        console.log(err)
+        ElMessage({
+          message: `获取详细信息失败 ${err.response.data.detail}`,
+          duration: 6000,
+          type: "error",
+        })
       })
     },
 
@@ -87,15 +91,15 @@ export default {
     },
 
     friendRequest() {
-      const reason = { note: this.reason }
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/friend`
+      const reason = { reason: this.reason }
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/verify/request`
       axios.post(URL, reason, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success("发送成功")
       }).catch(err => {
         ElMessage({
-          message: err,
+          message: `发送好友申请失败 ${err.response.data.detail}`,
           duration: 6000,
           type: "error",
         })

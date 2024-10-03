@@ -18,7 +18,7 @@ export const queryInfo = async function (table, lastUpdate, uuid) {
     }
 
     if (table === "Account") {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/${uuid}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/${uuid}/profile/`
       const res = await axios.get(URL)
       const data = res.data
       

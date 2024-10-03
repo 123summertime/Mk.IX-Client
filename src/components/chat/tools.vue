@@ -174,7 +174,7 @@ export default {
 
     // 创建一个群聊
     makeGroup() {
-      const QA = { Q: this.makeGroupQ, A: this.makeGroupA, name: this.makeGroupName }
+      const QA = { name: this.makeGroupName, Q: this.makeGroupQ, A: this.makeGroupA }
       const URL = `http://${localStorage.getItem('adress')}/v1/group/register`
       axios.post(URL, QA, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -216,7 +216,7 @@ export default {
     },
 
     searchUser() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/current/${this.searchUserID}`
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.searchUserID}/profile/current`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(async res => {
@@ -261,9 +261,9 @@ export default {
 
     // 发送入群申请
     joinGroupByRequest() {
-      const A = { note: this.searchGroupA }
+      const reason = { reason: this.searchGroupA }
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/request`
-      axios.post(URL, A, {
+      axios.post(URL, reason, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success("发送成功")
@@ -283,9 +283,9 @@ export default {
     },
 
     makeFriendByRequest() {
-      const A = { note: this.searchGroupA }
+      const reason = { reason: this.searchGroupA }
       const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.searchUserID}/friend`
-      axios.post(URL, A, {
+      axios.post(URL, reason, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         ElMessage.success("发送成功")
@@ -345,15 +345,13 @@ export default {
     requestResponse(type, group, time, verdict) {
       const uuid = this.$store.state.account
       const URLmapping = {
-        join: `http://${localStorage.getItem('adress')}/v1/group/${group}/verify/response?verdict=${verdict}`,
-        friend: `http://${localStorage.getItem('adress')}/v1/user/${uuid}/verify/response?verdict=${verdict}`,
+        join: `http://${localStorage.getItem('adress')}/v1/group/${group}/verify/request/${time}`,
+        friend: `http://${localStorage.getItem('adress')}/v1/user/${uuid}/verify/request/${time}`,
       }
-
       const url = URLmapping[type]
-      const T = { note: time }
-      axios.post(url, T, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      }).then(res => {
+      const headers = { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }}
+      const method = verdict ? axios.post(url, {}, headers) : axios.delete(url, headers)
+      method.then(res => {
         ElMessage.success(verdict ? "已通过" : "已拒绝")
       }).catch(err => {
         ElMessage({

@@ -127,7 +127,11 @@ export default {
           this.getGroupInfo(null, id, false)
         }
       }).catch(err => {
-        console.log(err)
+        ElMessage({
+          message: `初始化失败 ${err.response.data.detail}`,
+          duration: 6000,
+          type: "error",
+        })
       })
     },
 
@@ -155,11 +159,15 @@ export default {
     async getAdminsInfo(groupID) {
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${groupID}/members/admin`
       try {
-        const res = await axios.get(URL)
+        const res = await axios.get(URL, {headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }})
         return res.data
       } catch (err) {
-        console.log("获取管理员信息时出现错误", err)
-        return []
+        ElMessage({
+          message: `获取管理员信息时失败 ${err.response.data.detail}`,
+          duration: 6000,
+          type: "error",
+        })
+        return {}
       }
     },
 
