@@ -98,7 +98,7 @@ export default {
   },
 
   methods: {
-    // 初始化，获取用户/群基本信息，建立连接
+    // 初始化，获取用户/群基本信息，建立websocket连接
     async initialization() {
       const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/me`
       axios.get(URL, {
@@ -107,26 +107,27 @@ export default {
         const data = res.data
         const userInfo = await queryInfo("Account", data.lastUpdate, data.uuid)
         this.uuid = data.uuid
-        this.username = data.userName
+        this.username = data.username
         this.avatar = userInfo.avatar
 
-        this.$store.dispatch('loginAs', {
+        this.$store.dispatch('websocketConnection', {
           account: this.uuid,
-          userName: this.username,
-        })
-        this.$store.dispatch('sysConnection', {
-          uuid: this.uuid,
+          username: this.username,
+          groups: data.groups.filter(i => {
+            return (i.owner.uuid === this.uuid) || i.admin.some(admin => admin.uuid === this.uuid)
+          }), // 自己为群主或管理员的群
         })
 
         const localGroups = await this.getLocalGroups(this.uuid)
-        data.groups.forEach(id => {
-          localGroups.delete(id.group)
-          this.getGroupInfo(id.lastUpdate, id.group, true)
-        })
-        for (const id of localGroups) {
-          this.getGroupInfo(null, id, false)
+        for (const group of data.groups) {
+          localGroups.delete(group.group)
+          this.getGroupInfo(group, true)
+        }
+        for (const group in localGroups) {
+          this.getGroupInfo({group}, false)
         }
       }).catch(err => {
+        console.log(err)
         ElMessage({
           message: `初始化失败 ${err.response.data.detail}`,
           duration: 6000,
@@ -136,19 +137,17 @@ export default {
     },
 
     // 获取每个群的信息(群名，群主，管理员，是否可用)
-    async getGroupInfo(lastUpdate, groupID, available) {
-      const groupInfo = await queryInfo("Group", lastUpdate, groupID)
+    async getGroupInfo(group, available) {
+      const groupInfo = await queryInfo("Group", group.lastUpdate, group.group)
       if (!available) {
         const element = { ...groupInfo, admins: { owner: {}, admin: {} }, available }
         this.groupList.push(element)
         return
       }
 
-      const adminInfo = await this.getAdminsInfo(groupID)
-
-      const owner = { [adminInfo.owner.uuid]: adminInfo.owner.lastUpdate }
+      const owner = { [group.owner.uuid]: group.owner.lastUpdate }
       const admin = {}
-      adminInfo.admin.forEach(i => { admin[i.uuid] = i.lastUpdate })
+      group.admin.forEach(i => { admin[i.uuid] = i.lastUpdate })
 
       const element = { ...groupInfo, admins: { owner, admin }, available }
       this.groupList.push(element)

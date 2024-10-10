@@ -282,7 +282,6 @@ export default {
       }).then(res => {
         ElMessage.success("退出成功")
         this.unsubscribeVisible = false
-        this.$store.dispatch('disconnect', this.info.group)
         if (deleteHistory) {
           this.deleteHistory()
         }

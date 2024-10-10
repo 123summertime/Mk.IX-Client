@@ -84,16 +84,6 @@ export default {
       }
     },
 
-    // 建立这个群的ws连接
-    async makeConnection() {
-      const uuid = this.$store.state.account
-      this.$store.dispatch('wsConnect', {
-        groupID: this.group,
-        uuid: uuid,
-        admin: this.admins.owner[uuid] || this.admins.admin[uuid] ? true : false,
-      })
-    },
-
     // 新增一条历史记录(本地)
     putHistory(message) {
       this.DB.add('History', message)
@@ -243,9 +233,9 @@ export default {
   async mounted() {
     this.buildOrGetDB()
     await this.getHistory()
-    if (this.available) {
-      await this.makeConnection()
-    }
+    // if (this.available) {
+    //   await this.makeConnection()
+    // }
   },
 
   components: {

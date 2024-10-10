@@ -96,8 +96,9 @@ export default {
     sendingText() {
       if (!this.input) { return }
 
-      this.$store.state.wsConnections[this.group].send(JSON.stringify({
+      this.$store.state.ws.send(JSON.stringify({
         type: "text",
+        group: this.group,
         payload: {
           name: null,
           size: null,
@@ -115,8 +116,9 @@ export default {
     sendingImage() {
       if (!this.payload.content) { return }
 
-      this.$store.state.wsConnections[this.group].send(JSON.stringify({
+      this.$store.state.ws.send(JSON.stringify({
         type: this.payload.type,
+        group: this.group,
         payload: {
           name: this.payload.name,
           size: this.payload.size,

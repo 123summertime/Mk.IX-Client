@@ -18,14 +18,14 @@ export const queryInfo = async function (table, lastUpdate, uuid) {
     }
 
     if (table === "Account") {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${uuid}/profile/`
+      const URL = `http://${localStorage.getItem('adress')}/v1/user/${uuid}/profile`
       const res = await axios.get(URL)
       const data = res.data
       
       infoDB.update("Account", {
         time: data.lastUpdate,
         uuid: uuid,
-        userName: data.userName,
+        userName: data.username,
         avatar: data.avatar,
       })
       

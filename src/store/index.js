@@ -18,79 +18,69 @@ async function favoriteDB() {
 
 export default createStore({
   actions: {
-    async wsConnect(context, info) {
+    async websocketConnection(context, info) {
+      context.commit('loginAs', info)
+
       const adress = localStorage.getItem('adress')
       const token = localStorage.getItem('token')
-      const URL = `ws://${adress}/ws/ws?userID=${info.uuid}&groupID=${info.groupID}`
+      const device = localStorage.getItem('device')
 
-      const ws = new WebSocket(URL, [token])
-      context.commit('newConnection', {
-        groupID: info.groupID,
-        ws: ws,
-      })
+      // 首先获取wsToken，用于ws连接验证
+      const wsTokenURL = `http://${adress}/v1/user/wsToken?device=${device ? device : ""}`
+      const res = await axios.get(wsTokenURL, { headers: { 'Authorization': `Bearer ${token}` } })
+      localStorage.setItem('device', res.data.device)
 
-      // 获取群验证，仅作用于群主和管理员
+      // 建立websocket连接，带上wsToken
+      const wsURL = `ws://${adress}/websocket/connect`
+      const ws = new WebSocket(wsURL, [res.data.token])
+
       ws.onopen = async function () {
-        if (!info.admin) { return }
-
-        const URL = `http://${localStorage.getItem('adress')}/v1/group/${info.groupID}/verify/request`
-        axios.get(URL, {
+        // 获取好友申请
+        const friendURL = `http://${adress}/v1/user/${info.account}/verify/request`
+        axios.get(friendURL, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         }).then(res => {
-          // 结果会通过systemWS发送 sysMsgGetter.vue将对其作处理
-        }).catch(err => {
-          console.log("获取入群申请时失败", err)
-        })
-      }
-
-      // 接收群消息
-      ws.onmessage = async function (event) {
-        const data = JSON.parse(event.data)
-        const fullData = await queryInfo("Account", data.senderKey, data.senderID)
-        context.commit('getNewMessage', {
-          groupID: data.group,
-          payload: {
-            time: data.time,
-            type: data.type,
-            group: data.group,
-            uuid: fullData.uuid,
-            userName: fullData.userName,
-            avatar: fullData.avatar,
-            payload: data.payload
-          }
-        })
-      }
-    },
-
-    async sysConnection(context, info) {
-      const adress = localStorage.getItem('adress')
-      const token = localStorage.getItem('token')
-      const URL = `ws://${adress}/ws/systemWS?userID=${info.uuid}`
-      const ws = new WebSocket(URL, [token])
-
-      // 获取好友申请
-      ws.onopen = async function () {
-        const URL = `http://${localStorage.getItem('adress')}/v1/user/${info.uuid}/verify/request`
-        axios.get(URL, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        }).then(res => {
-          // 结果会通过systemWS发送 sysMsgGetter.vue将对其作处理
+          // 结果会通过ws发送 sysMsgGetter.vue将对其作处理
         }).catch(err => {
           console.log("获取好友申请时失败", err)
         })
+
+        // 获取群申请
+        for (const groupInfo of info.groups) {
+          const requestURL = `http://${adress}/v1/group/${groupInfo.group}/verify/request`
+          axios.get(requestURL, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+          }).then(res => {
+            // 结果会通过ws发送 sysMsgGetter.vue将对其作处理
+          }).catch(err => {
+            console.log("获取入群申请时失败", err)
+          })
+        }
       }
 
-      // 接收系统消息
+      // 接收消息
       ws.onmessage = async function (event) {
         const data = JSON.parse(event.data)
-        context.commit('getNewSysMessage', data)
+        if (data.isSystemMessage) {
+          context.commit('newSystemMessage', data)
+        } else {
+          const fullData = await queryInfo("Account", data.senderKey, data.senderID)
+          context.commit('newGroupMessage', {
+            groupID: data.group,
+            payload: {
+              time: data.time,
+              type: data.type,
+              group: data.group,
+              uuid: fullData.uuid,
+              userName: fullData.username,
+              avatar: fullData.avatar,
+              payload: data.payload
+            }
+          })
+        }
       }
 
-      context.commit('sysConnection', { "ws": ws })
-    },
-
-    loginAs(context, info) {
-      context.commit('loginAs', info)
+      context.commit('websocketConnection', { ws })
     },
 
     lastMessage(context, info) {
@@ -112,33 +102,24 @@ export default createStore({
     buildGroupDB(context, info) {
       context.commit('buildGroupDB', info)
     },
-
-    disconnect(context, info) {
-      context.commit('disconnect', info)
-    }
   },
 
   mutations: {
-    newConnection(state, connect) {
-      state.wsConnections[connect.groupID] = connect.ws
-      state[connect.groupID] = ""
+    loginAs(state, info) {
+      state.account = info.account
+      state.userName = info.username
     },
 
-    sysConnection(state, ws) {
-      state.sys = ws
+    websocketConnection(state, ws) {
+      state.ws = ws.ws
     },
 
-    getNewMessage(state, payload) {
+    newGroupMessage(state, payload) {
       state[payload.groupID] = payload.payload
     },
 
-    getNewSysMessage(state, payload) {
-      state.sysMsg = payload
-    },
-
-    loginAs(state, info) {
-      state.account = info.account
-      state.userName = info.userName
+    newSystemMessage(state, payload) {
+      state.systemMessage = payload
     },
 
     lastMessage(state, info) {
@@ -160,24 +141,19 @@ export default createStore({
     buildGroupDB(state, info) {
       state.groupDB[info.group] = info.db
     },
-
-    disconnect(state, info) {
-      Reflect.deleteProperty(state.wsConnections, info)
-    }
   },
 
   state: {
-    account: "",
+    account: "",  
     userName: "",
-    sysMsg: "",
+    systemMessage: "",
     groupList: [],
     groupAttentions: new Map(),  // group: String -> type: String, 
     favoriteDB: await favoriteDB(),
     groupDB: {},    // group: dbCRUD实例对象
     currentAt: {},  // {uuid: String, userName: String}
-    wsConnections: {},  // {groupID: Websocket}
     // {group}: group新收到的消息
     // lastMessageOf{group}: group的最后一条消息
-    // sys: 系统消息Websocket
+    // ws: websocket连接
   },
 })

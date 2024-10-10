@@ -46,7 +46,7 @@ export default {
 
   computed: {
     getLastSysMessage() {
-      return this.$store.state.sysMsg
+      return this.$store.state.systemMessage
     }
   },
 
