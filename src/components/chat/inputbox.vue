@@ -36,7 +36,7 @@
 
 
     <!-- 确认遮罩层 -->
-    <el-dialog v-model="visible" title="发送确认" width="30%" :show-close="false" :destroy-on-close="true">
+    <el-dialog v-model="visible" title="发送确认" width="540px" :show-close="false" :destroy-on-close="true">
       <img class="previewImg" :src="payload.content" v-if="payload.type === 'image'" />
       <audioMsg class="previewAudio" v-else-if="payload.type === 'audio'" :group="group" :message="audioMessagePreview">
       </audioMsg>
@@ -87,7 +87,7 @@ export default {
       },
       visible: false,
       favorite: false,
-      atList: new Set(),  // 存储@其他人的JSON字符串，包含属性uuid, userName
+      atList: new Set(),  // 存储@其他人的JSON字符串，包含属性uuid, username
     }
   },
 
@@ -230,15 +230,19 @@ export default {
       }
     },
 
-    async recorderBuilder() {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      this.recorder.recorder = new MediaRecorder(stream)
-    },
-
     // 录音时，有最大时长限制
     async audioRecorder() {
       if (!this.recorder.recorder) {
-        await this.recorderBuilder()
+        if (!navigator.mediaDevices) {
+          ElMessage({
+            message: "语音仅在HTTPS下可用",
+            duration: 6000,
+            type: "error",
+          })
+          return
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        this.recorder.recorder = new MediaRecorder(stream)
       }
 
       this.recorder.recorder.ondataavailable = event => {

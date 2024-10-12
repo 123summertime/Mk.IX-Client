@@ -2,7 +2,7 @@
   <div class="atBarRoot">
     <ul class="atListWrapper" @wheel="onScroll" ref="AtListWrapper">
       <li class="atCard" v-for="user in atListArray" :key="user.uuid">
-        <p class="atText">{{ "@" + user.userName }}</p>
+        <p class="atText">{{ "@" + user.username }}</p>
         <CircleClose @click="deleteAt(user)"></CircleClose>
       </li>
     </ul>

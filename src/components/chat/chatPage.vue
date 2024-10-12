@@ -154,22 +154,6 @@ export default {
       this.$store.dispatch('updateGroupInfo', element)
     },
 
-    // 获取该群管理员信息
-    async getAdminsInfo(groupID) {
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${groupID}/members/admin`
-      try {
-        const res = await axios.get(URL, {headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }})
-        return res.data
-      } catch (err) {
-        ElMessage({
-          message: `获取管理员信息时失败 ${err.response.data.detail}`,
-          duration: 6000,
-          type: "error",
-        })
-        return {}
-      }
-    },
-
     // 获取本地群聊(如已退出的群或被踢出的群)
     async getLocalGroups(uuid) {
       const databases = await indexedDB.databases();
@@ -270,11 +254,33 @@ export default {
       localStorage.setItem("pinned", JSON.stringify(this.pinned))
     },
 
+    // 获取该群管理员信息
+    async getAdminsInfo(groupID) {
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${groupID}/members/admin`
+      try {
+        const res = await axios.get(URL, {headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }})
+        return res.data
+      } catch (err) {
+        ElMessage({
+          message: `获取管理员信息时失败 ${err.response.data.detail}`,
+          duration: 6000,
+          type: "error",
+        })
+        return {}
+      }
+    },
+
     // 加入某群后
-    joinGroupSuccess(info, autoChangeGroup) {
-      this.getGroupInfo("", info.group, true)
+    async joinGroupSuccess(info, autoChangeGroup) {
+      const res = await this.getAdminsInfo(info.target)
+      const groupInfo = await queryInfo('Group', info.targetKey, info.target)
+      const owner = { [res.owner.uuid]: res.owner.lastUpdate }
+      const admin = {}
+      res.admin.forEach(i => { admin[i.uuid] = i.lastUpdate })
+      const element = { ...groupInfo, admins: { owner, admin }, available: true }
+      this.groupList.push(element)
       if (autoChangeGroup) {
-        this.currGroupChange(info.group, info.name)
+        this.currGroupChange(info.target, groupInfo.name)
       }
     },
 

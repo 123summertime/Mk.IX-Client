@@ -72,7 +72,7 @@ export default createStore({
               type: data.type,
               group: data.group,
               uuid: fullData.uuid,
-              userName: fullData.username,
+              username: fullData.username,
               avatar: fullData.avatar,
               payload: data.payload
             }
@@ -107,7 +107,7 @@ export default createStore({
   mutations: {
     loginAs(state, info) {
       state.account = info.account
-      state.userName = info.username
+      state.username = info.username
     },
 
     websocketConnection(state, ws) {
@@ -145,13 +145,13 @@ export default createStore({
 
   state: {
     account: "",  
-    userName: "",
+    username: "",
     systemMessage: "",
     groupList: [],
     groupAttentions: new Map(),  // group: String -> type: String, 
     favoriteDB: await favoriteDB(),
     groupDB: {},    // group: dbCRUD实例对象
-    currentAt: {},  // {uuid: String, userName: String}
+    currentAt: {},  // {uuid: String, username: String}
     // {group}: group新收到的消息
     // lastMessageOf{group}: group的最后一条消息
     // ws: websocket连接

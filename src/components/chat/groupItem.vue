@@ -51,7 +51,7 @@ export default {
 
     getSummary(message) {
       const type = message.type
-      const prefix = message.userName + ": "
+      const prefix = message.username + ": "
       const mapping = {
         text: prefix + message.payload.content,
         revoke: message.payload.content,

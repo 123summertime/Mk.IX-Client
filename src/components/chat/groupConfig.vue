@@ -9,14 +9,14 @@
         <p>群名称</p>
         <div class="groupName">
           <p>{{ this.info.name }}</p>
-          <ArrowRight class="arrow" v-if="checkPermissions" />
+          <ArrowRight :class="['arrow', checkPermissions ? '' : 'hiddenArrow']" />
         </div>
       </li>
       <li>
         <p>群ID</p>
         <div class="groupID">
           <p>{{ info.group }}</p>
-          <ArrowRight class="arrow" />
+          <ArrowRight class="arrow hiddenArrow" />
         </div>
       </li>
       <li v-if="available" @click="membersVisible = true">
@@ -283,7 +283,9 @@ export default {
         ElMessage.success("退出成功")
         this.unsubscribeVisible = false
         if (deleteHistory) {
-          this.deleteHistory()
+          setTimeout(() => {
+            this.deleteHistory()
+          }, 200);
         }
       }).catch(err => {
         ElMessage({
@@ -355,11 +357,12 @@ export default {
   margin: 12px 0 12px 8px;
 }
 
+.hiddenArrow {
+  visibility: hidden;
+}
+
 .groupID {
   cursor: default;
-}
-.groupID .arrow {
-  visibility: hidden;
 }
 
 .list {

@@ -114,7 +114,7 @@
   <!-- 搜索用户 -->
   <namecard
     :uuid="searchUserID"
-    :userName="searchUserName"
+    :username="searchusername"
     :avatar="searchUserAvatar"
     :bio_="searchUserBio"
     :lastSeen_="searchUserLastSeen"
@@ -160,7 +160,7 @@ export default {
       byRequsetVisible: false,
       searchUserTrigger: false,
       searchUserID: "",
-      searchUserName: "",
+      searchusername: "",
       searchUserAvatar: "",
       searchUserBio: "",
       searchUserLastSeen: "",
@@ -221,7 +221,7 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(async res => {
         const info = await queryInfo("Account", res.data.lastUpdate, this.searchUserID)
-        this.searchUserName = info.userName
+        this.searchusername = info.username
         this.searchUserAvatar = info.avatar
         this.searchUserBio = res.data.bio
         this.searchUserLastSeen = res.data.lastSeen
@@ -242,8 +242,6 @@ export default {
       axios.post(URL, A, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        ElMessage.success("加入成功")
-        this.$emit('joinGroupSuccess', { group: this.searchGroupID, name: this.searchGroupName }, true)
         this.searchVisible = false
         this.byQuestionVisible = false
         this.searchGroupVisible = false
@@ -305,14 +303,14 @@ export default {
       const { time, type, target, targetKey, state, senderID, senderKey, payload } = joinRequset
       const senderInfo = await queryInfo("Account", senderKey, senderID)
       const groupInfo = await queryInfo("Group", targetKey, target)
-      const { avatar: senderAvatar, userName } = senderInfo
+      const { avatar: senderAvatar, username } = senderInfo
       const { avatar: groupAvatar, name: groupName } = groupInfo
 
       const idx = this.messageList.findIndex(i => i.time === time)
       if (idx === -1) {  // 新入群申请
-        this.messageList.push({ time, type, target, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName })
+        this.messageList.push({ time, type, target, state, senderID, payload, senderAvatar, username, groupAvatar, groupName })
       } else {  // 更新入群申请(自己/其它管理员已审核过了)
-        this.messageList[idx] = { time, type, target, state, senderID, payload, senderAvatar, userName, groupAvatar, groupName }
+        this.messageList[idx] = { time, type, target, state, senderID, payload, senderAvatar, username, groupAvatar, groupName }
       }
     },
 
@@ -320,22 +318,22 @@ export default {
     async newFriendRequest(friendRequest) {
       const { time, type, state, senderID, senderKey, payload } = friendRequest
       const senderInfo = await queryInfo("Account", senderKey, senderID)
-      const { avatar: senderAvatar, userName } = senderInfo
+      const { avatar: senderAvatar, username } = senderInfo
 
       const idx = this.messageList.findIndex(i => i.time === time)
       if (idx === -1) {
-        this.messageList.push({ time, type, state, senderID, payload, senderAvatar, userName })
+        this.messageList.push({ time, type, state, senderID, payload, senderAvatar, username })
       } else {
-        this.messageList[idx] = { time, type, state, senderID, payload, senderAvatar, userName }
+        this.messageList[idx] = { time, type, state, senderID, payload, senderAvatar, username }
       }
     },
 
     // 群验证的消息文本
     groupMailText(msg) {
-      const { type, userName, groupName } = msg
+      const { type, username, groupName } = msg
       const mapping = {
-        join: `${userName} 申请加入 ${groupName}`,
-        friend: `${userName} 申请加你为好友`,
+        join: `${username} 申请加入 ${groupName}`,
+        friend: `${username} 申请加你为好友`,
       }
 
       return mapping[type]
@@ -363,7 +361,7 @@ export default {
     },
 
     joined(msg) {
-      this.$emit('joinGroupSuccess', { group: msg.target, name: msg.payload }, false)
+      this.$emit('joinGroupSuccess', msg)
     },
   },
 

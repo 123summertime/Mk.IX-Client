@@ -85,6 +85,14 @@ export default {
 
     copyMsg() {
       const cb = navigator.clipboard
+      if (!cb) {
+        ElMessage({
+          message: "复制仅在HTTPS下可用",
+          duration: 6000,
+          type: "error",
+        })
+        return
+      }
       if (this.message.type === 'text') {
         cb.writeText(this.message.content)
       }

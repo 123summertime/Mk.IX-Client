@@ -3,10 +3,12 @@
     <div class="imgsOuter" @scroll="onScroll" ref="ImgsOuter">
       <div class="imgs">
         <div class="eachImg" v-for="img, idx in favoriteImgs" :key="img.time">
-          <el-popover placement="top" :width="240" trigger="click" :hide-after="0">
-            <el-button type="danger" @click="deleteOperation(img, idx)">删除</el-button>
-            <el-button type="info" @click="pinnedOperation(img, idx)">置顶</el-button>
-            <el-button type="primary" @click="sendOperation(img)">发送</el-button>
+          <el-popover placement="top" :width="260" trigger="click" :hide-after="0">
+            <div class="imgOpers">
+              <el-button type="danger" @click="deleteOperation(img, idx)">删除</el-button>
+              <el-button type="info" @click="pinnedOperation(img, idx)">置顶</el-button>
+              <el-button type="primary" @click="sendOperation(img)">发送</el-button>
+            </div>
             <template #reference>
               <img :src="img.payload" />
             </template>
@@ -111,5 +113,11 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.imgOpers {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 </style>

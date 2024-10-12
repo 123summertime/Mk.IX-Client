@@ -3,7 +3,7 @@
     <div class="info">
       <img :src="avatar" @click="namecardTrigger = !namecardTrigger" />
       <p :class="['nameplate', role + 'Nameplate']" v-if="this.role != 'user'">{{ role == 'owner' ? '群主' : '管理员' }}</p>
-      <p class="name">{{ userName }}</p>
+      <p class="name">{{ username }}</p>
     </div>
     <div class="oper">
       <div v-if="showAt" @click="newAt">
@@ -21,7 +21,7 @@
     <namecard 
       :uuid="uuid"
       :avatar="avatar"
-      :userName="userName"
+      :username="username"
       :namecardTrigger="namecardTrigger">
     </namecard>
 
@@ -65,7 +65,7 @@ export default {
   data() {
     return {
       avatar: "",
-      userName: "",
+      username: "",
       namecardTrigger : false,
       checkerVisible: false,
       invokeFunc: null, // Function
@@ -78,7 +78,7 @@ export default {
     async getFullData() {
       const info = await queryInfo('Account', this.lastUpdate, this.uuid)
       this.avatar = info.avatar
-      this.userName = info.userName
+      this.username = info.username
     },
 
     beforeRequestCheck(invoke, checkerText) {
@@ -95,13 +95,13 @@ export default {
     // 修改了管理员
     adminModify() {
       const isAdd = this.role === 'user'
-      this.checkerText = `确认将 ${this.userName} ${isAdd ? '添加为' : '移除'}管理员?`
+      this.checkerText = `确认将 ${this.username} ${isAdd ? '添加为' : '移除'}管理员?`
 
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/admin/${this.uuid}`
       const headers = { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }
-      const method = this.operation ? axios.post(URL, {}, headers) : axios.delete(URL, headers)
+      const method = isAdd ? axios.post(URL, {}, headers) : axios.delete(URL, headers)
       method.then(res => {
-        ElMessage.success(`已将 ${this.userName} ${isAdd ? '添加为' : '移除'}管理员`)
+        ElMessage.success(`已将 ${this.username} ${isAdd ? '添加为' : '移除'}管理员`)
         this.$emit('groupAdminModified', { group: this.group, uuid: this.uuid, operation: isAdd })
       }).catch(err => {
         ElMessage({
@@ -118,7 +118,7 @@ export default {
       axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        ElMessage.success(`已将 ${this.userName} 移除群聊`)
+        ElMessage.success(`已将 ${this.username} 移除群聊`)
         this.$emit('userRemoved', { group: this.group, uuid: this.uuid, role: this.role })
       }).catch(err => {
         ElMessage({
@@ -131,10 +131,10 @@ export default {
 
     // at别人了
     newAt() {
-      ElMessage.success(`已@${this.userName}`)
+      ElMessage.success(`已@${this.username}`)
       this.$store.dispatch("getNewAt", {
         uuid: this.uuid,
-        userName: this.userName,
+        username: this.username,
       })
     }
   },
@@ -157,11 +157,11 @@ export default {
     },
 
     modifyAdminCheckerText() {
-      return `确认将 ${this.userName} ${this.role === 'user' ? '添加为' : '移除'}管理员?`
+      return `确认将 ${this.username} ${this.role === 'user' ? '添加为' : '移除'}管理员?`
     },
 
     modifyMemberCheckerText() {
-      return `确认将 ${this.userName} 移除群聊?`
+      return `确认将 ${this.username} 移除群聊?`
     }
   },
 

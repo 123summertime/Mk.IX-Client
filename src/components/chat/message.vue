@@ -16,7 +16,7 @@
       <div class="container">
         <div class="upper">
           <p :class="['nameplate', getNameplate == '群主' ? 'ownerNameplate' : 'adminNameplate']" v-if=getNameplate>{{ getNameplate }}</p>
-          <p class="userName">{{ message.userName }}</p>
+          <p class="username">{{ message.username }}</p>
         </div>
         <div class="lower" @contextmenu.prevent="onRightClick">
           <textMsg class="payload" v-if="message.type == 'text'" :group="group" :message="message"></textMsg>
@@ -43,7 +43,7 @@
     <namecard
       :uuid="message.uuid"
       :avatar="message.avatar"
-      :userName="message.userName"
+      :username="message.username"
       :namecardTrigger="namecardTrigger">
     </namecard>
 
@@ -145,8 +145,9 @@ export default {
       const newPayload = JSON.parse(JSON.stringify(this.message.payload))
       newPayload.meta = null
 
-      this.$store.state.wsConnections[groupID].send(JSON.stringify({
+      this.$store.state.ws.send(JSON.stringify({
         type: this.message.type === "file" ? "forwardFile" : this.message.type,
+        group: groupID,
         payload: newPayload,
       }))
       this.showGroupSelector = false
@@ -171,7 +172,7 @@ export default {
         this.isLongPress = true
         this.$store.dispatch("getNewAt", {
           uuid: this.message.uuid,
-          userName: this.message.userName,
+          username: this.message.username,
         })
       }, activeDelay)
     },
@@ -267,7 +268,7 @@ export default {
   background-color: var(--admin);
 }
 
-.userName {
+.username {
   line-height: 30px;
 }
 

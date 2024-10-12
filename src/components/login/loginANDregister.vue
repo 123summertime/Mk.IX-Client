@@ -107,6 +107,14 @@ export default {
 
     copyToken(text) {
       const cb = navigator.clipboard
+      if (!cb) {
+        ElMessage({
+          message: "复制仅在HTTPS下可用",
+          duration: 6000,
+          type: "error",
+        })
+        return
+      }
       cb.writeText(text)
       ElMessage.success("复制成功")
     },

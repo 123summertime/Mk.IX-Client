@@ -25,7 +25,7 @@ export const queryInfo = async function (table, lastUpdate, uuid) {
       infoDB.update("Account", {
         time: data.lastUpdate,
         uuid: uuid,
-        userName: data.username,
+        username: data.username,
         avatar: data.avatar,
       })
       

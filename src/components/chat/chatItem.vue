@@ -67,7 +67,7 @@ export default {
           uuid: msg.uuid,
           payload: msg.payload,
           avatar: info.avatar,
-          userName: info.userName,
+          username: info.username,
         }
         this.messageList.unshift(message)
       }
@@ -115,7 +115,7 @@ export default {
       const newPayload = {
         name: null,
         size: null,
-        content: `${message.userName} 撤回了一条${revokeMsg.uuid === message.uuid ? '' : '成员'}消息`,
+        content: `${message.username} 撤回了一条${revokeMsg.uuid === message.uuid ? '' : '成员'}消息`,
         meta: null,
       }
 

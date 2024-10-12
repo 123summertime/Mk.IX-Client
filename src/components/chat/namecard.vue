@@ -7,7 +7,7 @@
       <div class="namecardInfo">
         <span>
           <i>昵称:</i>
-          <i>{{ userName }}</i>
+          <i>{{ username }}</i>
         </span>
         <span>
           <i>uuid:</i>
@@ -48,7 +48,7 @@ import { computeTime } from './../../assets/utils'
 export default {
   props: {
     uuid: String,
-    userName: String,
+    username: String,
     avatar: String,
     bio_: String,       // 可选 如果传入了就不执行showProfile() 下同
     lastSeen_: String,  // 可选
