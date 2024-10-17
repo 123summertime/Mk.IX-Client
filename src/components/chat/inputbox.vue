@@ -36,7 +36,7 @@
 
 
     <!-- 确认遮罩层 -->
-    <el-dialog v-model="visible" title="发送确认" width="540px" :show-close="false" :destroy-on-close="true">
+    <el-dialog v-model="visible" title="发送确认" width="640px" :show-close="false" :destroy-on-close="true">
       <img class="previewImg" :src="payload.content" v-if="payload.type === 'image'" />
       <audioMsg class="previewAudio" v-else-if="payload.type === 'audio'" :group="group" :message="audioMessagePreview">
       </audioMsg>

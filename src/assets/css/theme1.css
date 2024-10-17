@@ -10,6 +10,7 @@
   --basic-3-0: #ffd900;
   --basic-4-0: #3eede7;
   --basic-5-0: #c9171e;
+  --basic-6-0: #00bc12;
 
   --neutral-0: #fffefb;
   --neutral-1: #f5f4f1;
@@ -28,6 +29,9 @@
   --text-alt: var(--neutral-1);
   --check: var(--basic-1-0);
   --warn: var(--basic-5-0);
+  --positive: var(--basic-6-0);
+  --negative: var(--basic-5-0);
+  --neutral: var(--neutral-3);
 }
 
 /* chatPage */
@@ -117,6 +121,11 @@
   --tools-toolsRoot: var(--neutral-0);
   --tools-searchResult: var(--neutral-2);
   --tools-searchResultOper: var(--basic-1-0);
+}
+
+/* eachNotice */
+:root {
+  --eachNotice-hover: var(--neutral-1);
 }
 
 /* 覆盖el原有样式 */

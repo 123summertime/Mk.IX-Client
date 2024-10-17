@@ -25,7 +25,7 @@
       :namecardTrigger="namecardTrigger">
     </namecard>
 
-    <el-dialog v-model="checkerVisible" width="540px">
+    <el-dialog v-model="checkerVisible" width="640px">
     <div class="checker">
       <WarningFilled></WarningFilled>
       <p>{{ checkerText }}</p>

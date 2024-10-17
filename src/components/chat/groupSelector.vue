@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    width="540"
+    width="640px"
     :title="computedTitle"
     :show-close="false"
     :close-on-click-modal="false"

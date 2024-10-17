@@ -165,6 +165,36 @@ export default {
       setTimeout(() => {
         element.classList.remove('flash')
       }, 2000)
+    },
+
+    async newMessageHandler(message) {
+      if (!message) { return }
+
+      if (message.type === 'revoke') {
+        this.newRevokeHandler(message)
+        return
+      }
+
+      this.newAttentionHandler(message)
+
+      const atBottom = this.$refs.messageView.scrollTop + this.$refs.messageView.clientHeight >= this.$refs.messageView.scrollHeight
+      const storage = {
+        time: message.time,
+        type: message.type,
+        uuid: message.uuid,
+        payload: JSON.parse(JSON.stringify(message.payload))
+      }
+      this.messageList.push(message)
+      this.putHistory(storage)
+
+      // 如果是自己发的或已经滚动到底，加入新消息后自动滚动到底
+      if (message.uuid === this.$store.state.account || atBottom) {
+        this.$nextTick(() => {
+          requestAnimationFrame(() => {
+            this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+          })
+        })
+      }
     }
 
   },
@@ -179,32 +209,7 @@ export default {
     // 从Vuex中获取该群最新消息，加入messageList并存储
     newMessage: {
       async handler(message) {
-        if (!message) { return }
-
-        if (message.type === 'revoke') {
-          this.newRevokeHandler(message)
-          return
-        }
-
-        this.newAttentionHandler(message)
-
-        const storage = {
-          time: message.time,
-          type: message.type,
-          uuid: message.uuid,
-          payload: JSON.parse(JSON.stringify(message.payload))
-        }
-        this.messageList.push(message)
-        this.putHistory(storage)
-        
-        // 如果是自己发的，自动滚动到底
-        if (message.uuid === this.$store.state.account) {
-          this.$nextTick(() => {
-            requestAnimationFrame(() => {
-              this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
-            })
-          })
-        }
+        this.newMessageHandler(message)
       }
     },
 
@@ -233,9 +238,11 @@ export default {
   async mounted() {
     this.buildOrGetDB()
     await this.getHistory()
-    // if (this.available) {
-    //   await this.makeConnection()
-    // }
+
+    // 没有历史记录，但vuex可能有消息，比这个组件挂载的早，所以手动获取一次（比如新入的群）
+    if (this.messageList.length == 0) {
+      this.newMessageHandler(this.newMessage)
+    }
   },
 
   components: {

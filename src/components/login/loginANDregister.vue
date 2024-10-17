@@ -19,7 +19,7 @@
     <div @click="switchOption">{{ currentText.switch }}</div>
   </div>
 
-  <el-dialog v-model="tokenVisible" append-to-body title="Bot登录成功" width="540">
+  <el-dialog v-model="tokenVisible" append-to-body title="Bot登录成功" width="640px">
     <div>
       <p class="token">{{ token }}</p>
     </div>
@@ -29,7 +29,7 @@
     </template>
   </el-dialog>
 
-  <el-dialog v-model="registerSuccessVisible" title="注册成功" width="540">
+  <el-dialog v-model="registerSuccessVisible" title="注册成功" width="640px">
     <div>
       <i>您的uuid为</i><i class="account">{{ accountORusername }}</i>
     </div>

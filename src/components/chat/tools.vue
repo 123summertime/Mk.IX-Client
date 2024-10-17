@@ -14,33 +14,24 @@
     </div>
   </div>
 
-  <sysMsgGetter
-    @newJoinRequest="newJoinRequest"
-    @newFriendRequest="newFriendRequest"
-    @joined="joined"></sysMsgGetter>
-
   <!-- 群验证 -->
-  <el-dialog v-model="mailVisible" title="群验证" width="540px">
-    <ul class="GroupMails">
-      <li v-for="msg in messageList" :key="msg.time" class="mail">
-        <img :src="msg.senderAvatar" />
-        <div class="mailTexts">
-          <p>{{ groupMailText(msg) }}</p>
-          <p>{{ '理由：' + msg.payload }}</p>
+  <el-dialog v-model="mailVisible" class="mailDialog" width="640px">
+    <el-tabs v-model="mailTab">
+      <el-tab-pane label="通知" name="notice">
+        <div class="requests" @scroll="onScroll" ref="NoticeList">
+          <eachNotice v-for="msg in noticeList" :key="msg.time" :msg="msg" @deleteNotice="deleteNotice"></eachNotice>
         </div>
-        <div class="mailOpers" v-if="msg.state === '等待审核'">
-          <Close @click="requestResponse(msg.type, msg.target, msg.time, false)"></Close>
-          <Check @click="requestResponse(msg.type, msg.target, msg.time, true)"></Check>
+      </el-tab-pane>
+      <el-tab-pane label="收到的申请" name="receiveRequest">
+        <div class="requests">
+          <eachRequest v-for="msg in requestList" :key="msg.time" :msg="msg"></eachRequest>
         </div>
-        <div class="mailResponse" v-else>
-          <p>{{ msg.state }}</p>
-        </div>
-      </li>
-    </ul>
+      </el-tab-pane>
+    </el-tabs>
   </el-dialog>
 
   <!-- 创建群 -->
-  <el-dialog v-model="makeVisible" title="创建群" width="540px">
+  <el-dialog v-model="makeVisible" title="创建群" width="640px">
     <div class="groupOpersItem">
       <p>群名</p>
       <el-input v-model="makeGroupName"></el-input>
@@ -60,9 +51,9 @@
       </span>
     </template>
   </el-dialog>
-  
+
   <!-- 搜索 -->
-  <el-dialog v-model="searchVisible" class="searchDialog" width="540px">
+  <el-dialog v-model="searchVisible" class="searchDialog" width="640px">
     <el-tabs v-model="searchTab">
       <el-tab-pane label="搜索群" name="searchGroup">
         <div class="searchInputBox">
@@ -93,7 +84,7 @@
   </el-dialog>
 
   <!-- 搜索群-回答入群问题 -->
-  <el-dialog v-model="byQuestionVisible" class="searchDialog" width="540px">
+  <el-dialog v-model="byQuestionVisible" class="searchDialog" width="640px">
     <div>
       <p>{{ "问题: " + searchGroupQ }}</p>
     </div>
@@ -104,7 +95,7 @@
   </el-dialog>
 
   <!-- 搜索群-发送申请 -->
-  <el-dialog v-model="byRequsetVisible" class="searchDialog" width="540px">
+  <el-dialog v-model="byRequsetVisible" class="searchDialog" width="640px">
     <div class="searchInputBox">
       <el-input v-model="searchGroupA" placeholder="申请理由(选填)"></el-input>
       <el-button type="primary" @click="joinGroupByRequest">申请</el-button>
@@ -121,16 +112,28 @@
     :namecardTrigger="searchUserTrigger">
   </namecard>
 
+  <!-- 获取非群消息的websocket消息 -->
+  <sysMsgGetter
+    @joined="joined"
+    @notice="newNotice"
+    @newJoinRequest="newJoinRequest"
+    @newFriendRequest="newFriendRequest">
+  </sysMsgGetter>
+
 </template>
 
 <script>
 import axios from 'axios'
+import Dexie from 'dexie'
 
 import router from './../../router/index.js'
 import sysMsgGetter from './sysMsgGetter.vue'
 import namecard from './namecard.vue'
+import eachNotice from './eachNotice.vue'
+import eachRequest from './eachRequest.vue'
 
 import { queryInfo } from '../../assets/queryDB.js'
+import { dbCRUD } from '../../assets/dbCRUD.js'
 
 export default {
   emits: [
@@ -144,11 +147,16 @@ export default {
       makeGroupA: "",
       makeVisible: false,
       mailVisible: false,
-      messageList: [],
+      mailTab: "notice",
 
+      noticeList: [],
+      requestList: [],
+      page: 0,
+      step: 20,
+      
       // 搜索相关
       searchVisible: false,
-      searchTab: "searchGroup",      
+      searchTab: "searchGroup",
       searchGroupVisible: false,
       searchGroupID: "",
       searchGroupName: "",
@@ -306,11 +314,11 @@ export default {
       const { avatar: senderAvatar, username } = senderInfo
       const { avatar: groupAvatar, name: groupName } = groupInfo
 
-      const idx = this.messageList.findIndex(i => i.time === time)
+      const idx = this.requestList.findIndex(i => i.time === time)
       if (idx === -1) {  // 新入群申请
-        this.messageList.push({ time, type, target, state, senderID, payload, senderAvatar, username, groupAvatar, groupName })
+        this.requestList.push({ time, type, target, state, senderID, payload, senderAvatar, username, groupAvatar, groupName })
       } else {  // 更新入群申请(自己/其它管理员已审核过了)
-        this.messageList[idx] = { time, type, target, state, senderID, payload, senderAvatar, username, groupAvatar, groupName }
+        this.requestList[idx] = { time, type, target, state, senderID, payload, senderAvatar, username, groupAvatar, groupName }
       }
     },
 
@@ -320,58 +328,70 @@ export default {
       const senderInfo = await queryInfo("Account", senderKey, senderID)
       const { avatar: senderAvatar, username } = senderInfo
 
-      const idx = this.messageList.findIndex(i => i.time === time)
+      const idx = this.requestList.findIndex(i => i.time === time)
       if (idx === -1) {
-        this.messageList.push({ time, type, state, senderID, payload, senderAvatar, username })
+        this.requestList.push({ time, type, state, senderID, payload, senderAvatar, username })
       } else {
-        this.messageList[idx] = { time, type, state, senderID, payload, senderAvatar, username }
+        this.requestList[idx] = { time, type, state, senderID, payload, senderAvatar, username }
       }
-    },
-
-    // 群验证的消息文本
-    groupMailText(msg) {
-      const { type, username, groupName } = msg
-      const mapping = {
-        join: `${username} 申请加入 ${groupName}`,
-        friend: `${username} 申请加你为好友`,
-      }
-
-      return mapping[type]
-    },
-
-    // 审核验证消息
-    requestResponse(type, group, time, verdict) {
-      const uuid = this.$store.state.account
-      const URLmapping = {
-        join: `http://${localStorage.getItem('adress')}/v1/group/${group}/verify/request/${time}`,
-        friend: `http://${localStorage.getItem('adress')}/v1/user/${uuid}/verify/request/${time}`,
-      }
-      const url = URLmapping[type]
-      const headers = { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }}
-      const method = verdict ? axios.post(url, {}, headers) : axios.delete(url, headers)
-      method.then(res => {
-        ElMessage.success(verdict ? "已通过" : "已拒绝")
-      }).catch(err => {
-        ElMessage({
-          message: `操作失败 ${err.response.data.detail}`,
-          duration: 6000,
-          type: "error",
-        })
-      })
     },
 
     joined(msg) {
       this.$emit('joinGroupSuccess', msg)
     },
+
+    buildOrGetDB() {
+      const db = new Dexie('Notice')
+      db.version(1).stores({
+        notice: "&time",
+      })
+      this.DB = new dbCRUD(db)
+    },
+
+    async loadNoticeHistory() {
+      const history = await this.DB.queryRange('notice', this.page * this.step, this.step, true)
+      for (const msg of history) {
+        this.noticeList.push(msg)
+      }
+      this.page += 1
+    },
+
+    newNotice(noticeMsg) {
+      this.noticeList.unshift(noticeMsg)
+      this.DB.add("notice", {
+        time: noticeMsg.time, 
+        type: noticeMsg.type, 
+        subType: noticeMsg.subType, 
+        payload: noticeMsg.payload,
+      })
+    },
+
+    deleteNotice(time) {
+      const idx = this.noticeList.findIndex(i => i.time === time)
+      this.noticeList.splice(idx, 1)
+      this.DB.delete("notice", "time", time)
+      ElMessage.success("删除成功")
+    },
+
+    async onScroll() {
+      const threshold = 50
+      if (this.$refs.NoticeList.scrollTop <= threshold) {
+        await this.loadNoticeHistory()
+      }
+    },
   },
 
-  mounted() {
+  async mounted() {
     this.searchState = 0
+    this.buildOrGetDB()
+    await this.loadNoticeHistory()
   },
 
   components: {
     sysMsgGetter,
     namecard,
+    eachNotice,
+    eachRequest,
   }
 }
 </script>
@@ -392,61 +412,15 @@ export default {
   cursor: pointer;
 }
 
-.GroupMails {
+.requests {
   display: flex;
   flex-direction: column;
   max-height: 40vh;
   overflow: scroll;
 }
 
-.GroupMails::-webkit-scrollbar {
+.requests::-webkit-scrollbar {
   display: none;
-}
-
-.mail {
-  display: flex;
-  padding: 8px;
-  border-radius: 16px;
-}
-
-.mail img {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-}
-
-.mail .mailTexts {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  justify-content: space-around;
-  margin: 0 24px;
-}
-
-.mail .mailOpers {
-  display: flex;
-  justify-content: space-around;
-  width: 20%;
-  height: 100%;
-  margin: auto 0;
-}
-
-.mail .mailOpers svg {
-  width: 36px;
-  height: 36px;
-  cursor: pointer;
-}
-
-.mail .mailOpers svg:nth-child(1):hover {
-  color: var(--warn);
-}
-
-.mail .mailOpers svg:nth-child(2):hover {
-  color: var(--check);
-}
-
-.mailResponse {
-  line-height: 48px;
 }
 
 .groupOpersItem {
@@ -475,7 +449,6 @@ export default {
   width: 75%;
 }
 
-
 .searchResult {
   width: 100%;
   display: flex;
@@ -485,7 +458,7 @@ export default {
 }
 
 .searchResultL {
-  display: flex ;
+  display: flex;
 }
 
 .searchResultL img {
@@ -506,7 +479,7 @@ export default {
   font-size: 1.25rem;
 }
 
-.searchResultR { 
+.searchResultR {
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -515,11 +488,13 @@ export default {
 
 
 <style>
-.searchDialog .el-dialog__header {
+.searchDialog .el-dialog__header,
+.mailDialog .el-dialog__header {
   display: none;
 }
 
-.searchDialog .el-dialog__body {
-  padding-top: 20px;
+.searchDialog .el-dialog__body,
+.mailDialog .el-dialog__body{
+  padding-top: 0;
 }
 </style>

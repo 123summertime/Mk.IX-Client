@@ -28,6 +28,6 @@ export class dbCRUD {
   }
 
   deleteDB() {
-    return this.DB.delete()
+    return this.DB.delete({disableAutoOpen: false})
   }
 }

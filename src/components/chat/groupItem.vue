@@ -4,10 +4,10 @@
     <div class="groupInfo">
       <p :class="['groupName', active ? 'groupNameActive' : '']">{{ name }}</p>
       <p class="currMessage">
-        <p :class="['currMessageContext', active ? 'currMessageContextActive': '']">
+        <i :class="['currMessageContext', active ? 'currMessageContextActive': '']">
           <i class='attention' v-if="showAttention">{{ `[${this.attentionContent}]` }}</i>
           {{ lastMessage }}
-        </p>
+        </i>
       </p>
     </div>
     <div class="rightSide">
@@ -67,6 +67,7 @@ export default {
       if (!message) {
         this.lastMessage = " "
         this.lastMessageTime = ""
+        this.$refs.groupInfoRoot.style.order = 2147483647
         return
       }
 
@@ -116,7 +117,8 @@ export default {
     },
 
     getLastMessage() {
-      return this.$store.state[`lastMessageOf${this.group}`]
+      const a = this.$store.state[`lastMessageOf${this.group}`]
+      return a
     },
 
     needAttention() {
@@ -138,9 +140,7 @@ export default {
     getLastMessage: {
       deep: true,
       handler(newVal) {
-        if (newVal) {
-          this.computeInfo(newVal)
-        }
+        this.computeInfo(newVal)
       }
     },
 
@@ -246,7 +246,7 @@ export default {
 
 .attention {
   color: var(--groupItem-attention);
-  margin-right: 4px;
+  margin-right: 2px;
 }
 
 .currMessageContext {

@@ -123,7 +123,7 @@ export default {
           localGroups.delete(group.group)
           this.getGroupInfo(group, true)
         }
-        for (const group in localGroups) {
+        for (const group of localGroups) {
           this.getGroupInfo({group}, false)
         }
       }).catch(err => {
@@ -271,24 +271,30 @@ export default {
     },
 
     // 加入某群后
-    async joinGroupSuccess(info, autoChangeGroup) {
+    async joinGroupSuccess(info) {
       const res = await this.getAdminsInfo(info.target)
       const groupInfo = await queryInfo('Group', info.targetKey, info.target)
       const owner = { [res.owner.uuid]: res.owner.lastUpdate }
       const admin = {}
       res.admin.forEach(i => { admin[i.uuid] = i.lastUpdate })
       const element = { ...groupInfo, admins: { owner, admin }, available: true }
+      const idx = this.groupList.findIndex(i => i.group === info.target)
+      if (idx != -1) {
+        this.groupList.splice(idx, 1)
+      }
       this.groupList.push(element)
-      if (autoChangeGroup) {
-        this.currGroupChange(info.target, groupInfo.name)
+      if (this.currGroupID === info.target) {
+        this.currGroupAvailable = true
       }
     },
 
     // 删除某群历史记录
     deleteHistory(group) {
+      this.drawer = false
       this.currGroupID = ""
-      this.groupList.splice(this.groupList.findIndex(i => i.group == group), 1)
+      this.currGroupName = ""
       this.$store.state.groupDB[group].deleteDB().then(() => {
+        this.groupList.splice(this.groupList.findIndex(i => i.group === group), 1)
         ElMessage.success("清空聊天记录成功")
       }).catch(err => {
         ElMessage({
@@ -475,25 +481,28 @@ export default {
 <!-- 
 文件关系结构
 chatPage
-  |- groupItem
-  |- splitter
-  |- tools
-  |     |- sysMsgGetter
-  |- groupConfig
-  |     |- eachMember
-  |     |     |- namecard
-  |- inputBox
-  |     |- atBar
-  |     |- favorite
-  |     |- audioMsg
-  |- chatItem
-  |     |- message
-  |     |     |- broadcast
-  |     |     |- fileMsg
-  |     |     |- imageMsg
-  |     |     |- textMsg
-  |     |     |- audioMsg
-  |     |     |- messageMenu
-  |     |     |- namecard
-  |     |     |- groupSelector 
+  ├─ groupItem
+  ├─ splitter
+  ├─ tools
+  │     ├─ namecard
+  │     ├─ sysMsgGetter
+  │     ├─ eachNotice  
+  │     └─ eachRequest
+  ├─ groupConfig
+  │     └─ eachMember
+  │           └─ namecard
+  ├─ inputBox
+  │     ├─ atBar
+  │     ├─ favorite
+  │     └─ audioMsg
+  └─ chatItem
+        └─ message
+              ├─ broadcast
+              ├─ fileMsg
+              ├─ imageMsg
+              ├─ textMsg
+              ├─ audioMsg
+              ├─ messageMenu
+              ├─ namecard
+              └─ groupSelector 
  -->

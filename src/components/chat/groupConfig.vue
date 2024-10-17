@@ -40,7 +40,7 @@
   </div>
 
   <!-- 修改群头像 -->
-  <el-dialog v-model="editAvatarVisible" width="540px">
+  <el-dialog v-model="editAvatarVisible" width="640px">
     <ImgCutter class="imgCutter"
       :isModal="false"
       :boxWidth="500"
@@ -54,7 +54,7 @@
   </el-dialog>
 
   <!-- 修改群名 -->
-  <el-dialog title="修改群名" v-model="editGroupNameVisible" width="540px">
+  <el-dialog title="修改群名" v-model="editGroupNameVisible" width="640px">
     <el-input v-model="groupName" placeholder="新群名" />
     <template #footer>
       <span class="dialog-footer">
@@ -65,7 +65,7 @@
   </el-dialog>
 
   <!-- 清空聊天记录确认 -->
-  <el-dialog v-model="deleteHistoryVisible" width="540px">
+  <el-dialog v-model="deleteHistoryVisible" width="640px">
     <div class="deleteHistoryText">
       <WarningFilled></WarningFilled>
       <p>确认清空聊天记录?</p>
@@ -79,7 +79,7 @@
   </el-dialog>
 
   <!-- 退出群确认 -->
-  <el-dialog v-model="unsubscribeVisible" width="540px">
+  <el-dialog v-model="unsubscribeVisible" width="640px">
     <div class="unsubscribeText">
       <WarningFilled></WarningFilled>
       <p>{{ getRole === 'owner' ? '确认解散群?' : '确认退出群?' }}</p>
@@ -96,7 +96,7 @@
   <!-- 群成员信息 -->
   <el-dialog v-model="membersVisible"
     class="memberInfo"
-    width="540px"
+    width="640px"
     :title="`${this.info.name} (${this.membersCount})`"
     style="max-height: 70vh; overflow-y: auto;">
     <ul class="list">

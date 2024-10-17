@@ -6,6 +6,7 @@ export default {
     'newJoinRequest',
     'newFriendRequest',
     "joined",
+    "notice",
   ],
 
   methods: {
@@ -37,6 +38,10 @@ export default {
         friended: () => {
           ElMessage.success(`你已成功加入 ${payload}`)
           this.$emit('joined', msg)
+        },
+        // 通知消息
+        notice: () => {
+          this.$emit('notice', msg)
         }
       }
 

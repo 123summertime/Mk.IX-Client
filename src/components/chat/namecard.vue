@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="namecardVisible" width="540">
+  <el-dialog v-model="namecardVisible" width="640px">
     <div class="namecard">
       <div class="namecardAvatar">
         <img :src="avatar" />
@@ -23,7 +23,7 @@
         </span>
         <span v-if="!messageFrom()">
           <el-button type="primary" @click="friendRequestVisible = true">发送好友申请</el-button>
-          <el-dialog v-model="friendRequestVisible" width="540" title="好友申请">
+          <el-dialog v-model="friendRequestVisible" width="640px" title="好友申请">
             <div>
               <el-input v-model="reason" placeholder="申请理由(选填)" />
             </div>
