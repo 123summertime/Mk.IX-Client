@@ -439,7 +439,6 @@ textarea {
   height: 100%;
   padding: 8px 16px 16px 16px;
   font-size: 1.2rem;
-  font-family: Microsoft Yahei;
   resize: none;
   border: none;
   outline: none;

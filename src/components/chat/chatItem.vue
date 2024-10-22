@@ -98,8 +98,9 @@ export default {
 
     // 撤回一条消息
     revokeMsg(time) {
-      this.$store.state.wsConnections[this.group].send(JSON.stringify({
-        type: 'revoke',
+      this.$store.state.ws.send(JSON.stringify({
+        type: 'revokeRequest',
+        group: this.group,
         payload: {
           name: null,
           size: null,
@@ -110,24 +111,21 @@ export default {
 
     // 其他用户撤回了一条消息，修改历史记录
     async newRevokeHandler(message) {
-      const revokeID = message.payload.content
-      const revokeMsg = await this.DB.query('History', { time: revokeID })
-      const newPayload = {
-        name: null,
-        size: null,
-        content: `${message.username} 撤回了一条${revokeMsg.uuid === message.uuid ? '' : '成员'}消息`,
-        meta: null,
+      const target = message.payload.meta.time
+      const revokeMsg = await this.DB.query('History', { time: target })
+      if (revokeMsg) {
+        const storage = {
+          time: target,
+          uuid: revokeMsg.uuid,
+          type: "revoke",
+          payload: { content: message.payload.content }
+        }
+        await this.DB.update('History', storage)
+        const idx = this.messageList.findIndex(i => i.time === target)
+        if (idx != -1) { this.messageList[idx] = message }
+        return true
       }
-
-      revokeMsg.type = 'revoke'
-      revokeMsg.payload = newPayload
-      await this.DB.update('History', revokeMsg)
-
-      const idx = this.messageList.findIndex(i => i.time === revokeID)
-      if (idx != -1) {
-        this.messageList[idx].type = 'revoke'
-        this.messageList[idx].payload = newPayload
-      }
+      return false
     },
 
     // 其他用户@你
@@ -169,10 +167,8 @@ export default {
 
     async newMessageHandler(message) {
       if (!message) { return }
-
       if (message.type === 'revoke') {
-        this.newRevokeHandler(message)
-        return
+        if (await this.newRevokeHandler(message)) { return }
       }
 
       this.newAttentionHandler(message)
@@ -184,6 +180,7 @@ export default {
         uuid: message.uuid,
         payload: JSON.parse(JSON.stringify(message.payload))
       }
+
       this.messageList.push(message)
       this.putHistory(storage)
 

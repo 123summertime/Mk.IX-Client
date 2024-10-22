@@ -26,7 +26,7 @@
         <div class="groupToolBar" v-show="currGroupID">
           <p>{{ currGroupName }}</p>
           <MoreFilled @click="drawer = !drawer"></MoreFilled>
-          <el-drawer v-model="drawer" :with-header="false" :destroy-on-close="true" style="min-width: 400px;">
+          <el-drawer v-model="drawer" :with-header="false" :destroy-on-close="true" style="max-width: 600px;min-width: 400px;">
             <groupConfig v-if="currGroupID"
               :info="groupList.find(item => item.group === currGroupID)"
               :isPinned="pinned[currGroupID]"

@@ -93,8 +93,9 @@ export default {
         })
         return
       }
+
       if (this.message.type === 'text') {
-        cb.writeText(this.message.content)
+        cb.writeText(this.message.payload.content)
       }
       if (this.message.type === 'image') {
         const blob = this.base64ToBlob(this.message.payload.content, "image/png")

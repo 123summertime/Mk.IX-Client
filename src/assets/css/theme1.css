@@ -23,6 +23,7 @@
 }
 
 :root {
+  --self: var(--basic-0-0);
   --owner: var(--basic-3-0);
   --admin: var(--basic-4-0);
   --text: var(--neutral-5);
@@ -126,6 +127,11 @@
 /* eachNotice */
 :root {
   --eachNotice-hover: var(--neutral-1);
+}
+
+/* eachRequest */
+:root {
+  --eachRequest-hover: var(--neutral-1);
 }
 
 /* 覆盖el原有样式 */

@@ -6,11 +6,13 @@
       <Warning v-else class="neutral"></Warning>
     </div>
     <div class="content">
-      <p class="line1">{{ msg.payload }}</p>
-      <p class="line2">{{ formatTime(msg.time) }}</p>
+      <p :title="msg.payload">{{ msg.payload }}</p>
+    </div>
+    <div>
+      <p class="time">{{ formatTime(msg.time) }}</p>
     </div>
     <div class="opers" title="删除" @click="remove">
-      <Remove></Remove>
+      <Delete></Delete>
     </div>
   </div>
 </template>
@@ -43,6 +45,7 @@ export default {
 .eachNoticeRoot {
   display: flex;
   align-items: center;
+  width: 100%;
   height: 64px;
   padding: 8px;
   border-radius: 8px;
@@ -53,40 +56,48 @@ export default {
 }
 
 .icon {
-  width: 48px;
-  height: 48px;
-}
-
-.icon svg {
-  width: 100%;
-  height: 100%;
+  flex: 0 0 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 100%;
-  margin-left: 24px;
-}
-.content .line1 {
-  font-size: 1rem;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 0 12px;
 }
 
-.content .line2 {
+.content p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.time {
+  flex: 0 0 auto;
   font-size: 0.75rem;
+  line-height: 1rem;
   opacity: 0.8;
+  white-space: nowrap;
+  margin-right: 24px;
 }
 
 .opers {
-  width: 24px;
-  height: 24px;
+  flex: 0 0 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .opers svg {
-  width: 100%;
-  height: 100%;
+  width: 24px;
   cursor: pointer;
+}
+
+.opers svg:hover {
+  color: var(--warn);
+  transform: scale(1.2);
 }
 
 .positive {

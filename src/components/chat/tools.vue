@@ -18,12 +18,12 @@
   <el-dialog v-model="mailVisible" class="mailDialog" width="640px">
     <el-tabs v-model="mailTab">
       <el-tab-pane label="通知" name="notice">
-        <div class="requests" @scroll="onScroll" ref="NoticeList">
+        <div class="mailItems" @scroll="onScroll" ref="NoticeList">
           <eachNotice v-for="msg in noticeList" :key="msg.time" :msg="msg" @deleteNotice="deleteNotice"></eachNotice>
         </div>
       </el-tab-pane>
       <el-tab-pane label="收到的申请" name="receiveRequest">
-        <div class="requests">
+        <div class="mailItems">
           <eachRequest v-for="msg in requestList" :key="msg.time" :msg="msg"></eachRequest>
         </div>
       </el-tab-pane>
@@ -412,14 +412,14 @@ export default {
   cursor: pointer;
 }
 
-.requests {
+.mailItems {
   display: flex;
   flex-direction: column;
   max-height: 40vh;
   overflow: scroll;
 }
 
-.requests::-webkit-scrollbar {
+.mailItems::-webkit-scrollbar {
   display: none;
 }
 

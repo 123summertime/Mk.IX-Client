@@ -43,7 +43,7 @@
   <el-dialog v-model="editAvatarVisible" width="640px">
     <ImgCutter class="imgCutter"
       :isModal="false"
-      :boxWidth="500"
+      :boxWidth="600"
       fileType="webp"
       rate="1:1"
       @cutDown="groupAvatarModified">
@@ -375,11 +375,6 @@ export default {
 .list::-webkit-scrollbar {
   display: none;
 }
-
-.list li {
-  margin: 4px 0;
-}
-
 li .el-switch {
   height: 48px;
 }

@@ -3,18 +3,19 @@
     <div class="info">
       <img :src="avatar" @click="namecardTrigger = !namecardTrigger" />
       <p :class="['nameplate', role + 'Nameplate']" v-if="this.role != 'user'">{{ role == 'owner' ? '群主' : '管理员' }}</p>
+      <p class="nameplate selfNameplate" v-if="isSelf">我</p>
       <p class="name">{{ username }}</p>
     </div>
     <div class="oper">
       <div v-if="showAt" @click="newAt">
-        <p class="icon">@</p>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><path fill="currentColor" d="M67.565714 514.139429c0 282.422857 191.140571 453.851429 454.290286 453.851428 70.710857 0 138.861714-9.856 180.845714-23.570286 29.586286-9.417143 39.003429-24.850286 39.003429-40.704s-12.434286-27.867429-28.708572-27.867428c-4.717714 0-11.574857 0.859429-20.132571 2.998857-52.297143 12.873143-96.859429 21.430857-157.293714 21.430857-234.861714 0-394.294857-141.421714-394.294857-383.561143 0-231.862857 150.857143-393.435429 378.002285-393.435428 201.014857 0 369.005714 123.867429 369.005715 346.294857 0 129.846857-44.141714 217.289143-114.432 217.289143-47.140571 0-74.130286-27.428571-74.130286-74.148572v-290.56c0-23.149714-12.854857-37.302857-34.285714-37.302857-21.430857 0-35.145143 14.153143-35.145143 37.302857v48.841143h-3.858286c-21.869714-52.717714-75.428571-86.125714-138.861714-86.125714-110.994286 0-189.001143 94.701714-189.001143 230.546286 0 137.142857 77.568 232.722286 190.72 232.722285 66.011429 0 117.430857-36.004571 142.281143-96.859428h3.84c8.594286 60.434286 59.154286 97.28 127.305143 97.28 119.570286 0 193.718857-117.412571 193.718857-281.984 0-249.014857-183.442286-410.569143-436.297143-410.569143-266.130286 0-452.571429 182.125714-452.571429 458.130286z m433.298286 166.290285c-77.165714 0-125.586286-63.853714-125.586286-165.430857 0-99.84 48.859429-163.712 126.006857-163.712 78.427429 0 128.146286 62.573714 128.146286 162.011429 0 101.558857-50.578286 167.131429-128.566857 167.131428z"></path></svg>
       </div>
       <div v-if="getManagePermission" @click="beforeRequestCheck(adminModify, modifyAdminCheckerText)" :title="role === 'user' ? '添加管理员' : '移除管理员'">
         <CirclePlus v-if="role === 'user'"></CirclePlus>
-        <Remove v-else-if="role === 'admin'"></Remove>
+        <Remove v-else-if="role === 'admin'" class="warnSVG"></Remove>
       </div>
       <div v-if="getRemovePermission" @click="beforeRequestCheck(userRemoved, modifyMemberCheckerText)" title="移除群聊">
-        <Close></Close>
+        <Close class="warnSVG"></Close>
       </div>
     </div>
 
@@ -27,7 +28,7 @@
 
     <el-dialog v-model="checkerVisible" width="640px">
     <div class="checker">
-      <WarningFilled></WarningFilled>
+      <Warning></Warning>
       <p>{{ checkerText }}</p>
     </div>
     <template #footer>
@@ -162,6 +163,10 @@ export default {
 
     modifyMemberCheckerText() {
       return `确认将 ${this.username} 移除群聊?`
+    },
+
+    isSelf() {
+      return this.uuid === this.$store.state.account
     }
   },
 
@@ -190,6 +195,8 @@ export default {
 
 .info {
   display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 .info img {
@@ -200,14 +207,14 @@ export default {
 }
 
 .nameplate {
-  margin: 12px 0 12px 12px;
+  margin-left: 12px;
   line-height: 24px;
   padding: 0 6px;
   border-radius: 10px;
+  color: var(--text);
 }
 
 .name {
-  line-height: 48px;
   margin-left: 12px;
   color: var(--text);
 }
@@ -220,39 +227,56 @@ export default {
   background-color: var(--admin);
 }
 
+.selfNameplate {
+  background-color: var(--self);
+}
+
 .oper {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 0 0 96px;
 }
 
 .oper div {
-  width: 24px;
-  height: 24px;
-  margin: auto 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 24px;
+}
+
+.oper div svg {
+  color: var(--text);
   cursor: pointer;
 }
 
-.oper div svg, 
-.oper div .icon {
-  width: 100%;
-  height: 100%;
-  font-size: 24px;
-  line-height: 24px;
-  color: var(--text);
+.oper div svg:hover {
+  color: var(--check);
+  transform: scale(1.2);
+}
+
+.oper div .warnSVG:hover {
+  color: var(--warn);
 }
 
 .checker {
   display: flex;
+  align-items: center;
   width: 100%;
   height: 48px;
 }
 
 .checker svg {
-  width: 48px;
-  height: 48px;
+  flex: 0 0 48px;
+  color: var(--text);
 }
 
 .checker p {
-  line-height: 48px;
-  margin-left: 16px;
+  flex: 1;
+  margin-left: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
