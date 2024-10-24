@@ -9,7 +9,7 @@
   --basic-2-0: #9896f1;
   --basic-3-0: #ffd900;
   --basic-4-0: #3eede7;
-  --basic-5-0: #c9171e;
+  --basic-5-0: #f85149;
   --basic-6-0: #00bc12;
 
   --neutral-0: #fffefb;
@@ -20,6 +20,7 @@
   --neutral-5: #1d1c1c;
 
   --spical-0: rgba(213, 155, 246, 0.6);
+  --spical-1: rgba(255, 205, 210, 0.6);
 }
 
 :root {

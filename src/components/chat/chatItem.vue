@@ -271,7 +271,7 @@ export default {
 
 .attentionButton p {
   height: 100%;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   line-height: 32px;
 }
 

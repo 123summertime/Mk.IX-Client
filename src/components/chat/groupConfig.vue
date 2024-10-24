@@ -1,40 +1,64 @@
 <template>
   <div class="groupConfigRoot">
-    <ul class="groupItems">
-      <li>
+    <span class="title">
+      <p>群聊信息</p>
+    </span>
+    <ul class="general">
+      <li class="avatar">
         <p>群头像</p>
         <img class="groupAvatar" :src="info.avatar" title="点击修改头像" @click="beforeModifyAvatar" />
+        <ArrowRight class="arrow hiddenArrow" />
       </li>
-      <li @click="checkPermissions ? this.editGroupNameVisible = true : ''">
-        <p>群名称</p>
-        <div class="groupName">
-          <p>{{ this.info.name }}</p>
-          <ArrowRight :class="['arrow', checkPermissions ? '' : 'hiddenArrow']" />
-        </div>
-      </li>
+
       <li>
         <p>群ID</p>
-        <div class="groupID">
-          <p>{{ info.group }}</p>
-          <ArrowRight class="arrow hiddenArrow" />
-        </div>
+        <p>{{ info.group }}</p>
+        <ArrowRight class="arrow hiddenArrow" />
       </li>
+
+      <li @click="checkPermissions ? editGroupNameVisible = true : ''">
+        <p>群名称</p>
+        <p>{{ this.info.name }}</p>
+        <ArrowRight :class="['arrow', checkPermissions ? '' : 'hiddenArrow']" />
+      </li>
+
       <li v-if="available" @click="membersVisible = true">
         <p>群成员</p>
-        <div class="members" title="点击查看详细信息">
-          <p>{{ membersCount + "人" }}</p>
-          <ArrowRight class="arrow" />
-        </div>
+        <p>{{ membersCount + "人" }}</p>
+        <ArrowRight class="arrow" />
+      </li>
+
+      <li v-if="available && checkPermissions" @click="editGroupQAVisible = true">
+        <p>入群问题</p>
+        <ArrowRight class="arrow" />
+      </li>
+    </ul>
+
+    <span class="title">
+      <p>个人设置</p>
+    </span>
+    <ul class="general">
+      <li>
+        <p>加密</p>
+        <ArrowRight class="arrow" />
       </li>
       <li>
         <p>置顶</p>
         <el-switch v-model="currPinned" @change="groupPinnedModified" />
       </li>
-      <li class="deleteHistory">
-        <el-button type="danger" @click="deleteHistoryVisible = true">清空聊天记录</el-button>
+    </ul>
+
+    <span class="title dangerTitle">
+      <p>高危操作</p>
+    </span>
+    <ul class="dangerZone">
+      <li @click="deleteHistoryVisible = true" >
+        <p class="dangerItem">删除聊天记录</p>
+        <ArrowRight class="arrow dangerItem" />
       </li>
-      <li class="unsubscribe" v-if="available">
-        <el-button type="danger" @click="unsubscribeVisible = true">{{ getRole === 'owner' ? '解散群' : '退出群' }}</el-button>
+      <li v-if="available" @click="unsubscribeVisible = true">
+        <p class="dangerItem">{{ getRole === 'owner' ? '解散群' : '退出群' }}</p>
+        <ArrowRight class="arrow dangerItem" />
       </li>
     </ul>
   </div>
@@ -47,9 +71,9 @@
       fileType="webp"
       rate="1:1"
       @cutDown="groupAvatarModified">
-    <template #cancel>
-      <el-button @click="editAvatarVisible = false">取消</el-button>
-    </template>
+      <template #cancel>
+        <el-button @click="editAvatarVisible = false">取消</el-button>
+      </template>
     </ImgCutter>
   </el-dialog>
 
@@ -57,39 +81,47 @@
   <el-dialog title="修改群名" v-model="editGroupNameVisible" width="640px">
     <el-input v-model="groupName" placeholder="新群名" />
     <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="editGroupNameVisible = false">取消</el-button>
-        <el-button type="primary" @click="groupNameModified">确认修改</el-button>
-      </span>
+      <el-button @click="editGroupNameVisible = false">取消</el-button>
+      <el-button type="primary" @click="groupNameModified">确认修改</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 修改入群问题 -->
+  <el-dialog title="修改入群问题" v-model="editGroupQAVisible" width="640px">
+    <div class="editQAContent">
+      <p>正确回答入群问题可以直接加入群聊，无需验证</p>
+      <p>问题允许为空，为空时该群聊将无法被搜索到</p>
+      <el-input v-model="newGroupQ" placeholder="入群问题" />
+      <el-input v-model="newGroupA" placeholder="入群问题的答案" />
+    </div>
+    <template #footer>
+      <el-button @click="editGroupQAVisible = false">取消</el-button>
+      <el-button type="primary" @click="groupQAModified">确认修改</el-button>
     </template>
   </el-dialog>
 
   <!-- 清空聊天记录确认 -->
   <el-dialog v-model="deleteHistoryVisible" width="640px">
-    <div class="deleteHistoryText">
-      <WarningFilled></WarningFilled>
+    <div class="checker">
+      <Warning></Warning>
       <p>确认清空聊天记录?</p>
     </div>
     <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="deleteHistoryVisible = false">取消</el-button>
-        <el-button type="danger" @click="deleteHistory">确认删除</el-button>
-      </span>
+      <el-button @click="deleteHistoryVisible = false">取消</el-button>
+      <el-button type="danger" @click="deleteHistory">确认删除</el-button>
     </template>
   </el-dialog>
 
   <!-- 退出群确认 -->
   <el-dialog v-model="unsubscribeVisible" width="640px">
-    <div class="unsubscribeText">
-      <WarningFilled></WarningFilled>
+    <div class="checker">
+      <Warning></Warning>
       <p>{{ getRole === 'owner' ? '确认解散群?' : '确认退出群?' }}</p>
     </div>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="unsubscribeVisible = false">取消</el-button>
-        <el-button type="danger" @click="unsubscribe(false)">{{ getRole === 'owner' ? '确认解散' : '确认退出' }}</el-button>
-        <el-button type="danger" @click="unsubscribe(true)">{{ (getRole === 'owner' ? '确认解散' : '确认退出') + "并清空聊天记录" }}</el-button>
-      </span>
+    <template #footer class="di">
+      <el-checkbox class="checkbox" v-model="unsubscribeAndDeleteHistory" label="同时删除本地聊天记录" />
+      <el-button @click="unsubscribeVisible = false">取消</el-button>
+      <el-button type="danger" @click="unsubscribe">{{ getRole === 'owner' ? '确认解散' : '确认退出' }}</el-button>
     </template>
   </el-dialog>
 
@@ -99,8 +131,8 @@
     width="640px"
     :title="`${this.info.name} (${this.membersCount})`"
     style="max-height: 70vh; overflow-y: auto;">
-    <ul class="list">
-      <li>
+    <div class="list">
+      <div>
         <eachMember v-for="(lastUpdate, uuid) in (info.admins.owner)"
           :key="uuid"
           :uuid="uuid"
@@ -108,8 +140,8 @@
           :role="'owner'"
           :currentUserPermission="getRole"
           :group="info.group"></eachMember>
-      </li>
-      <li v-if="Object.keys(info.admins.admin).length">
+      </div>
+      <div v-if="Object.keys(info.admins.admin).length">
         <eachMember v-for="(lastUpdate, uuid) in (info.admins.admin)"
           :key="uuid"
           :uuid="uuid"
@@ -119,8 +151,8 @@
           :currentUserPermission="getRole"
           @groupAdminModified="groupAdminModified"
           @userRemoved="userRemoved"></eachMember>
-      </li>
-      <li v-if="membersInfo">
+      </div>
+      <div v-if="membersInfo">
         <eachMember v-for="(lastUpdate, uuid) in membersInfo"
           :key="uuid"
           :uuid="uuid"
@@ -130,8 +162,8 @@
           :currentUserPermission="getRole"
           @groupAdminModified="groupAdminModified"
           @userRemoved="userRemoved"></eachMember>
-      </li>
-    </ul>
+      </div>
+    </div>
   </el-dialog>
 </template>
 
@@ -159,11 +191,15 @@ export default {
   data() {
     return {
       groupName: "",
+      newGroupQ: "",
+      newGroupA: "",
       editAvatarVisible: false,
       editGroupNameVisible: false,
       membersVisible: false,
       unsubscribeVisible: false,
+      unsubscribeAndDeleteHistory: false,
       deleteHistoryVisible: false,
+      editGroupQAVisible: false,
       currPinned: this.isPinned,
       membersCount: 0,
       membersInfo: {},
@@ -207,6 +243,22 @@ export default {
         this.editAvatarVisible = false
         ElMessage.success("修改成功")
         this.$emit('groupAvatarModified', { group: this.info.group, avatar: base64 })
+      }).catch(err => {
+        ElMessage({
+          message: `修改失败 ${err.response.data.detail}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+
+    groupQAModified() {
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/verify/question`
+      axios.patch(URL, { Q: this.newGroupQ, A: this.newGroupA }, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        this.editGroupQAVisible = false
+        ElMessage.success("修改成功")
       }).catch(err => {
         ElMessage({
           message: `修改失败 ${err.response.data.detail}`,
@@ -272,7 +324,7 @@ export default {
     },
 
     // 处理退出/解散群
-    unsubscribe(deleteHistory) {
+    unsubscribe() {
       const URL = this.getRole === 'owner'
         ? `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}`
         : `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/members/me`
@@ -282,7 +334,7 @@ export default {
       }).then(res => {
         ElMessage.success("退出成功")
         this.unsubscribeVisible = false
-        if (deleteHistory) {
+        if (this.unsubscribeAndDeleteHistory) {
           setTimeout(() => {
             this.deleteHistory()
           }, 200);
@@ -325,44 +377,87 @@ export default {
 </script>
 
 <style scoped>
-.groupItems li {
+.groupConfigRoot .title {
+  display: inline-block;
+  border-bottom: 2px solid var(--spical-0);
+  margin-bottom: 16px;
+}
+
+.groupConfigRoot .title p {
+  font-size: 1.4rem;
+  padding: 6px 24px 6px 0;
+}
+
+.groupConfigRoot .dangerTitle {
+  border-bottom: 2px solid var(--spical-1);
+}
+
+.groupConfigRoot .dangerTitle p {
+  color: var(--basic-5-0);
+}
+
+ul {
+  overflow: hidden;
+}
+
+ul li {
   display: flex;
   justify-content: space-between;
-  height: 48px;
-  line-height: 48px;
-  margin: 8px 0;
-}
-
-.groupItems li:nth-of-type(1) {
-  height: 64px;
-  line-height: 64px;
-}
-
-.groupAvatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+  align-items: center;
+  padding: 16px;
   cursor: pointer;
 }
 
-.groupName, .groupID, .members {
-  display: flex;
+.avatar {
+  height: 160px;
+}
+
+.avatar img {
   height: 100%;
+  border-radius: 16px;
   cursor: pointer;
+}
+
+li p:nth-of-type(1) {
+  flex: 1 0 auto;
+  font-size: 1.2rem;
+}
+
+li p:nth-of-type(2) {
+  color: var(--neutral-3);
+}
+
+li .dangerItem {
+  color: var(--warn);
 }
 
 .arrow {
-  width: 24px;
-  height: 24px;
-  margin: 12px 0 12px 8px;
+  flex: 0 0 24px;
+  margin-left: 12px;
 }
 
 .hiddenArrow {
   visibility: hidden;
 }
 
-.groupID {
-  cursor: default;
+.general {
+  border: 2px solid var(--spical-0);
+  border-radius: 8px;
+  margin-bottom: 32px;
+}
+
+.general li:hover {
+  background-color: var(--spical-0);
+}
+
+.dangerZone {
+  border: 2px solid var(--spical-1);
+  border-radius: 8px;
+  /* background-image: repeating-linear-gradient(-45deg, var(--spical-1), var(--spical-1) 8px, transparent 8px, transparent 24px); */
+}
+
+.dangerZone li:hover {
+  background-color: var(--spical-1);
 }
 
 .list {
@@ -375,32 +470,34 @@ export default {
 .list::-webkit-scrollbar {
   display: none;
 }
-li .el-switch {
-  height: 48px;
-}
 
-li .el-button {
-  width: 100%;
-  height: 80%;
-  margin: auto 0;
-}
-
-.unsubscribeText,
-.deleteHistoryText {
+.checker {
   display: flex;
+  align-items: center;
   width: 100%;
   height: 48px;
 }
 
-.unsubscribeText svg,
-.deleteHistoryText svg {
-  width: 48px;
-  height: 48px;
+.checker svg {
+  flex: 0 0 48px;
+  color: var(--text);
 }
 
-.unsubscribeText p,
-.deleteHistoryText p {
-  line-height: 48px;
-  margin-left: 16px;
+.checker p {
+  flex: 1;
+  margin-left: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.editQAContent p, 
+.editQAContent .el-input {
+  margin-bottom: 16px;
+}
+
+.checkbox {
+  float: left;
 }
 </style>

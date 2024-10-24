@@ -130,7 +130,7 @@ export default {
 }
 
 .reason {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   opacity: 0.8;
 }
 
@@ -140,7 +140,7 @@ export default {
 }
 
 .time p {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   opacity: 0.8;
 }
 

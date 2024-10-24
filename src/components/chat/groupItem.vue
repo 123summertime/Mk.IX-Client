@@ -1,19 +1,24 @@
 <template>
   <div :class="['groupInfoRoot', rootClasses]" ref="groupInfoRoot">
-    <img class="groupAvatar" :src="avatar">
+    <div class="groupAvatar">
+      <img :src="avatar">
+    </div>
+    
     <div class="groupInfo">
-      <p :class="['groupName', active ? 'groupNameActive' : '']">{{ name }}</p>
-      <p class="currMessage">
-        <i :class="['currMessageContext', active ? 'currMessageContextActive': '']">
+      <p :class="['groupName', 'noOverflow', active ? 'groupNameActive' : '']">{{ name }}</p>
+      <p :class="['currMessageContext', 'noOverflow', active ? 'currMessageContextActive': '']" >
+        <i>
           <i class='attention' v-if="showAttention">{{ `[${this.attentionContent}]` }}</i>
           {{ lastMessage }}
         </i>
       </p>
     </div>
+
     <div class="rightSide">
       <p v-show="lastMessageTime" :class="['time', active ? 'timeActive': '']">{{ lastMessageTime }}</p>
       <p v-show="unreadCount" class="unread">{{ unreadCount <= 99 ? unreadCount : "99+" }}</p>
     </div>
+
   </div>
 </template>
 
@@ -210,38 +215,34 @@ export default {
 }
 
 .groupAvatar {
-  width: 48px;
-  height: 48px;
+  flex: 0 0 48px;
+}
+
+.noOverflow {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.groupAvatar img {
+  width: 100%;
   border-radius: 50%;
 }
 
 .groupInfo {
+  flex: 1;
   height: 100%;
-  flex-grow: 1;
-  padding: 0 8px 0 12px;
+  margin: 0 12px;
   overflow: hidden;
 }
 
 .groupName {
-  width: 100%;
-  height: 24px;
   font-size: 1.2rem;
-  line-height: 24px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
   color: var(--groupItem-groupName);
 }
 
 .groupNameActive {
   color: var(--groupItem-groupNameActive)
-}
-
-.currMessage i {
-  width: 100%;
-  height: 100%;
-  font-size: 1rem;
-  line-height: 24px;
 }
 
 .attention {
@@ -250,9 +251,7 @@ export default {
 }
 
 .currMessageContext {
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
+  width: 100%;
   color: var(--groupItem-currMessageContext);
 }
 
@@ -260,7 +259,8 @@ export default {
   color: var(--groupItem-currMessageContextActive);
 }
 
-.rightSide { 
+.rightSide {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: end;

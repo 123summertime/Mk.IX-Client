@@ -288,7 +288,7 @@ export default {
 }
 
 .time {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   margin: 0 4px;
   white-space: nowrap;
   direction: ltr;

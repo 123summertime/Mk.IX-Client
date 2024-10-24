@@ -23,7 +23,7 @@
           </template>
         </el-popover>
       </div>
-      <div :class="['barItem', input ? '' : 'barItemDisabled']" title="发送(Shift+Enter)" @click="sendingText()">
+      <div :class="['barItem', (input || atList.size) ? '' : 'barItemDisabled']" title="发送(Shift+Enter)" @click="sendingText()">
         <Promotion class='icon' />
       </div>
     </div>

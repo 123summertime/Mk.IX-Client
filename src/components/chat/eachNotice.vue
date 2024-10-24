@@ -76,7 +76,7 @@ export default {
 
 .time {
   flex: 0 0 auto;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   line-height: 1rem;
   opacity: 0.8;
   white-space: nowrap;

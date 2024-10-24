@@ -42,9 +42,10 @@
 </template>
 
 <script>
+import CryptoJS from "crypto-js"
 import axios from 'axios'
 
-import { md5 } from './../../assets/utils'
+// import { md5 } from './../../assets/utils'
 import router from './../../router/index.js'
 
 export default {
@@ -64,7 +65,7 @@ export default {
   methods: {
     async login() {
       const URL = `http://${this.adress}/v1/user/token?isBot=${this.asBot}`
-      const hashed = md5(this.password)
+      const hashed = CryptoJS.MD5(this.password).toString()
       const formData = `grant_type=password&username=${this.accountORusername}&password=${hashed}`
 
       axios.post(URL, formData, {
