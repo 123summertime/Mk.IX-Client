@@ -3,7 +3,7 @@
 
     <div class="leftSide" ref="leftSide">
       <div class="userInfo">
-        <img :src=avatar>
+        <img :src=avatar alt="avatar">
         <p>{{ username }}</p>
       </div>
       <div class="groupList">

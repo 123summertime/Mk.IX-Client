@@ -10,7 +10,7 @@
         <ArrowRight class="arrow hiddenArrow" />
       </li>
 
-      <li>
+      <li @click="copyGroupID">
         <p>群ID</p>
         <p>{{ info.group }}</p>
         <ArrowRight class="arrow hiddenArrow" />
@@ -38,7 +38,7 @@
       <p>个人设置</p>
     </span>
     <ul class="general">
-      <li>
+      <li @click="cryptoVisible = true">
         <p>加密</p>
         <ArrowRight class="arrow" />
       </li>
@@ -48,9 +48,6 @@
       </li>
     </ul>
 
-    <span class="title dangerTitle">
-      <p>高危操作</p>
-    </span>
     <ul class="dangerZone">
       <li @click="deleteHistoryVisible = true" >
         <p class="dangerItem">删除聊天记录</p>
@@ -88,7 +85,7 @@
 
   <!-- 修改入群问题 -->
   <el-dialog title="修改入群问题" v-model="editGroupQAVisible" width="640px">
-    <div class="editQAContent">
+    <div class="dialogContent">
       <p>正确回答入群问题可以直接加入群聊，无需验证</p>
       <p>问题允许为空，为空时该群聊将无法被搜索到</p>
       <el-input v-model="newGroupQ" placeholder="入群问题" />
@@ -97,6 +94,25 @@
     <template #footer>
       <el-button @click="editGroupQAVisible = false">取消</el-button>
       <el-button type="primary" @click="groupQAModified">确认修改</el-button>
+    </template>
+  </el-dialog>
+
+  <!-- 加密 -->
+  <el-dialog title="加密" v-model="cryptoVisible" width="640px">
+    <div class="dialogContent">
+      <p><strong>对称加密</strong>，只有拥有密钥的群成员才能解读你发送的内容。</p>
+      <p>消息的<strong>加密与解密</strong>均在本地完成，加密后，服务器也无法获取消息的具体内容。</p>
+      <!-- <p>加密消息若解密失败，将被直接<strong>丢弃</strong>，即使之后提供正确的密钥也无法恢复。</p> -->
+      <p>加密只对<strong>文本及图片</strong>类型消息有效。空密钥即为关闭加密功能。</p>
+      <p>为确保消息正常显示，双方必须使用<strong>相同的</strong>密钥。</p>
+      <div class="inputLine">
+        <el-input v-model="cryptoKey" :maxlength="128" placeholder="密钥" />
+        <el-button type="primary" @click="generateCryptoKey">生成</el-button>
+      </div>
+    </div>
+    <template #footer>
+      <el-button @click="cryptoVisible = false">取消</el-button>
+      <el-button type="primary" @click="setCryptoKey">确认</el-button>
     </template>
   </el-dialog>
 
@@ -193,6 +209,7 @@ export default {
       groupName: "",
       newGroupQ: "",
       newGroupA: "",
+      cryptoKey: "",
       editAvatarVisible: false,
       editGroupNameVisible: false,
       membersVisible: false,
@@ -200,6 +217,7 @@ export default {
       unsubscribeAndDeleteHistory: false,
       deleteHistoryVisible: false,
       editGroupQAVisible: false,
+      cryptoVisible: false,
       currPinned: this.isPinned,
       membersCount: 0,
       membersInfo: {},
@@ -347,6 +365,37 @@ export default {
         })
       })
     },
+
+    getCryptoKey() {
+      const account = this.$store.state.account
+      const keys = JSON.parse(localStorage.getItem(`${account}-cryptoKey`) || "{}")
+      this.cryptoKey = keys[this.info.group] ?? ""
+    },
+
+    generateCryptoKey() {
+      this.cryptoKey = ""
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+      for (let i = 0; i < 32; i++) {
+        const randomIndex = Math.floor(Math.random() * chars.length)
+        this.cryptoKey += chars[randomIndex];
+      }
+    },
+
+    setCryptoKey() {
+      const account = this.$store.state.account
+      const keys = JSON.parse(localStorage.getItem(`${account}-cryptoKey`) || "{}")
+      keys[this.info.group] = this.cryptoKey
+      localStorage.setItem(`${account}-cryptoKey`, JSON.stringify(keys))
+      this.cryptoVisible = false
+      ElMessage.success("设置成功")
+    },
+
+    copyGroupID() {
+      const cb = navigator.clipboard
+      if (!cb) { return }
+      cb.writeText(this.info.group)
+      ElMessage.success("复制成功")
+    }
   },
 
   computed: {
@@ -364,6 +413,7 @@ export default {
   },
 
   mounted() {
+    this.getCryptoKey()
     if (this.available) {
       this.getMembersInfo()
     }
@@ -453,7 +503,7 @@ li .dangerItem {
 .dangerZone {
   border: 2px solid var(--spical-1);
   border-radius: 8px;
-  /* background-image: repeating-linear-gradient(-45deg, var(--spical-1), var(--spical-1) 8px, transparent 8px, transparent 24px); */
+  background-image: repeating-linear-gradient(-45deg, var(--spical-2), var(--spical-2) 8px, transparent 8px, transparent 24px);
 }
 
 .dangerZone li:hover {
@@ -492,12 +542,24 @@ li .dangerItem {
   text-overflow: ellipsis;
 }
 
-.editQAContent p, 
-.editQAContent .el-input {
+.checkbox {
+  float: left;
+}
+
+.dialogContent p, 
+.dialogContent .el-input {
   margin-bottom: 16px;
 }
 
-.checkbox {
-  float: left;
+.dialogContent > :last-child {
+  margin-bottom: 0;
+}
+
+.inputLine {
+  display: flex;
+}
+
+.inputLine .el-button {
+  margin-left: 12px;
 }
 </style>

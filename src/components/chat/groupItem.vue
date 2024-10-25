@@ -1,7 +1,7 @@
 <template>
   <div :class="['groupInfoRoot', rootClasses]" ref="groupInfoRoot">
     <div class="groupAvatar">
-      <img :src="avatar">
+      <img :src="avatar" alt="avatar">
     </div>
     
     <div class="groupInfo">

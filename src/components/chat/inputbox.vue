@@ -59,6 +59,7 @@
 </template>
 
 <script>
+import CryptoJS from "crypto-js"
 import axios from 'axios'
 
 import atBar from './atBar.vue'
@@ -92,19 +93,34 @@ export default {
   },
 
   methods: {
+    getCryptoKey() {
+      const keys = JSON.parse(localStorage.getItem(`${this.$store.state.account}-cryptoKey`) || "{}") 
+      return keys[this.group] || ""
+    },
+
+    encrypt(s) {
+      const key = this.getCryptoKey()
+      if (!key) {
+        return [s, false]
+      }
+      return [CryptoJS.AES.encrypt(s, key).toString(), true]
+    },
+
     // 发送text类型消息
     sendingText() {
       if (!this.input) { return }
 
+      const [content, encrypted] = this.encrypt(this.input)
       this.$store.state.ws.send(JSON.stringify({
         type: "text",
         group: this.group,
         payload: {
           name: null,
           size: null,
-          content: this.input,
+          content: content,
           meta: {
-            at: Array.from(this.atList).map(i => JSON.parse(i).uuid)
+            at: Array.from(this.atList).map(i => JSON.parse(i).uuid),
+            encrypt: encrypted,
           }
         }
       }))
@@ -116,13 +132,17 @@ export default {
     sendingImage() {
       if (!this.payload.content) { return }
 
+      const [content, encrypted] = this.encrypt(this.payload.content)
       this.$store.state.ws.send(JSON.stringify({
         type: this.payload.type,
         group: this.group,
         payload: {
           name: this.payload.name,
           size: this.payload.size,
-          content: this.payload.content,
+          content: content,
+          meta: {
+            encrypt: encrypted,
+          }
         }
       }))
       this.payload.content = ""

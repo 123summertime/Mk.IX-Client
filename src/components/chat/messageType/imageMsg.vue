@@ -1,6 +1,6 @@
 <template>
   <div class="imageMsg">
-    <el-image :src="message.payload.content" :preview-src-list="[message.payload.content]" />
+    <el-image :src="message.payload.content" :preview-src-list="[message.payload.content]" alt="image" />
   </div>
 </template>
   

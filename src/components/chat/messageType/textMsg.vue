@@ -4,7 +4,7 @@
       <i class="atItem" v-for="username in atList">
         {{ "@" + username }}
       </i>
-      <i class="content">
+      <i :class="['content', getClass ]">
         {{ message.payload.content }}
       </i>
     </p>
@@ -37,6 +37,13 @@ export default {
     }
   },
 
+  computed: {
+    getClass() {
+      if (!this.message.payload.meta) { return '' }
+      return this.message.payload.meta.encrypt ? 'encrypt': ''
+    }
+  },
+
   async mounted() {
     await this.getAtNames()
   }
@@ -61,5 +68,11 @@ export default {
 .textMsg p i{
   font-size: 1.2rem;
   line-height: 24px;
+}
+
+.encrypt { 
+  color: var(--neutral-3);
+  font-style: italic;
+  text-decoration: line-through;
 }
 </style>

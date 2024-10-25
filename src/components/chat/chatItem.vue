@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import CryptoJS from "crypto-js"
 import Dexie from 'dexie'
 
 import message from './message.vue'
@@ -143,6 +144,25 @@ export default {
       }
     },
 
+    getCryptoKey() {
+      const keys = JSON.parse(localStorage.getItem(`${this.$store.state.account}-cryptoKey`) || "{}") 
+      return keys[this.group] || ""
+    },
+
+    decryptHandler(message) {
+      if (!message.payload.meta.encrypt || !['text', 'image'].includes(message.type)) { return }
+      const key = this.getCryptoKey()
+      const bytes = CryptoJS.AES.decrypt(message.payload.content, key)
+      const decrypted = bytes.toString(CryptoJS.enc.Utf8)
+      if (decrypted) {
+        message.payload.meta.encrypt = false
+        message.payload.content = decrypted
+      } else {
+        message.type = "text"
+        message.payload.content = "加密信息"
+      }
+    },
+
     // 点击"有人@你"后, 滚动到该消息处
     async gotoAttention() {
       this.attentionVisible = false
@@ -172,6 +192,7 @@ export default {
       }
 
       this.newAttentionHandler(message)
+      this.decryptHandler(message)
 
       const atBottom = this.$refs.messageView.scrollTop + this.$refs.messageView.clientHeight >= this.$refs.messageView.scrollHeight
       const storage = {

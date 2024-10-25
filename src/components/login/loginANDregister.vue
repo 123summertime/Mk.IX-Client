@@ -45,7 +45,6 @@
 import CryptoJS from "crypto-js"
 import axios from 'axios'
 
-// import { md5 } from './../../assets/utils'
 import router from './../../router/index.js'
 
 export default {
