@@ -1,41 +1,41 @@
 <template>
-  <el-dialog v-model="namecardVisible" width="640px">
+  <el-dialog v-model="namecardVisible" :show-close="false" width="540px">
     <div class="namecard">
       <div class="namecardAvatar">
         <img :src="avatar" />
       </div>
-      <div class="namecardInfo">
-        <span>
-          <i>昵称:</i>
-          <i>{{ username }}</i>
-        </span>
-        <span>
-          <i>uuid:</i>
-          <i>{{ uuid }}</i>
-        </span>
-        <span>
-          <i>个性签名:</i>
-          <i>{{ bio }}</i>
-        </span>
-        <span>
-          <i>最后访问:</i>
-          <i>{{ lastSeen === "在线" ? lastSeen : formatedTime(lastSeen) }}</i>
-        </span>
-        <span v-if="!messageFrom()">
-          <el-button type="primary" @click="friendRequestVisible = true">发送好友申请</el-button>
-          <el-dialog v-model="friendRequestVisible" width="640px" title="好友申请">
-            <div>
-              <el-input v-model="reason" placeholder="申请理由(选填)" />
-            </div>
-            <template #footer>
-              <div>
-                <el-button @click="friendRequestVisible = false">取消</el-button>
-                <el-button type="primary" @click="friendRequest">发送</el-button>
-              </div>
-            </template>
-          </el-dialog>
-        </span>
+      <p class="username">{{ username }}</p>
+      <p class="uid">{{ "UID: " + uuid }}</p>
+      <div class="state">
+        <div>
+          <svg :class="['point', lastSeen === '在线' ? 'online' : 'offline']" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><circle fill="currentColor" cx="512" cy="512" r="512"/></svg>
+        </div>
+        <el-tooltip
+          effect="customized"
+          :content="userState"
+          placement="right">
+          <p>{{ lastSeen == '在线' ? '在线' : '离线' }}</p>
+        </el-tooltip>
       </div>
+      <div class="middle">
+        <p>{{ "“" + bio + "”" }}</p>
+      </div>
+      <div class="addFriend" v-if="!messageFrom()">
+        <el-button type="primary" @click="friendRequestVisible = true">发送好友申请</el-button>
+      </div>
+
+      <el-dialog v-model="friendRequestVisible" width="540px" title="好友申请">
+        <div>
+          <el-input v-model="reason" placeholder="申请理由(选填)" />
+        </div>
+        <template #footer>
+          <div>
+            <el-button @click="friendRequestVisible = false">取消</el-button>
+            <el-button type="primary" @click="friendRequest">发送</el-button>
+          </div>
+        </template>
+      </el-dialog>
+
     </div>
   </el-dialog>
 </template>
@@ -86,10 +86,6 @@ export default {
       })
     },
 
-    formatedTime(time) {
-      return computeTime(time)
-    },
-
     friendRequest() {
       const reason = { reason: this.reason }
       const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/verify/request`
@@ -125,47 +121,98 @@ export default {
     }
   },
 
+  computed: {
+    userState() {
+      if (this.lastSeen === "在线") { return "在线"}
+      return `上次在线: ${computeTime(this.lastSeen)}` 
+    },
+  }
+
 }
 </script>
 
 <style scoped>
 .namecard {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
 }
 
-.namecardAvatar img {
-  width: 96px;
-  height: 96px;
-  border-radius: 16px;
+.namecardAvatar {
+  flex: 0 0 128px;
 }
 
-.namecardInfo {
+.namecard img {
+  height: 100%;
+  border-radius: 50%;
+}
+
+.username {
+  margin-top: 16px;
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.uid {
+  color: var(--neutral-3);
+  margin-top: 4px;
+}
+
+.state {
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  margin-left: 32px;
+  justify-content: center;
+  margin-top: 4px;
 }
 
-.namecardInfo span {
+.state div {
+  flex: 0 0 16px;
   display: flex;
-  margin: 12px 0;
+  justify-content: center;
+  align-items: center;
+  margin: 0 4px;
 }
 
-.namecardInfo span:nth-child(1) {
-  margin-top: 0;
+.state p {
+  color: var(--neutral-3);
+  margin: 0 4px;
 }
 
-.namecardInfo span i:nth-child(1) {
-  width: 96px;
+.online {
+  color: var(--positive);
 }
 
-.namecardInfo span i:nth-child(2) {
-  width: calc(100% - 96px);
+.offline {
+  color: var(--negative);
+}
+
+.middle {
+  width: 100%;
+  padding: 8px 0;
+  margin: 16px 0;
+  border-top: 1px solid var(--basic-1-0);
+}
+
+.middle p {
+  font-style: italic;
   word-break: break-all;
 }
 
-:deep(.el-dialog__body) {
-  padding: 12px 20px;
+.addFriend {
+  margin-top: 16px;
+}
+</style>
+
+<style>
+.el-popper.is-customized {
+  background: var(--neutral-1);
+  padding: 6px 12px;
+  color: var(--neutral-3);
+}
+
+.el-popper.is-customized .el-popper__arrow::before {
+  background: var(--neutral-1);
+  right: 0;
 }
 </style>
