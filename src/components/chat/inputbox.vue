@@ -141,6 +141,7 @@ export default {
           size: this.payload.size,
           content: content,
           meta: {
+            at: [],
             encrypt: encrypted,
           }
         }
@@ -398,7 +399,7 @@ export default {
 
 <style scoped>
 .inputBoxRoot {
-  background-color: var(--inputBox-inputBoxRoot);
+  background-color: var(--inputBox-inputBoxRoot-bgcolor);
 }
 
 /* bar */
@@ -408,7 +409,7 @@ export default {
   width: 100%;
   height: 48px;
   padding: 8px 24px;
-  background-color: var(--inputBox-bar);
+  background-color: var(--inputBox-bar-bgcolor);
 }
 
 input[type="file"] {
@@ -420,7 +421,7 @@ input[type="file"] {
   cursor: pointer;
   background-color: transparent;
   margin-right: 24px;
-  color: var(--inputBox-barItem);
+  color: var(--inputBox-barItem-svgcolor);
 }
 
 .barItem label {
@@ -428,7 +429,7 @@ input[type="file"] {
 }
 
 .barItemDisabled {
-  color: var(--inputBox-iconDisabled);
+  color: var(--inputBox-barItemDisabled-svgcolor);
   cursor: not-allowed;
 }
 
@@ -462,7 +463,7 @@ textarea {
   resize: none;
   border: none;
   outline: none;
-  background-color: var(--inputBox-textarea);
+  background-color: var(--inputBox-textarea-bgcolor);
 }
 
 textarea::-webkit-scrollbar {
@@ -489,7 +490,7 @@ textarea::-webkit-scrollbar {
   display: inline-flex;
   border-radius: 12px;
   padding: 12px 16px;
-  background-color: var(--inputBox-previewAudio);
+  background-color: var(--inputBox-previewAudio-bgcolor);
   cursor: pointer;
 }
 

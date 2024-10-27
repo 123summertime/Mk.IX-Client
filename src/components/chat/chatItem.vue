@@ -152,15 +152,18 @@ export default {
     decryptHandler(message) {
       if (!message.payload.meta.encrypt || !['text', 'image'].includes(message.type)) { return }
       const key = this.getCryptoKey()
-      const bytes = CryptoJS.AES.decrypt(message.payload.content, key)
-      const decrypted = bytes.toString(CryptoJS.enc.Utf8)
-      if (decrypted) {
-        message.payload.meta.encrypt = false
-        message.payload.content = decrypted
-      } else {
-        message.type = "text"
-        message.payload.content = "加密信息"
-      }
+
+      try {
+        const bytes = CryptoJS.AES.decrypt(message.payload.content, key)
+        const decrypted = bytes.toString(CryptoJS.enc.Utf8)
+        if (decrypted) {
+          message.payload.meta.encrypt = false
+          message.payload.content = decrypted
+          return
+        }
+      } catch {}
+      message.type = "text"
+      message.payload.content = "加密信息"
     },
 
     // 点击"有人@你"后, 滚动到该消息处
@@ -286,7 +289,7 @@ export default {
   padding: 8px 20px 8px 32px;
   border-top-left-radius: 24px;
   border-bottom-left-radius: 24px;
-  background-color: var(--chatItem-attentionButton);
+  background-color: var(--chatItem-attentionButton-bgcolor);
   cursor: pointer;
 }
 
@@ -302,7 +305,7 @@ export default {
   }
 
   50% {
-    background-color: var(--chatItem-flash);
+    background-color: var(--chatItem-flash-bgcolor);
   }
 
   100% {

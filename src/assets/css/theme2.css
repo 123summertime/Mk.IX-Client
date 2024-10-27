@@ -1,8 +1,190 @@
-html {
-  --bg-color: rgb(99, 149, 144);
-}
-
-/* chatPage */
 :root {
-  --chatPage-header-bgcolor: aqua;
-}
+    --theme-0: #fef0fc;
+    --theme-1: #f6dff8;
+    --theme-2: #ebd1f4;
+    --theme-3: #e0c3f0;
+    --theme-4: #d59bf6;
+    
+    --color-0: #ffd900;
+    --color-1: #3eede7;
+    --color-2: #f85149;
+    --color-3: #00bc12;
+  
+    --neutral-0: #fffefb;
+    --neutral-1: #f5f4f1;
+    --neutral-2: #cccbc8;
+    --neutral-3: #808080;
+    --neutral-4: #1d1c1c;
+  
+    --spical-0: rgba(213, 155, 246, 0.6);   /* 0.6透明度的 --theme-4  */
+    --spical-1: rgba(248, 81, 73, 0.2);    /* 0.2透明度的 --color-2  */
+    --spical-2: rgba(248, 81, 73, 0.03);  /* 0.03透明度的 --color-2 */
+  }
+  
+  :root {
+    /* 字体背景颜色类 */
+    --text: var(--neutral-4);
+    --text-secondary: var(--neutral-3);
+    --text-opposite: var(--neutral-1);
+    --text-opposite-secondary: var(--neutral-0);
+    --bg: var(--neutral-1);
+    --bg-secondary: var(--neutral-0);
+    --border: var(--neutral-2);
+    --positive: var(--color-3);
+    --neutral: var(--neutral-3);
+    --negative: var(--color-2);
+  
+    /* 主题色 */
+    --theme: var(--theme-4);
+    --theme-alternative: var(--theme-3);
+  
+    /* 身份类 */
+    --self: var(--theme);
+    --owner: var(--color-0);
+    --admin: var(--color-1);
+  }
+  
+  /* chatPage */
+  :root {
+    --chatPage-leftSide-bgcolor: var(--bg-secondary);
+    --chatPage-userInfo-bgcolor: var(--bg);
+    --chatPage-header-bgcolor: var(--bg);
+    --chatPage-center-bgcolor: var(--bg);
+    --chatPage-conversationView-border: var(--border);
+    --chatPage-inputBox-border: var(--border);
+  }
+  
+  /* groupItem */
+  :root {
+    --groupItem-hover-bgcolor: var(--bg);
+    --groupItem-pinned-bgcolor: var(--bg);
+    --groupItem-normal-bgcolor: var(--bg-secondary);
+    --groupItem-active-bgcolor: var(--theme);
+    --groupItem-attention-textcolor: var(--theme);
+    --groupItem-groupName-textcolor: var(--text);
+    --groupItem-groupNameActive-textcolor: var(--text-opposite);
+    --groupItem-currMessageContext-textcolor: var(--text-secondary);
+    --groupItem-currMessageContextActive-textcolor: var(--text-opposite);
+    --groupItem-time-textcolor: var(--text);
+    --groupItem-timeActive-textcolor: var(--text-opposite);
+    --groupItem-unread-bgcolor: var(--theme);
+    --groupItem-unreadText-textcolor: var(--text);
+  }
+  
+  /* chatItem */
+  :root {
+    --chatItem-attentionButton-bgcolor: var(--theme-alternative);
+    --chatItem-flash-bgcolor: var(--theme-alternative);
+  }
+  
+  /* inputBox */
+  :root {
+    --inputBox-inputBoxRoot-bgcolor: transparent;
+    --inputBox-bar-bgcolor: transparent;
+    --inputBox-barItem-svgcolor: var(--text);
+    --inputBox-barItemDisabled-svgcolor: var(--text-secondary);
+    --inputBox-textarea-bgcolor: transparent;
+    --inputBox-previewAudio-bgcolor: var(--theme);
+  }
+  
+  /* messageType */
+  :root {
+    --message-common-bgcolor: var(--theme);
+    --message-file-bgcolor: var(--theme);
+    --message-at-textcolor: var(--text-opposite);
+    --message-content-textcolor: var(--text);
+    --message-contentEncrypt-textcolor: var(--text-secondary);
+    --message-volume-bgcolor: var(--bg);
+    --message-progress-bgcolor: var(--spical-0);
+  }
+  
+  /* atBar */
+  :root {
+    --atBar-atCard-bgcolor: var(--theme);
+    --atBar-atCard-textcolor: var(--text-opposite);
+  }
+  
+  /* favorite */
+  :root { 
+    --favorite-favoriteRoot-bgcolor: var(--bg);
+    --favorite-eachImg-hover-bgcolor: transparent;
+  }
+  
+  /* eachMember */
+  :root {
+    --eachMember-nameplate-textcolor: var(--text);
+    --eachMember-name-textcolor: var(--text);
+    --eachMember-oper-svgcolor: var(--text);
+    --eachMember-checker-svgcolor: var(--text);
+    --eachMember-checker-textcolor: var(--text);
+    --eachMember-hover-bgcolor: var(--bg);
+  }
+  
+  /* groupSelector */
+  :root { 
+    --groupSelector-hover-bgcolor: var(--theme-alternative);
+    --groupSelector-selected-bgcolor: var(--theme);
+    --groupSelector-groupName-textcolor: var(--text);
+  }
+  
+  /* messageMenu */
+  :root {
+    --messageMenu-msgMenuRoot-bgcolor: var(--bg);
+    --messageMenu-msgMenuRoot-hover-bgcolor: var(--theme);
+  }
+  
+  /* tools */
+  :root {
+    --tools-toolsRoot-bgcolor: var(--bg-secondary);
+    --tools-searchResult-border: var(--border);
+  }
+  
+  /* eachNotice */
+  :root {
+    --eachNotice-hover-bgcolor: var(--bg);
+    --eachNotice-item-svgcolor: var(--neutral);
+  }
+  
+  /* eachRequest */
+  :root {
+    --eachRequest-hover-bgcolor: var(--bg);
+  }
+  
+  /* groupConfig */
+  :root {
+    --groupConfig-generalTitle-border: var(--spical-0);
+    --groupConfig-general-border: var(--spical-0);
+    --groupConfig-general-hover-bgcolor: var(--spical-0);
+    --groupConfig-general-info-textcolor: var(--text-secondary);
+    --groupConfig-dangerZoneTitle-border: var(--spical-1);
+    --groupConfig-dangerZone-bgcolor: var(--spical-2);
+    --groupConfig-dangerZone-hover-bgcolor: var(--spical-1);
+    --groupConfig-checker-svgcolor: var(--text);
+    --groupConfig-checker-textcolor: var(--text);
+  }
+  
+  /* namecard */
+  :root {
+    --namecard-username-textcolor: var(--text);
+    --namecard-uid-textcolor: var(--text-secondary);
+    --namecard-state-textcolor: var(--text-secondary);
+    --namecard-middle-border: var(--theme);
+    --namecard-popper-bgcolor: var(--bg);
+    --namecard-popper-textcolor: var(--text-secondary);
+  }
+  
+  /* 覆盖el原有样式 */
+  .el-dialog, .i-dialog-footer, .dialogMain {
+    background-color: var(--bg-secondary) !important;
+  }
+  
+  :root {
+    --el-color-primary: var(--theme) !important;
+    --el-color-primary-light-3: var(--theme-3) !important;
+    --el-color-primary-light-5: var(--theme-2) !important;
+    --el-color-primary-light-7: var(--theme-1) !important;
+    --el-color-primary-light-8: var(--theme-0) !important;
+    --el-color-primary-light-9: var(--theme-0) !important;
+    --el-button-hover-text-color: var(--text-opposite-secondary) !important;
+    --el-fill-color-blank: var(--text-opposite-secondary) !important;
+  }

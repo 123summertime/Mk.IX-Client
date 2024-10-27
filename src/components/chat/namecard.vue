@@ -2,7 +2,7 @@
   <el-dialog v-model="namecardVisible" :show-close="false" width="540px">
     <div class="namecard">
       <div class="namecardAvatar">
-        <img :src="avatar" />
+        <el-image :src="avatar" :preview-src-list="[avatar]" alt="avatar" />
       </div>
       <p class="username">{{ username }}</p>
       <p class="uid">{{ "UID: " + uuid }}</p>
@@ -143,19 +143,20 @@ export default {
   flex: 0 0 128px;
 }
 
-.namecard img {
-  height: 100%;
+.namecard :deep(.el-image__inner) {
+  width: 128px;
+  height: 128px;
   border-radius: 50%;
 }
 
 .username {
   margin-top: 16px;
   font-size: 1.5rem;
-  color: var(--text);
+  color: var(--namecard-username-textcolor);
 }
 
 .uid {
-  color: var(--neutral-3);
+  color: var(--namecard-uid-textcolor);
   margin-top: 4px;
 }
 
@@ -175,7 +176,7 @@ export default {
 }
 
 .state p {
-  color: var(--neutral-3);
+  color: var(--namecard-state-textcolor);
   margin: 0 4px;
 }
 
@@ -191,7 +192,7 @@ export default {
   width: 100%;
   padding: 8px 0;
   margin: 16px 0;
-  border-top: 1px solid var(--basic-1-0);
+  border-top: 1px solid var(--namecard-middle-border);
 }
 
 .middle p {
@@ -206,13 +207,13 @@ export default {
 
 <style>
 .el-popper.is-customized {
-  background: var(--neutral-1);
+  background-color: var(--namecard-popper-bgcolor);
   padding: 6px 12px;
-  color: var(--neutral-3);
+  color: var(--namecard-popper-textcolor);
 }
 
 .el-popper.is-customized .el-popper__arrow::before {
-  background: var(--neutral-1);
+  background-color: var(--namecard-popper-bgcolor);
   right: 0;
 }
 </style>

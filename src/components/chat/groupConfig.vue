@@ -86,8 +86,8 @@
   <!-- 修改入群问题 -->
   <el-dialog title="修改入群问题" v-model="editGroupQAVisible" width="640px">
     <div class="dialogContent">
-      <p>正确回答入群问题可以直接加入群聊，无需验证</p>
-      <p>问题允许为空，为空时该群聊将无法被搜索到</p>
+      <p>正确回答入群问题可以直接加入群聊，<strong>无需验证</strong></p>
+      <p>问题允许为空，为空时该群聊将<strong>无法</strong>被搜索到</p>
       <el-input v-model="newGroupQ" placeholder="入群问题" />
       <el-input v-model="newGroupA" placeholder="入群问题的答案" />
     </div>
@@ -98,7 +98,7 @@
   </el-dialog>
 
   <!-- 加密 -->
-  <el-dialog title="加密" v-model="cryptoVisible" width="640px">
+  <el-dialog title="加密" v-model="cryptoVisible" :close-on-click-modal="false" width="640px">
     <div class="dialogContent">
       <p><strong>对称加密</strong>，只有拥有密钥的群成员才能解读你发送的内容。</p>
       <p>消息的<strong>加密与解密</strong>均在本地完成，加密后，服务器也无法获取消息的具体内容。</p>
@@ -429,21 +429,13 @@ export default {
 <style scoped>
 .groupConfigRoot .title {
   display: inline-block;
-  border-bottom: 2px solid var(--spical-0);
+  border-bottom: 2px solid var(--groupConfig-generalTitle-border);
   margin-bottom: 16px;
 }
 
 .groupConfigRoot .title p {
   font-size: 1.4rem;
   padding: 6px 24px 6px 0;
-}
-
-.groupConfigRoot .dangerTitle {
-  border-bottom: 2px solid var(--spical-1);
-}
-
-.groupConfigRoot .dangerTitle p {
-  color: var(--basic-5-0);
 }
 
 ul {
@@ -474,11 +466,11 @@ li p:nth-of-type(1) {
 }
 
 li p:nth-of-type(2) {
-  color: var(--neutral-3);
+  color: var(--groupConfig-general-info-textcolor);
 }
 
 li .dangerItem {
-  color: var(--warn);
+  color: var(--negative);
 }
 
 .arrow {
@@ -491,23 +483,28 @@ li .dangerItem {
 }
 
 .general {
-  border: 2px solid var(--spical-0);
+  border: 2px solid var(--groupConfig-general-border);
   border-radius: 8px;
   margin-bottom: 32px;
 }
 
 .general li:hover {
-  background-color: var(--spical-0);
+  background-color: var(--groupConfig-general-hover-bgcolor);
 }
 
 .dangerZone {
-  border: 2px solid var(--spical-1);
+  border: 2px solid var(--groupConfig-dangerZoneTitle-border);
   border-radius: 8px;
-  background-image: repeating-linear-gradient(-45deg, var(--spical-2), var(--spical-2) 8px, transparent 8px, transparent 24px);
+  background-image: repeating-linear-gradient(
+    -45deg, 
+    var(--groupConfig-dangerZone-bgcolor), 
+    var(--groupConfig-dangerZone-bgcolor) 8px, 
+    transparent 8px, 
+    transparent 24px);
 }
 
 .dangerZone li:hover {
-  background-color: var(--spical-1);
+  background-color: var(--groupConfig-dangerZone-hover-bgcolor);
 }
 
 .list {
@@ -530,13 +527,13 @@ li .dangerItem {
 
 .checker svg {
   flex: 0 0 48px;
-  color: var(--text);
+  color: var(--groupConfig-checker-svgcolor);
 }
 
 .checker p {
   flex: 1;
   margin-left: 12px;
-  color: var(--text);
+  color: var(--groupConfig-checker-textcolor);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

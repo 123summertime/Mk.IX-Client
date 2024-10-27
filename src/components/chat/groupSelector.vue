@@ -92,16 +92,16 @@ export default {
 }
 
 .groupItem:hover {
-  background-color: var(--groupSelector-hover);
+  background-color: var(--groupSelector-hover-bgcolor);
   cursor: pointer;
 }
 
 .groupName {
-  color: var(--text);
+  color: var(--groupSelector-groupName-textcolor);
 }
 
 .selected {
-  background-color: var(--groupSelector-selected) !important;
+  background-color: var(--groupSelector-selected-bgcolor) !important;
 }
 
 .groupItem img {

@@ -101,6 +101,7 @@ export default {
         const blob = this.base64ToBlob(this.message.payload.content, "image/png")
         cb.write([new ClipboardItem({ "image/png": blob })])
       }
+      ElMessage.success("复制成功")
     },
 
     deleteMsg() {
@@ -150,7 +151,7 @@ export default {
   width: 144px;
   padding: 8px;
   border-radius: 8px;
-  background-color: var(--messageMenu-msgMenuRoot);
+  background-color: var(--messageMenu-msgMenuRoot-bgcolor);
   z-index: 10000;
   opacity: 0.9;
 }
@@ -177,6 +178,6 @@ export default {
 
 .msgMenuRoot div:hover {
   border-radius: 8px;
-  background-color: var(--messageMenu-msgMenuRoot-hover);
+  background-color: var(--messageMenu-msgMenuRoot-hover-bgcolor);
 }
 </style>

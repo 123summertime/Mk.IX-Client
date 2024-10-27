@@ -1,153 +1,190 @@
-/* basic */
 :root {
-  --basic-0-0: #edb1f1;
-  --basic-1-0: #d59bf6;
-  --basic-1-1: #e0c3f0;
-  --basic-1-2: #ebd1f4;
-  --basic-1-3: #f6dff8;
-  --basic-1-4: #fef0fc;
-  --basic-2-0: #9896f1;
-  --basic-3-0: #ffd900;
-  --basic-4-0: #3eede7;
-  --basic-5-0: #f85149;
-  --basic-6-0: #00bc12;
+  --theme-0: #fef0fc;
+  --theme-1: #f6dff8;
+  --theme-2: #ebd1f4;
+  --theme-3: #e0c3f0;
+  --theme-4: #d59bf6;
+  
+  --color-0: #ffd900;
+  --color-1: #3eede7;
+  --color-2: #f85149;
+  --color-3: #00bc12;
 
   --neutral-0: #fffefb;
   --neutral-1: #f5f4f1;
   --neutral-2: #cccbc8;
   --neutral-3: #808080;
-  --neutral-4: #313d44; 
-  --neutral-5: #1d1c1c;
+  --neutral-4: #1d1c1c;
 
-  --spical-0: rgba(213, 155, 246, 0.6);
-  --spical-1: rgba(255, 205, 210, 0.6);
-  --spical-2: rgba(255, 205, 210, 0.1);
+  --spical-0: rgba(213, 155, 246, 0.6);   /* 0.6透明度的 --theme-4  */
+  --spical-1: rgba(248, 81, 73, 0.2);    /* 0.2透明度的 --color-2  */
+  --spical-2: rgba(248, 81, 73, 0.03);  /* 0.03透明度的 --color-2 */
 }
 
 :root {
-  --self: var(--basic-0-0);
-  --owner: var(--basic-3-0);
-  --admin: var(--basic-4-0);
-  --text: var(--neutral-5);
-  --text-alt: var(--neutral-1);
-  --check: var(--basic-1-0);
-  --warn: var(--basic-5-0);
-  --positive: var(--basic-6-0);
-  --negative: var(--basic-5-0);
+  /* 字体背景颜色类 */
+  --text: var(--neutral-4);
+  --text-secondary: var(--neutral-3);
+  --text-opposite: var(--neutral-1);
+  --text-opposite-secondary: var(--neutral-0);
+  --bg: var(--neutral-1);
+  --bg-secondary: var(--neutral-0);
+  --border: var(--neutral-2);
+  --positive: var(--color-3);
   --neutral: var(--neutral-3);
+  --negative: var(--color-2);
+
+  /* 主题色 */
+  --theme: var(--theme-4);
+  --theme-alternative: var(--theme-3);
+
+  /* 身份类 */
+  --self: var(--theme);
+  --owner: var(--color-0);
+  --admin: var(--color-1);
 }
 
 /* chatPage */
 :root {
-  --chatPage-leftSide: var(--neutral-0);
-  --chatPage-userInfo: var(--neutral-1);
-  --chatPage-header: var(--neutral-1);
-  --chatPage-center: var(--neutral-1);
-  --chatPage-conversationView-border: var(--neutral-2);
-  --chatPage-inputBox-border: var(--neutral-2);
+  --chatPage-leftSide-bgcolor: var(--bg-secondary);
+  --chatPage-userInfo-bgcolor: var(--bg);
+  --chatPage-header-bgcolor: var(--bg);
+  --chatPage-center-bgcolor: var(--bg);
+  --chatPage-conversationView-border: var(--border);
+  --chatPage-inputBox-border: var(--border);
 }
 
 /* groupItem */
 :root {
-  --groupItem-hoverBg: var(--neutral-1);
-  --groupItem-pinnedBg: var(--neutral-1);
-  --groupItem-normalBg: var(--neutral-0);
-  --groupItem-activeBg: var(--basic-1-0);
-  --groupItem-attention: var(--basic-1-0);
-  --groupItem-groupName: var(--neutral-5);
-  --groupItem-groupNameActive: var(--text-alt);
-  --groupItem-currMessageContext: var(--neutral-3);
-  --groupItem-currMessageContextActive: var(--text-alt);
-  --groupItem-time: var(--neutral-5);
-  --groupItem-timeActive: var(--text-alt);
-  --groupItem-unread: var(--basic-1-0);
-  --groupItem-unreadText: var(--neutral-5);
+  --groupItem-hover-bgcolor: var(--bg);
+  --groupItem-pinned-bgcolor: var(--bg);
+  --groupItem-normal-bgcolor: var(--bg-secondary);
+  --groupItem-active-bgcolor: var(--theme);
+  --groupItem-attention-textcolor: var(--theme);
+  --groupItem-groupName-textcolor: var(--text);
+  --groupItem-groupNameActive-textcolor: var(--text-opposite);
+  --groupItem-currMessageContext-textcolor: var(--text-secondary);
+  --groupItem-currMessageContextActive-textcolor: var(--text-opposite);
+  --groupItem-time-textcolor: var(--text);
+  --groupItem-timeActive-textcolor: var(--text-opposite);
+  --groupItem-unread-bgcolor: var(--theme);
+  --groupItem-unreadText-textcolor: var(--text);
 }
 
 /* chatItem */
 :root {
-  --chatItem-attentionButton: var(--basic-2-0);
-  --chatItem-flash: var(--basic-0-0);
+  --chatItem-attentionButton-bgcolor: var(--theme-alternative);
+  --chatItem-flash-bgcolor: var(--theme-alternative);
 }
 
 /* inputBox */
 :root {
-  --inputBox-inputBoxRoot: transparent;
-  --inputBox-bar: transparent;
-  --inputBox-barItem: var(--neutral-5);
-  --inputBox-textarea: transparent;
-  --inputBox-previewAudio: var(--basic-1-0);
-  --inputBox-iconDisabled: var(--neutral-3);
+  --inputBox-inputBoxRoot-bgcolor: transparent;
+  --inputBox-bar-bgcolor: transparent;
+  --inputBox-barItem-svgcolor: var(--text);
+  --inputBox-barItemDisabled-svgcolor: var(--text-secondary);
+  --inputBox-textarea-bgcolor: transparent;
+  --inputBox-previewAudio-bgcolor: var(--theme);
 }
 
 /* messageType */
 :root {
-  --message-commonBg: var(--basic-1-0);
-  --message-fileBg: var(--basic-1-0);
-  --message-atItem: var(--text-alt);
-  --message-content: var(--neutral-5);
-  --message-volume: var(--neutral-1);
-  --message-progress: var(--spical-0);
+  --message-common-bgcolor: var(--theme);
+  --message-file-bgcolor: var(--theme);
+  --message-at-textcolor: var(--text-opposite);
+  --message-content-textcolor: var(--text);
+  --message-contentEncrypt-textcolor: var(--text-secondary);
+  --message-volume-bgcolor: var(--bg);
+  --message-progress-bgcolor: var(--spical-0);
 }
 
 /* atBar */
 :root {
-  --atBar-atCard: var(--basic-1-0);
-  --atBar-atText: var(--text-alt);
+  --atBar-atCard-bgcolor: var(--theme);
+  --atBar-atCard-textcolor: var(--text-opposite);
 }
 
 /* favorite */
 :root { 
-  --favorite-favoriteRoot: var(--neutral-1);
-  --favorite-eachImg-hover: transparent;
+  --favorite-favoriteRoot-bgcolor: var(--bg);
+  --favorite-eachImg-hover-bgcolor: transparent;
 }
 
 /* eachMember */
 :root {
-  --eachMember-hover: var(--neutral-1);
+  --eachMember-nameplate-textcolor: var(--text);
+  --eachMember-name-textcolor: var(--text);
+  --eachMember-oper-svgcolor: var(--text);
+  --eachMember-checker-svgcolor: var(--text);
+  --eachMember-checker-textcolor: var(--text);
+  --eachMember-hover-bgcolor: var(--bg);
 }
 
 /* groupSelector */
 :root { 
-  --groupSelector-hover: var(--basic-0-0);
-  --groupSelector-selected: var(--basic-1-0);
+  --groupSelector-hover-bgcolor: var(--theme-alternative);
+  --groupSelector-selected-bgcolor: var(--theme);
+  --groupSelector-groupName-textcolor: var(--text);
 }
 
 /* messageMenu */
 :root {
-  --messageMenu-msgMenuRoot: var(--neutral-1);
-  --messageMenu-msgMenuRoot-hover: var(--basic-1-0);
+  --messageMenu-msgMenuRoot-bgcolor: var(--bg);
+  --messageMenu-msgMenuRoot-hover-bgcolor: var(--theme);
 }
 
 /* tools */
 :root {
-  --tools-toolsRoot: var(--neutral-0);
-  --tools-searchResult: var(--neutral-2);
-  --tools-searchResultOper: var(--basic-1-0);
+  --tools-toolsRoot-bgcolor: var(--bg-secondary);
+  --tools-searchResult-border: var(--border);
 }
 
 /* eachNotice */
 :root {
-  --eachNotice-hover: var(--neutral-1);
+  --eachNotice-hover-bgcolor: var(--bg);
+  --eachNotice-item-svgcolor: var(--neutral);
 }
 
 /* eachRequest */
 :root {
-  --eachRequest-hover: var(--neutral-1);
+  --eachRequest-hover-bgcolor: var(--bg);
+}
+
+/* groupConfig */
+:root {
+  --groupConfig-generalTitle-border: var(--spical-0);
+  --groupConfig-general-border: var(--spical-0);
+  --groupConfig-general-hover-bgcolor: var(--spical-0);
+  --groupConfig-general-info-textcolor: var(--text-secondary);
+  --groupConfig-dangerZoneTitle-border: var(--spical-1);
+  --groupConfig-dangerZone-bgcolor: var(--spical-2);
+  --groupConfig-dangerZone-hover-bgcolor: var(--spical-1);
+  --groupConfig-checker-svgcolor: var(--text);
+  --groupConfig-checker-textcolor: var(--text);
+}
+
+/* namecard */
+:root {
+  --namecard-username-textcolor: var(--text);
+  --namecard-uid-textcolor: var(--text-secondary);
+  --namecard-state-textcolor: var(--text-secondary);
+  --namecard-middle-border: var(--theme);
+  --namecard-popper-bgcolor: var(--bg);
+  --namecard-popper-textcolor: var(--text-secondary);
 }
 
 /* 覆盖el原有样式 */
 .el-dialog, .i-dialog-footer, .dialogMain {
-  background-color: var(--neutral-0) !important;
+  background-color: var(--bg-secondary) !important;
 }
 
 :root {
-  --el-color-primary: var(--basic-1-0) !important;
-  --el-color-primary-light-3: var(--basic-1-1) !important;
-  --el-color-primary-light-5: var(--basic-1-2) !important;
-  --el-color-primary-light-7: var(--basic-1-3) !important;
-  --el-color-primary-light-8: var(--basic-1-4) !important;
-  --el-color-primary-light-9: var(--basic-1-4) !important;
-  --el-button-hover-text-color: var(--neutral-0) !important;
-  --el-fill-color-blank: var(--neutral-0) !important;
+  --el-color-primary: var(--theme) !important;
+  --el-color-primary-light-3: var(--theme-3) !important;
+  --el-color-primary-light-5: var(--theme-2) !important;
+  --el-color-primary-light-7: var(--theme-1) !important;
+  --el-color-primary-light-8: var(--theme-0) !important;
+  --el-color-primary-light-9: var(--theme-0) !important;
+  --el-button-hover-text-color: var(--text-opposite-secondary) !important;
+  --el-fill-color-blank: var(--text-opposite-secondary) !important;
 }

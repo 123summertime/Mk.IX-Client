@@ -176,7 +176,7 @@ export default {
     },
 
     readThemeSettings() {
-      const currentTheme = localStorage.getItem("theme") || "theme1"
+      const currentTheme = localStorage.getItem("theme") || "theme2"
       const mapping = { theme1, theme2 }
       const style = document.createElement('style')
       style.innerHTML = mapping[currentTheme]
@@ -345,7 +345,7 @@ export default {
   width: 20vw;
   max-width: 50%;
   height: 100%;
-  background-color: var(--chatPage-leftSide);
+  background-color: var(--chatPage-leftSide-bgcolor);
 }
 
 .userInfo {
@@ -353,7 +353,7 @@ export default {
   width: 100%;
   height: 64px;
   padding: 8px 16px;
-  background-color: var(--chatPage-userInfo);
+  background-color: var(--chatPage-userInfo-bgcolor);
 }
 
 .userInfo img {
@@ -400,7 +400,7 @@ export default {
   display: flex;
   width: 100%;
   height: 64px;
-  background-color: var(--chatPage-header);
+  background-color: var(--chatPage-header-bgcolor);
   padding: 8px 24px;
 }
 
@@ -428,7 +428,7 @@ export default {
   flex-direction: column;
   width: 100%;
   height: calc(100% - 64px);
-  background-color: var(--chatPage-center);
+  background-color: var(--chatPage-center-bgcolor);
 }
 
 .conversationView {

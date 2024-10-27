@@ -100,7 +100,7 @@ export default {
 }
 
 .request:hover {
-  background-color: var(--eachRequest-hover);
+  background-color: var(--eachRequest-hover-bgcolor);
 }
 
 .request .image {
@@ -153,11 +153,11 @@ export default {
 }
 
 .requestOpers svg:nth-child(1):hover {
-  color: var(--warn);
+  color: var(--negative);
 }
 
 .requestOpers svg:nth-child(2):hover {
-  color: var(--check);
+  color: var(--positive);
 }
 
 .requestOpers svg {

@@ -190,7 +190,7 @@ export default {
 }
 
 .eachMemberRoot:hover {
-  background-color: var(--eachMember-hover);
+  background-color: var(--eachMember-hover-bgcolor);
 }
 
 .info {
@@ -211,12 +211,12 @@ export default {
   line-height: 24px;
   padding: 0 6px;
   border-radius: 10px;
-  color: var(--text);
+  color: var(--eachMember-nameplate-textcolor);
 }
 
 .name {
   margin-left: 12px;
-  color: var(--text);
+  color: var(--eachMember-name-textcolor);
 }
 
 .ownerNameplate {
@@ -246,17 +246,17 @@ export default {
 }
 
 .oper div svg {
-  color: var(--text);
+  color: var(--eachMember-oper-svgcolor);
   cursor: pointer;
 }
 
 .oper div svg:hover {
-  color: var(--check);
+  color: var(--positive);
   transform: scale(1.2);
 }
 
 .oper div .warnSVG:hover {
-  color: var(--warn);
+  color: var(--negative);
 }
 
 .checker {
@@ -268,13 +268,13 @@ export default {
 
 .checker svg {
   flex: 0 0 48px;
-  color: var(--text);
+  color: var(--eachMember-checker-svgcolor);
 }
 
 .checker p {
   flex: 1;
   margin-left: 12px;
-  color: var(--text);
+  color: var(--eachMember-checker-textcolor);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

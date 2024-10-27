@@ -199,7 +199,7 @@ export default {
 }
 
 .groupInfoRoot:hover {
-  background-color: var(--groupItem-hoverBg);
+  background-color: var(--groupItem-hover-bgcolor);
 }
 
 .pinnedBg {
@@ -207,11 +207,11 @@ export default {
 }
 
 .noramlBg {
-  background-color: var(--groupItem-normalBg);
+  background-color: var(--groupItem-normal-bgcolor);
 }
 
 .activeBg {
-  background-color: var(--groupItem-activeBg) !important;
+  background-color: var(--groupItem-active-bgcolor) !important;
 }
 
 .groupAvatar {
@@ -238,25 +238,25 @@ export default {
 
 .groupName {
   font-size: 1.2rem;
-  color: var(--groupItem-groupName);
+  color: var(--groupItem-groupName-textcolor);
 }
 
 .groupNameActive {
-  color: var(--groupItem-groupNameActive)
+  color: var(--groupItem-groupNameActive-textcolor)
 }
 
 .attention {
-  color: var(--groupItem-attention);
+  color: var(--groupItem-attention-textcolor);
   margin-right: 2px;
 }
 
 .currMessageContext {
   width: 100%;
-  color: var(--groupItem-currMessageContext);
+  color: var(--groupItem-currMessageContext-textcolor);
 }
 
 .currMessageContextActive {
-  color: var(--groupItem-currMessageContextActive);
+  color: var(--groupItem-currMessageContextActive-textcolor);
 }
 
 .rightSide {
@@ -271,11 +271,11 @@ export default {
   white-space: nowrap;
   font-size: 0.8rem;
   line-height: 24px;
-  color: var(--groupItem-time);
+  color: var(--groupItem-time-textcolor);
 }
 
 .timeActive {
-  color: var(--groupItem-timeActive);
+  color: var(--groupItem-timeActive-textcolor);
 }
 
 .unread {
@@ -286,7 +286,7 @@ export default {
   font-size: 0.8rem;
   line-height: 20px;
   text-align: center;
-  background-color: var(--groupItem-unread);
-  color: var(--groupItem-unreadText);
+  background-color: var(--groupItem-unread-bgcolor);
+  color: var(--groupItem-unreadText-textcolor);
 }
 </style>

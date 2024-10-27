@@ -52,7 +52,7 @@ export default {
 }
 
 .eachNoticeRoot:hover {
-  background-color: var(--eachNotice-hover);
+  background-color: var(--eachNotice-hover-bgcolor);
 }
 
 .icon {
@@ -96,7 +96,7 @@ export default {
 }
 
 .opers svg:hover {
-  color: var(--warn);
+  color: var(--negative);
   transform: scale(1.2);
 }
 
@@ -109,6 +109,6 @@ export default {
 }
 
 .neutral {
-  color: var(--neutral);
+  color: var(--eachNotice-item-svgcolor);
 }
 </style>

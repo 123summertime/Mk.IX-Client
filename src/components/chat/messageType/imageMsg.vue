@@ -21,7 +21,7 @@ export default {
   
 <style scoped>
 .imageMsg {
-  background-color: var(--message-commonBg);
+  background-color: var(--message-common-bgcolor);
 }
 
 :deep(.el-image__inner) {

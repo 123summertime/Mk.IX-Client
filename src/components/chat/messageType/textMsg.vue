@@ -53,16 +53,16 @@ export default {
 
 <style scoped>
 .textMsg {
-  background-color: var(--message-commonBg);
+  background-color: var(--message-common-bgcolor);
 }
 
 .atItem {
-  color: var(--message-atItem);
+  color: var(--message-at-textcolor);
   margin-right: 8px;
 }
 
 .content {
-  color: var(--message-content);
+  color: var(--message-content-textcolor);
 }
 
 .textMsg p i{
@@ -71,7 +71,7 @@ export default {
 }
 
 .encrypt { 
-  color: var(--neutral-3);
+  color: var(--message-contentEncrypt-textcolor);
   font-style: italic;
   text-decoration: line-through;
 }

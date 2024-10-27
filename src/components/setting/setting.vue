@@ -39,6 +39,6 @@ export default {
 
 <style scoped>
 .settingRoot {
-  background-color: var(--bg-color);
+  color: antiquewhite;
 }
 </style>

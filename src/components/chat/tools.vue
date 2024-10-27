@@ -403,7 +403,7 @@ export default {
   width: 100%;
   height: 48px;
   padding: 8px 16px;
-  background: var(--tools-toolsRoot);
+  background-color: var(--tools-toolsRoot-bgcolor);
 }
 
 .toolsRoot div svg {
@@ -453,7 +453,7 @@ export default {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  border-top: 1px solid var(--tools-searchResult);
+  border-top: 1px solid var(--tools-searchResult-border);
   padding-top: 20px;
 }
 
