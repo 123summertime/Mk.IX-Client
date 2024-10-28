@@ -261,15 +261,16 @@ export default {
 }
 
 .ownerNameplate {
-  background-color: var(--owner);
+  background: var(--owner);
 }
 
 .adminNameplate {
-  background-color: var(--admin);
+  background: var(--admin);
 }
 
 .username {
   line-height: 30px;
+  color: var(--message-username-textcolor);
 }
 
 .lower {
@@ -292,6 +293,7 @@ export default {
   margin: 0 4px;
   white-space: nowrap;
   direction: ltr;
+  color: var(--message-time-textcolor);
 }
 
 .contextMenu {

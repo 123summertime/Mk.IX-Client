@@ -131,7 +131,7 @@ export default {
     // 发送图片类型消息，以base64的形式
     sendingImage() {
       if (!this.payload.content) { return }
-
+      console.log(this.payload.content)
       const [content, encrypted] = this.encrypt(this.payload.content)
       this.$store.state.ws.send(JSON.stringify({
         type: this.payload.type,
@@ -399,7 +399,7 @@ export default {
 
 <style scoped>
 .inputBoxRoot {
-  background-color: var(--inputBox-inputBoxRoot-bgcolor);
+  background: var(--inputBox-inputBoxRoot-bgcolor);
 }
 
 /* bar */
@@ -409,7 +409,7 @@ export default {
   width: 100%;
   height: 48px;
   padding: 8px 24px;
-  background-color: var(--inputBox-bar-bgcolor);
+  background: var(--inputBox-bar-bgcolor);
 }
 
 input[type="file"] {
@@ -463,7 +463,8 @@ textarea {
   resize: none;
   border: none;
   outline: none;
-  background-color: var(--inputBox-textarea-bgcolor);
+  background: var(--inputBox-textarea-bgcolor);
+  color: var(--inputBox-textarea-textcolor);
 }
 
 textarea::-webkit-scrollbar {
@@ -490,7 +491,7 @@ textarea::-webkit-scrollbar {
   display: inline-flex;
   border-radius: 12px;
   padding: 12px 16px;
-  background-color: var(--inputBox-previewAudio-bgcolor);
+  background: var(--inputBox-previewAudio-bgcolor);
   cursor: pointer;
 }
 

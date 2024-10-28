@@ -199,19 +199,19 @@ export default {
 }
 
 .groupInfoRoot:hover {
-  background-color: var(--groupItem-hover-bgcolor);
+  background: var(--groupItem-hover-bgcolor);
 }
 
 .pinnedBg {
-  background-color: var(--groupItem-pinnedBg);
+  background: var(--groupItem-pinned-bgcolor);
 }
 
 .noramlBg {
-  background-color: var(--groupItem-normal-bgcolor);
+  background: var(--groupItem-normal-bgcolor);
 }
 
 .activeBg {
-  background-color: var(--groupItem-active-bgcolor) !important;
+  background: var(--groupItem-active-bgcolor) !important;
 }
 
 .groupAvatar {
@@ -286,7 +286,7 @@ export default {
   font-size: 0.8rem;
   line-height: 20px;
   text-align: center;
-  background-color: var(--groupItem-unread-bgcolor);
+  background: var(--groupItem-unread-bgcolor);
   color: var(--groupItem-unreadText-textcolor);
 }
 </style>

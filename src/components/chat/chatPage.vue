@@ -337,6 +337,7 @@ export default {
   height: 100vh;
   min-width: 600px;
   min-height: 400px;
+  background: var(--chatPage-chatPageRoot-bgcolor);
 }
 
 /* leftSide */
@@ -345,7 +346,7 @@ export default {
   width: 20vw;
   max-width: 50%;
   height: 100%;
-  background-color: var(--chatPage-leftSide-bgcolor);
+  background: var(--chatPage-leftSide-bgcolor);
 }
 
 .userInfo {
@@ -353,7 +354,11 @@ export default {
   width: 100%;
   height: 64px;
   padding: 8px 16px;
-  background-color: var(--chatPage-userInfo-bgcolor);
+  background: var(--chatPage-userInfo-bgcolor);
+}
+
+.userInfo p {
+  color: var(--chatPage-username-textcolor);
 }
 
 .userInfo img {
@@ -400,7 +405,7 @@ export default {
   display: flex;
   width: 100%;
   height: 64px;
-  background-color: var(--chatPage-header-bgcolor);
+  background: var(--chatPage-header-bgcolor);
   padding: 8px 24px;
 }
 
@@ -409,6 +414,7 @@ export default {
   justify-content: space-between;
   width: 100%;
   height: 48px;
+  color: var(--chatPage-groupName-textcolor);
 }
 
 .groupToolBar p {
@@ -428,14 +434,16 @@ export default {
   flex-direction: column;
   width: 100%;
   height: calc(100% - 64px);
-  background-color: var(--chatPage-center-bgcolor);
+  background: var(--chatPage-center-bgcolor);
 }
 
 .conversationView {
   position: relative;
   width: 100%;
   flex-grow: 1;
-  border-top: 1px solid var(--chatPage-conversationView-border);
+  border-top: 1px solid;  /* 非渐变色 */
+  border-bottom: 1px solid;
+  border-image: var(--chatPage-center-border) 1;  /* 渐变色 */
 }
 
 .conversation {
@@ -448,7 +456,6 @@ export default {
   width: 100%;
   height: 25%;
   max-height: 50%;
-  border-top: 1px solid var(--chatPage-inputBox-border);
 }
 
 /* splitter */

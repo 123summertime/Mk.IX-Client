@@ -29,7 +29,7 @@
   --text-opposite-secondary: var(--neutral-0);
   --bg: var(--neutral-1);
   --bg-secondary: var(--neutral-0);
-  --border: var(--neutral-2);
+  --border: linear-gradient(90deg, var(--neutral-2), var(--neutral-2));  /* 必须使用linear-gradient */
   --positive: var(--color-3);
   --neutral: var(--neutral-3);
   --negative: var(--color-2);
@@ -46,12 +46,14 @@
 
 /* chatPage */
 :root {
+  --chatPage-chatPageRoot-bgcolor: var(--bg);
   --chatPage-leftSide-bgcolor: var(--bg-secondary);
   --chatPage-userInfo-bgcolor: var(--bg);
   --chatPage-header-bgcolor: var(--bg);
   --chatPage-center-bgcolor: var(--bg);
-  --chatPage-conversationView-border: var(--border);
-  --chatPage-inputBox-border: var(--border);
+  --chatPage-center-border: var(--border);
+  --chatPage-username-textcolor: var(--text);
+  --chatPage-groupName-textcolor: var(--text);
 }
 
 /* groupItem */
@@ -84,7 +86,9 @@
   --inputBox-barItem-svgcolor: var(--text);
   --inputBox-barItemDisabled-svgcolor: var(--text-secondary);
   --inputBox-textarea-bgcolor: transparent;
+  --inputBox-textarea-textcolor: var(--text);
   --inputBox-previewAudio-bgcolor: var(--theme);
+  --message-time-textcolor: var(--text);
 }
 
 /* messageType */
@@ -96,6 +100,8 @@
   --message-contentEncrypt-textcolor: var(--text-secondary);
   --message-volume-bgcolor: var(--bg);
   --message-progress-bgcolor: var(--spical-0);
+  --message-time-textcolor: var(--text);
+  --message-username-textcolor: var(--text);
 }
 
 /* atBar */
