@@ -82,13 +82,17 @@ export default {
 .favoriteRoot {
   width: 100%;
   height: 100%;
-  background-color: var(--favorite-favoriteRoot-bgcolor);
+  background: var(--favorite-favoriteRoot-bgcolor);
 }
 
 .imgsOuter {
   width: 100%;
   height: 100%;
   overflow-y: auto;
+}
+
+.imgsOuter::-webkit-scrollbar {
+  display: none;
 }
 
 .imgs {
@@ -105,7 +109,7 @@ export default {
 }
 
 .eachImg:hover {
-  background-color: var(--favorite-eachImg-hover-bgcolor);
+  background: var(--favorite-eachImg-hover-bgcolor);
 }
 
 .eachImg img {

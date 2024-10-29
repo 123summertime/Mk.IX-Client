@@ -169,7 +169,7 @@ export default {
   justify-content: center;
   max-width: 90%;
   height: 48px;
-  background-color: var(--message-common-bgcolor);
+  background: var(--message-common-bgcolor);
   cursor: pointer;
 }
 
@@ -180,6 +180,10 @@ export default {
 
 .beforeBar svg {
   height: 24px;
+}
+
+.beforeBar svg, .afterBar p {
+  color: var(--message-content-textcolor);
 }
 
 .bar {
@@ -204,7 +208,7 @@ export default {
 .volume {
   width: 6px;
   border-radius: 3px;
-  background-color: var(--message-volume-bgcolor);
+  background: var(--message-volume-bgcolor);
 }
 
 .progress {
@@ -215,7 +219,8 @@ export default {
   top: 0;
   width: 0;
   height: 24px;
-  background-color: var(--message-progress-bgcolor);
+  background: var(--message-progress-bgcolor);
+  mix-blend-mode: darken;
 }
 
 .progressLine {

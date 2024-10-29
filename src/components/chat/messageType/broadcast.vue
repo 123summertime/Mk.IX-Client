@@ -23,5 +23,6 @@ export default {
 .broadcast p {
   font-size: 1rem;
   text-align: center;
+  color: var(--message-content-textcolor);
 }
 </style>

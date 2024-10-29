@@ -1,7 +1,10 @@
 <template>
-  <div class="imageMsg">
-    <el-image :src="message.payload.content" :preview-src-list="[message.payload.content]" alt="image" />
-  </div>
+  <el-image class="imageMsg"
+    :src="message.payload.content"
+    fit="cover"
+    :hide-on-click-modal="true"
+    :preview-src-list="[message.payload.content]"
+    alt="image" />
 </template>
   
 <script>
@@ -10,21 +13,20 @@ export default {
     group: String,
     message: Object
   },
-
-  data() {
-    return {
-
-    }
-  },
 }
 </script>
   
 <style scoped>
 .imageMsg {
-  background-color: var(--message-common-bgcolor);
+  padding: 0 !important;
+}
+
+.imageMsg .el-image {
+  max-height: 100%;
+  border-radius: 12px;
 }
 
 :deep(.el-image__inner) {
-  max-height: 40vh;
+  max-height: 33vh;
 }
 </style>

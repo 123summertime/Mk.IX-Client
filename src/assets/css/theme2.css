@@ -26,7 +26,7 @@
   --color-9: #343155;
 
   --color-6: #D489FF;
-  --color-7: #7985FF;
+  --color-7: #99A2FF;
   --color-8: #6AD8FD;
   --color-XI: #9D85FA;
   --color-X: #C77AFF;
@@ -35,6 +35,7 @@
 
   --mask-0: rgba(245, 244, 241, 0.1);
   --mask-1: rgba(199, 122, 255, 0.2);
+  --mask-3: rgba(199, 122, 255, 0);
   
 }
 
@@ -119,14 +120,15 @@
   --message-contentEncrypt-textcolor: var(--text-tertiary);
   --message-volume-bgcolor: var(--text-secondary);
   --message-progress-bgcolor: var(--mask-1);
+  --message-fileRightSide-textcolor: var(--color-7);
   --message-time-textcolor: var(--text-tertiary);
   --message-username-textcolor: var(--text-secondary);
 }
 
 /* atBar */
 :root {
-  --atBar-atCard-bgcolor: var(--theme);
-  --atBar-atCard-textcolor: var(--text-secondary);
+  --atBar-atCard-bgcolor: var(--mask-1);
+  --atBar-atCard-textcolor: var(--color-7);
 }
 
 /* favorite */
@@ -161,6 +163,7 @@
 /* tools */
 :root {
   --tools-toolsRoot-bgcolor: transparent;
+  --tools-items-svgcolor: var(--text-secondary);
   --tools-searchResult-border: var(--border);
 }
 

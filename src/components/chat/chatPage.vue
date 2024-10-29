@@ -441,9 +441,9 @@ export default {
   position: relative;
   width: 100%;
   flex-grow: 1;
-  border-top: 1px solid;  /* 非渐变色 */
+  border-top: 1px solid;
   border-bottom: 1px solid;
-  border-image: var(--chatPage-center-border) 1;  /* 渐变色 */
+  border-image: var(--chatPage-center-border) 1;
 }
 
 .conversation {

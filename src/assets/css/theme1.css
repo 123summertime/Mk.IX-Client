@@ -100,6 +100,7 @@
   --message-contentEncrypt-textcolor: var(--text-secondary);
   --message-volume-bgcolor: var(--bg);
   --message-progress-bgcolor: var(--spical-0);
+  --message-fileRightSide-textcolor: var(--text);
   --message-time-textcolor: var(--text);
   --message-username-textcolor: var(--text);
 }
@@ -142,6 +143,7 @@
 /* tools */
 :root {
   --tools-toolsRoot-bgcolor: var(--bg-secondary);
+  --tools-items-svgcolor: var(--text);
   --tools-searchResult-border: var(--border);
 }
 

@@ -197,6 +197,10 @@ export default {
   text-overflow: ellipsis;
 }
 
+.fileMsgInnerL p, .fileMsgInnerL p i {
+  color: var(--message-content-textcolor);
+}
+
 .fileMsgInnerR {
   position: relative;
   width: 64px;
@@ -220,11 +224,13 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--message-fileRightSide-textcolor);
 }
 
 .fileMsgIcon {
   width: 64px;
   height: 64px;
+  color: var(--message-fileRightSide-textcolor);
 }
 
 @media screen and (max-width: 1000px) {

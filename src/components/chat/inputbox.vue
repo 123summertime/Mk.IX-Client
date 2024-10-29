@@ -34,7 +34,6 @@
       <favorite class="favorite" v-if="favorite" @sendFavoriteImg="sendFavoriteImg"></favorite>
     </div>
 
-
     <!-- 确认遮罩层 -->
     <el-dialog v-model="visible" title="发送确认" width="640px" :show-close="false" :destroy-on-close="true">
       <img class="previewImg" :src="payload.content" v-if="payload.type === 'image'" />
@@ -385,7 +384,7 @@ export default {
       handler() {
         this.atList = new Set()
       }
-    }
+    },
   },
 
   components: {

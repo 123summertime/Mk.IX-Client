@@ -222,11 +222,11 @@ export default {
 
 .avatar img {
   position: relative;
-  display: inline-block;
+  display: block;
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  transform: translateY(8px);
+  transform: translateY(12px);
   cursor: pointer;
 }
 
@@ -248,6 +248,7 @@ export default {
 
 .upper {
   display: flex;
+  align-items: flex-end;
   height: 24px;
   white-space: nowrap;
   direction: ltr;
@@ -257,7 +258,7 @@ export default {
   line-height: 24px;
   margin-right: 6px;
   padding: 0 6px;
-  border-radius: 10px;
+  border-radius: 6px;
 }
 
 .ownerNameplate {
@@ -269,7 +270,6 @@ export default {
 }
 
 .username {
-  line-height: 30px;
   color: var(--message-username-textcolor);
 }
 
@@ -277,6 +277,7 @@ export default {
   display: flex;
   align-items: flex-end;
   max-width: 100%;
+  margin-top: 8px;
 }
 
 .payload {
@@ -284,7 +285,6 @@ export default {
   white-space: pre-wrap;
   border-radius: 12px;
   padding: 12px 16px;
-  margin-top: 6px;
   direction: ltr;
 }
 
