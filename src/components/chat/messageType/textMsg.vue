@@ -53,7 +53,7 @@ export default {
 
 <style scoped>
 .textMsg {
-  background-color: var(--message-common-bgcolor);
+  background: var(--message-common-bgcolor);
 }
 
 .atItem {

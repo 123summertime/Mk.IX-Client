@@ -68,7 +68,7 @@ export default {
   margin: 0 auto;
   padding: 32px;
   border-radius: 32px;
-  background-color: rgba(245, 245, 245, 0.1);
+  background: rgba(245, 245, 245, 0.1);
   overflow: scroll;
   z-index: 10;
 }
@@ -79,7 +79,7 @@ export default {
 
 .bkgdItem {
   position: absolute;
-  background-color: rgba(245, 245, 245, 0.2);
+  background: rgba(245, 245, 245, 0.2);
   border-radius: 16px;
   width: var(--bkgdItem-size);
   height: var(--bkgdItem-size);

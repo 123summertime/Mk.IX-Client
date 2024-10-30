@@ -96,7 +96,7 @@ export default {
 
       ref.left = x + 'px'
       ref.top = y + 'px'
-      ref.display = 'block'
+      ref.display = 'flex'
 
       // 右键菜单会超出屏幕则向左挪144px 144px是右键菜单的宽度
       if (event.pageX + 144 > window.innerWidth) {
@@ -259,6 +259,7 @@ export default {
   margin-right: 6px;
   padding: 0 6px;
   border-radius: 6px;
+  color: var(--message-nameplate-textcolor);
 }
 
 .ownerNameplate {

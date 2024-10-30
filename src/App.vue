@@ -32,4 +32,8 @@ img {
 a {
   text-decoration: none;
 }
+
+.el-dialog header span {
+  padding-left: 8px;
+}
 </style>

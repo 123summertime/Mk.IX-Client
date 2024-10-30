@@ -52,7 +52,7 @@ export default {
   align-items: center;
   padding: 4px 12px;
   margin-right: 8px;
-  background-color: var(--atBar-atCard-bgcolor);
+  background: var(--atBar-atCard-bgcolor);
   border-radius: 6px;
 }
 
@@ -62,8 +62,9 @@ export default {
 }
 
 svg {
-  height: 16px;
+  height: 20px;
   margin-left: 4px;
   cursor: pointer;
+  color: var(--atBar-atCard-svgcolor);
 }
 </style>

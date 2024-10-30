@@ -259,7 +259,7 @@ export default {
 :deep(.el-input__inner) {
   border: none;
   outline: none;
-  background-color: transparent;
+  background: transparent;
 }
 
 :deep(.el-input__wrapper) {

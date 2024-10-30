@@ -100,7 +100,7 @@ export default {
 }
 
 .request:hover {
-  background-color: var(--eachRequest-hover-bgcolor);
+  background: var(--eachRequest-hover-bgcolor);
 }
 
 .request .image {
@@ -127,6 +127,7 @@ export default {
 .content p {
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--eachRequest-item-textcolor);
 }
 
 .reason {
@@ -137,6 +138,7 @@ export default {
 .time {
   flex: 0 0 auto;
   margin-right: 24px;
+  color: var(--eachRequest-itemRightSide-textcolor);
 }
 
 .time p {
@@ -163,6 +165,7 @@ export default {
 .requestOpers svg {
   width: 24px;
   cursor: pointer;
+  color: var(--eachRequest-itemRightSide-textcolor);
 }
 
 .requestOpers svg:hover {

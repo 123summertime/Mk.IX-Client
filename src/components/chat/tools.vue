@@ -32,20 +32,22 @@
 
   <!-- 创建群 -->
   <el-dialog v-model="makeVisible" title="创建群" width="640px">
-    <div class="groupOpersItem">
-      <p>群名</p>
-      <el-input v-model="makeGroupName"></el-input>
-    </div>
-    <div class="groupOpersItem">
-      <p>入群问题</p>
-      <el-input v-model="makeGroupQ"></el-input>
-    </div>
-    <div class="groupOpersItem">
-      <p>答案</p>
-      <el-input v-model="makeGroupA"></el-input>
+    <div class="buildGroup">
+      <div class="groupOpersItem">
+        <p>群名</p>
+        <el-input v-model="makeGroupName"></el-input>
+      </div>
+      <div class="groupOpersItem">
+        <p>入群问题</p>
+        <el-input v-model="makeGroupQ"></el-input>
+      </div>
+      <div class="groupOpersItem">
+        <p>答案</p>
+        <el-input v-model="makeGroupA"></el-input>
+      </div>
     </div>
     <template #footer>
-      <span class="dialog-footer">
+      <span class="buildGroupFooter">
         <el-button @click="makeVisible = false">取消</el-button>
         <el-button type="primary" @click="makeGroup">确认</el-button>
       </span>
@@ -85,11 +87,11 @@
 
   <!-- 搜索群-回答入群问题 -->
   <el-dialog v-model="byQuestionVisible" class="searchDialog" width="640px">
-    <div>
+    <div class="dialogText">
       <p>{{ "问题: " + searchGroupQ }}</p>
     </div>
     <div class="searchInputBox">
-      <el-input v-model="searchGroupA"></el-input>
+      <el-input v-model="searchGroupA" placeholder="答案"></el-input>
       <el-button type="primary" @click="joinGroupByQA">验证</el-button>
     </div>
   </el-dialog>
@@ -403,7 +405,7 @@ export default {
   width: 100%;
   height: 48px;
   padding: 8px 16px;
-  background-color: var(--tools-toolsRoot-bgcolor);
+  background: var(--tools-toolsRoot-bgcolor);
 }
 
 .toolsRoot div svg {
@@ -424,6 +426,14 @@ export default {
   display: none;
 }
 
+.buildGroup {
+  padding: 0 8px;
+}
+
+.buildGroupFooter {
+  padding-right: 8px;
+}
+
 .groupOpersItem {
   display: flex;
   height: 32px;
@@ -434,6 +444,7 @@ export default {
 .groupOpersItem p,
 .searchGroupID p {
   line-height: 32px;
+  color: var(--tools-common-textcolor);
 }
 
 .groupOpersItem .el-input {
@@ -454,7 +465,8 @@ export default {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  border-top: 1px solid var(--tools-searchResult-border);
+  border-top: 1px solid;
+  border-image: var(--tools-searchResult-border) 1;
   padding-top: 20px;
 }
 
@@ -480,10 +492,27 @@ export default {
   font-size: 1.2rem;
 }
 
+.searchResultM p {
+  color: var(--tools-searchResult-textcolor);
+}
+
 .searchResultR {
   display: flex;
   justify-content: space-around;
   align-items: center;
+}
+
+.dialogText {
+  color: var(--tools-common-textcolor);
+}
+
+/* 覆盖el样式 */
+:deep(.el-tabs__item) {
+  color: var(--tools-tab-textcolor);
+}
+
+:deep(.el-tabs__item:hover), :deep(.is-active) {
+  color: var(--el-color-primary);
 }
 </style>
 

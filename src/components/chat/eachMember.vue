@@ -190,7 +190,7 @@ export default {
 }
 
 .eachMemberRoot:hover {
-  background-color: var(--eachMember-hover-bgcolor);
+  background: var(--eachMember-hover-bgcolor);
 }
 
 .info {
@@ -220,15 +220,15 @@ export default {
 }
 
 .ownerNameplate {
-  background-color: var(--owner);
+  background: var(--owner);
 }
 
 .adminNameplate {
-  background-color: var(--admin);
+  background: var(--admin);
 }
 
 .selfNameplate {
-  background-color: var(--self);
+  background: var(--self);
 }
 
 .oper {

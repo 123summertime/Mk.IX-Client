@@ -207,13 +207,13 @@ export default {
 
 <style>
 .el-popper.is-customized {
-  background-color: var(--namecard-popper-bgcolor);
+  background: var(--namecard-popper-bgcolor);
   padding: 6px 12px;
   color: var(--namecard-popper-textcolor);
 }
 
 .el-popper.is-customized .el-popper__arrow::before {
-  background-color: var(--namecard-popper-bgcolor);
+  background: var(--namecard-popper-bgcolor);
   right: 0;
 }
 </style>

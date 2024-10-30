@@ -52,7 +52,7 @@ export default {
 }
 
 .eachNoticeRoot:hover {
-  background-color: var(--eachNotice-hover-bgcolor);
+  background: var(--eachNotice-hover-bgcolor);
 }
 
 .icon {
@@ -67,6 +67,7 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   margin: 0 12px;
+  color: var(--eachNotice-item-textcolor);
 }
 
 .content p {
@@ -81,6 +82,7 @@ export default {
   opacity: 0.8;
   white-space: nowrap;
   margin-right: 24px;
+  color: var(--eachNotice-itemRightSide-textcolor);
 }
 
 .opers {
@@ -93,6 +95,7 @@ export default {
 .opers svg {
   width: 24px;
   cursor: pointer;
+  color: var(--eachNotice-itemRightSide-textcolor);
 }
 
 .opers svg:hover {
@@ -109,6 +112,6 @@ export default {
 }
 
 .neutral {
-  color: var(--eachNotice-item-svgcolor);
+  color: var(--neutral);
 }
 </style>

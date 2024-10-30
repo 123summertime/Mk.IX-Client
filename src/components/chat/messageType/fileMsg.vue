@@ -179,7 +179,7 @@ export default {
   width: 300px;
   max-width: 90%;
   height: 100px;
-  background-color: var(--message-file-bgcolor);
+  background: var(--message-file-bgcolor);
   cursor: pointer;
 }
 

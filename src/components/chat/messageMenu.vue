@@ -151,33 +151,32 @@ export default {
   width: 144px;
   padding: 8px;
   border-radius: 8px;
-  background-color: var(--messageMenu-msgMenuRoot-bgcolor);
+  background: var(--messageMenu-msgMenuRoot-bgcolor);
   z-index: 10000;
   opacity: 0.9;
 }
 
 .msgMenuRoot div {
   display: flex;
+  align-items: center;
   width: 100%;
-  height: 24px;
-  margin: 4px 0;
-  padding: 0 4px;
+  height: 36px;
+  padding: 8px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
 .msgMenuRoot div svg {
-  width: 16px;
   height: 100%;
+  color: var(--messageMenu-item-textcolor);
 }
 
 .msgMenuRoot div p {
-  height: 100%;
-  line-height: 24px;
   margin-left: 8px;
+  color: var(--messageMenu-item-textcolor);
 }
 
 .msgMenuRoot div:hover {
-  border-radius: 8px;
-  background-color: var(--messageMenu-msgMenuRoot-hover-bgcolor);
+  background: var(--messageMenu-item-hover-bgcolor);
 }
 </style>

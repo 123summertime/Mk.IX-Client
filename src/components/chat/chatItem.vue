@@ -289,7 +289,7 @@ export default {
   padding: 8px 20px 8px 32px;
   border-top-left-radius: 24px;
   border-bottom-left-radius: 24px;
-  background-color: var(--chatItem-attentionButton-bgcolor);
+  background: var(--chatItem-attentionButton-bgcolor);
   cursor: pointer;
 }
 
@@ -301,15 +301,15 @@ export default {
 
 @keyframes flash {
   0% {
-    background-color: transparent;
+    background: transparent;
   }
 
   50% {
-    background-color: var(--chatItem-flash-bgcolor);
+    background: var(--chatItem-flash-bgcolor);
   }
 
   100% {
-    background-color: transparent;
+    background: transparent;
   }
 }
 

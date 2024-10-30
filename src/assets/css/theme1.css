@@ -48,6 +48,7 @@
 :root {
   --chatPage-chatPageRoot-bgcolor: var(--bg);
   --chatPage-leftSide-bgcolor: var(--bg-secondary);
+  --chatPage-drawer-bgcolor: var(--bg);
   --chatPage-userInfo-bgcolor: var(--bg);
   --chatPage-header-bgcolor: var(--bg);
   --chatPage-center-bgcolor: var(--bg);
@@ -103,12 +104,14 @@
   --message-fileRightSide-textcolor: var(--text);
   --message-time-textcolor: var(--text);
   --message-username-textcolor: var(--text);
+  --message-nameplate-textcolor: var(--text);
 }
 
 /* atBar */
 :root {
   --atBar-atCard-bgcolor: var(--theme);
   --atBar-atCard-textcolor: var(--text-opposite);
+  --atBar-atCard-svgcolor: var(--text);
 }
 
 /* favorite */
@@ -137,25 +140,32 @@
 /* messageMenu */
 :root {
   --messageMenu-msgMenuRoot-bgcolor: var(--bg);
-  --messageMenu-msgMenuRoot-hover-bgcolor: var(--theme);
+  --messageMenu-item-textcolor: var(--text);
+  --messageMenu-item-hover-bgcolor: var(--theme);
 }
 
 /* tools */
 :root {
   --tools-toolsRoot-bgcolor: var(--bg-secondary);
   --tools-items-svgcolor: var(--text);
+  --tools-tab-textcolor: var(--text);
   --tools-searchResult-border: var(--border);
+  --tools-searchResult-textcolor: var(--text);
+  --tools-common-textcolor: var(--text);
 }
 
 /* eachNotice */
 :root {
   --eachNotice-hover-bgcolor: var(--bg);
-  --eachNotice-item-svgcolor: var(--neutral);
+  --eachNotice-item-textcolor: var(--text);
+  --eachNotice-itemRightSide-textcolor: var(--text-secondary);
 }
 
 /* eachRequest */
 :root {
   --eachRequest-hover-bgcolor: var(--bg);
+  --eachRequest-item-textcolor: var(--text);
+  --eachRequest-itemRightSide-textcolor: var(--text-secondary);
 }
 
 /* groupConfig */
@@ -183,7 +193,15 @@
 
 /* 覆盖el原有样式 */
 .el-dialog, .i-dialog-footer, .dialogMain {
-  background-color: var(--bg-secondary) !important;
+  background: var(--bg-secondary) !important;
+}
+
+.el-dialog header span {
+  color: var(--text);
+}
+
+.el-input__inner {
+  color: var(--text);
 }
 
 :root {
@@ -194,5 +212,5 @@
   --el-color-primary-light-8: var(--theme-0) !important;
   --el-color-primary-light-9: var(--theme-0) !important;
   --el-button-hover-text-color: var(--text-opposite-secondary) !important;
-  --el-fill-color-blank: var(--text-opposite-secondary) !important;
+  --el-fill-color-blank: var(--text-opposite-secondary) !important;   /* el-input的背景色 */
 }

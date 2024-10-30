@@ -21,21 +21,22 @@
   --spical-2: rgba(248, 81, 73, 0.03);  /* 0.03透明度的 --color-2 */
   
   
-  --color-4: #3E3A65;
+  --color-4: #3e3a65;
   --color-5: #473765;
   --color-9: #343155;
 
-  --color-6: #D489FF;
+  --color-6: #d489ff;
   --color-7: #99A2FF;
   --color-8: #6AD8FD;
   --color-XI: #9D85FA;
-  --color-X: #C77AFF;
+  --color-X: #c77aff;
+  --color-XII: #D1C4E9;
 
   --neutral-5: #404040;
 
   --mask-0: rgba(245, 244, 241, 0.1);
   --mask-1: rgba(199, 122, 255, 0.2);
-  --mask-3: rgba(199, 122, 255, 0);
+  --mask-3: rgba(62, 58, 101, 0.5);
   
 }
 
@@ -49,7 +50,7 @@
   --text-opposite-secondary: var(--neutral-5);
 
   --bg: linear-gradient(180deg, var(--color-4), var(--color-5));
-  --bg-secondary: linear-gradient();
+  --bg-secondary: var(--color-4);
   --border: linear-gradient(90deg, var(--color-6), var(--color-7), var(--color-8));
   --positive: var(--color-3);
   --neutral: var(--neutral-3);
@@ -69,6 +70,7 @@
 :root {
   --chatPage-chatPageRoot-bgcolor: var(--bg);
   --chatPage-leftSide-bgcolor: transparent;
+  --chatPage-drawer-bgcolor: var(--bg-secondary);
   --chatPage-userInfo-bgcolor: transparent;
   --chatPage-header-bgcolor: transparent;
   --chatPage-center-bgcolor: transparent;
@@ -123,59 +125,68 @@
   --message-fileRightSide-textcolor: var(--color-7);
   --message-time-textcolor: var(--text-tertiary);
   --message-username-textcolor: var(--text-secondary);
+  --message-nameplate-textcolor: var(--text-opposite);
 }
 
 /* atBar */
 :root {
   --atBar-atCard-bgcolor: var(--mask-1);
   --atBar-atCard-textcolor: var(--color-7);
+  --atBar-atCard-svgcolor: var(--text);
 }
 
 /* favorite */
 :root { 
-  --favorite-favoriteRoot-bgcolor: var(--bg);
+  --favorite-favoriteRoot-bgcolor: transparent;
   --favorite-eachImg-hover-bgcolor: transparent;
 }
 
 /* eachMember */
 :root {
-  --eachMember-nameplate-textcolor: var(--text);
+  --eachMember-nameplate-textcolor: var(--text-opposite);
   --eachMember-name-textcolor: var(--text);
   --eachMember-oper-svgcolor: var(--text);
   --eachMember-checker-svgcolor: var(--text);
   --eachMember-checker-textcolor: var(--text);
-  --eachMember-hover-bgcolor: var(--bg);
+  --eachMember-hover-bgcolor: var(--mask-1);
 }
 
 /* groupSelector */
 :root { 
-  --groupSelector-hover-bgcolor: var(--theme-alternative);
-  --groupSelector-selected-bgcolor: var(--theme);
+  --groupSelector-hover-bgcolor: var(--mask-1);
+  --groupSelector-selected-bgcolor: linear-gradient(135deg, var(--color-XI), var(--color-X));
   --groupSelector-groupName-textcolor: var(--text);
 }
 
 /* messageMenu */
 :root {
-  --messageMenu-msgMenuRoot-bgcolor: var(--bg);
-  --messageMenu-msgMenuRoot-hover-bgcolor: var(--theme);
+  --messageMenu-msgMenuRoot-bgcolor: var(--color-XII);
+  --messageMenu-item-textcolor: var(--text-opposite);
+  --messageMenu-item-hover-bgcolor: var(--color-XI);
 }
 
 /* tools */
 :root {
   --tools-toolsRoot-bgcolor: transparent;
   --tools-items-svgcolor: var(--text-secondary);
+  --tools-tab-textcolor: var(--text-secondary);
   --tools-searchResult-border: var(--border);
+  --tools-searchResult-textcolor: var(--text-secondary);
+  --tools-common-textcolor: var(--text-secondary);
 }
 
 /* eachNotice */
 :root {
-  --eachNotice-hover-bgcolor: var(--bg);
-  --eachNotice-item-svgcolor: var(--neutral);
+  --eachNotice-hover-bgcolor: var(--mask-1);
+  --eachNotice-item-textcolor: var(--text-secondary);
+  --eachNotice-itemRightSide-textcolor: var(--text-tertiary);
 }
 
 /* eachRequest */
 :root {
-  --eachRequest-hover-bgcolor: var(--bg);
+  --eachRequest-hover-bgcolor: var(--mask-1);
+  --eachRequest-item-textcolor: var(--text-secondary);
+  --eachRequest-itemRightSide-textcolor: var(--text-tertiary);
 }
 
 /* groupConfig */
@@ -203,7 +214,15 @@
 
 /* 覆盖el原有样式 */
 .el-dialog, .i-dialog-footer, .dialogMain {
-  background-color: var(--bg-secondary) !important;
+  background: var(--bg-secondary) !important;
+}
+
+.el-dialog header span {
+  color: var(--text);
+}
+
+.el-input__inner {
+  color: var(--text-secondary);
 }
 
 :root {

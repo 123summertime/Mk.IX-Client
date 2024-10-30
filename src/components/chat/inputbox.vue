@@ -7,7 +7,7 @@
         </label>
         <input type="file" id="fileUpload" @change="fileUpload">
       </div>
-      <div class="barItem" title="图片" @click="favorite = !favorite">
+      <div class="barItem" title="图片" @click="favoriteVisible = !favoriteVisible">
         <Picture class="icon"></Picture>
       </div>
       <div class="barItem" title="语音">
@@ -28,11 +28,18 @@
       </div>
     </div>
 
-    <div class="main">
-      <atBar class="atBar" :atList="atList" @deleteAt="deleteAt"></atBar>
-      <textarea v-model=input @keydown="onKeyDown" v-on:paste="pasteImg" :disabled="!available"></textarea>
-      <favorite class="favorite" v-if="favorite" @sendFavoriteImg="sendFavoriteImg"></favorite>
-    </div>
+      <div class="main">
+        <atBar class="atBar" 
+        :atList="atList" 
+        :style="{ display: favoriteVisible ? 'none' : 'block' }"
+        @deleteAt="deleteAt" ></atBar>
+        <textarea v-model=input 
+         :disabled="!available" 
+         :style="{ color: favoriteVisible ? 'transparent' : '' }"
+         v-on:paste="pasteImg" 
+         @keydown="onKeyDown"></textarea>
+        <favorite class="favorite" v-if="favoriteVisible" @sendFavoriteImg="sendFavoriteImg"></favorite>
+      </div>
 
     <!-- 确认遮罩层 -->
     <el-dialog v-model="visible" title="发送确认" width="640px" :show-close="false" :destroy-on-close="true">
@@ -86,7 +93,7 @@ export default {
         recording: false,
       },
       visible: false,
-      favorite: false,
+      favoriteVisible: false,
       atList: new Set(),  // 存储@其他人的JSON字符串，包含属性uuid, username
     }
   },
@@ -321,7 +328,7 @@ export default {
 
     // 发送收藏的表情包，尝试改为webp后发送
     sendFavoriteImg(img) {
-      this.favorite = false
+      this.favoriteVisible = false
       this.payload.type = 'image'
       this.payload.content = img
 
@@ -418,7 +425,7 @@ input[type="file"] {
 .barItem {
   height: 100%;
   cursor: pointer;
-  background-color: transparent;
+  background: transparent;
   margin-right: 24px;
   color: var(--inputBox-barItem-svgcolor);
 }

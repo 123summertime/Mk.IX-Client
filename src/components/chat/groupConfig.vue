@@ -427,6 +427,10 @@ export default {
 </script>
 
 <style scoped>
+.groupConfigRoot {
+  background: var(--groupConfig-groupConfigRoot-bgcolor);
+}
+
 .groupConfigRoot .title {
   display: inline-block;
   border-bottom: 2px solid var(--groupConfig-generalTitle-border);
@@ -489,7 +493,7 @@ li .dangerItem {
 }
 
 .general li:hover {
-  background-color: var(--groupConfig-general-hover-bgcolor);
+  background: var(--groupConfig-general-hover-bgcolor);
 }
 
 .dangerZone {
@@ -504,7 +508,7 @@ li .dangerItem {
 }
 
 .dangerZone li:hover {
-  background-color: var(--groupConfig-dangerZone-hover-bgcolor);
+  background: var(--groupConfig-dangerZone-hover-bgcolor);
 }
 
 .list {
