@@ -16,8 +16,8 @@
     </div>
     <template #footer>
       <div>
-        <el-button @click="canceled">取消</el-button>
-        <el-button type="primary" :disabled="groupID === ''" @click="selected">确定</el-button>
+        <el-button plain type="info" @click="canceled">取消</el-button>
+        <el-button plain type="primary" :disabled="groupID === ''" @click="selected">确定</el-button>
       </div>
     </template>
   </el-dialog>

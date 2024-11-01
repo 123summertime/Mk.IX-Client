@@ -48,8 +48,8 @@
     </div>
     <template #footer>
       <span class="buildGroupFooter">
-        <el-button @click="makeVisible = false">取消</el-button>
-        <el-button type="primary" @click="makeGroup">确认</el-button>
+        <el-button plain type="info" @click="makeVisible = false">取消</el-button>
+        <el-button plain type="primary" @click="makeGroup">确认</el-button>
       </span>
     </template>
   </el-dialog>
@@ -60,7 +60,7 @@
       <el-tab-pane label="搜索群" name="searchGroup">
         <div class="searchInputBox">
           <el-input v-model="searchGroupID" placeholder='群号'></el-input>
-          <el-button type="primary" @click="searchGroup">搜索</el-button>
+          <el-button plain type="primary" @click="searchGroup">搜索</el-button>
         </div>
         <div v-if="searchGroupVisible" class="searchResult">
           <div class="searchResultL">
@@ -71,15 +71,15 @@
             </div>
           </div>
           <div class="searchResultR">
-            <el-button type="primary" class="searchResultOper" @click="byQuestionVisible = true">回答入群问题</el-button>
-            <el-button type="primary" class="searchResultOper" @click="byRequsetVisible = true">发送申请</el-button>
+            <el-button plain type="primary" class="searchResultOper" @click="byQuestionVisible = true">回答入群问题</el-button>
+            <el-button plain type="primary" class="searchResultOper" @click="byRequsetVisible = true">发送申请</el-button>
           </div>
         </div>
       </el-tab-pane>
       <el-tab-pane label="搜索人" name="searchUser">
         <div class="searchInputBox">
           <el-input v-model="searchUserID" placeholder='用户ID'></el-input>
-          <el-button type="primary" @click="searchUser">搜索</el-button>
+          <el-button plain type="primary" @click="searchUser">搜索</el-button>
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -92,7 +92,7 @@
     </div>
     <div class="searchInputBox">
       <el-input v-model="searchGroupA" placeholder="答案"></el-input>
-      <el-button type="primary" @click="joinGroupByQA">验证</el-button>
+      <el-button plain type="primary" @click="joinGroupByQA">验证</el-button>
     </div>
   </el-dialog>
 
@@ -100,7 +100,7 @@
   <el-dialog v-model="byRequsetVisible" class="searchDialog" width="640px">
     <div class="searchInputBox">
       <el-input v-model="searchGroupA" placeholder="申请理由(选填)"></el-input>
-      <el-button type="primary" @click="joinGroupByRequest">申请</el-button>
+      <el-button plain type="primary" @click="joinGroupByRequest">申请</el-button>
     </div>
   </el-dialog>
 

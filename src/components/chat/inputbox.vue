@@ -54,8 +54,8 @@
             <div class="msgSize" :title="fileSize">{{ fileSize }}</div>
           </div>
           <div class="buttons">
-            <el-button type="primary" @click="confirmedSending">确认</el-button>
-            <el-button @click="canceledSending">取消</el-button>
+            <el-button plain type="primary" @click="confirmedSending">确认</el-button>
+            <el-button plain type="info" @click="canceledSending">取消</el-button>
           </div>
         </span>
       </template>
@@ -434,8 +434,12 @@ input[type="file"] {
   cursor: pointer;
 }
 
+.barItem:hover {
+  color: var(--inputBox-barItem-hover-svgcolor);
+}
+
 .barItemDisabled {
-  color: var(--inputBox-barItemDisabled-svgcolor);
+  color: var(--inputBox-barItemDisabled-svgcolor) !important;
   cursor: not-allowed;
 }
 

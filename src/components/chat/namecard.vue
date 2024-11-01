@@ -1,5 +1,8 @@
 <template>
   <el-dialog v-model="namecardVisible" :show-close="false" width="540px">
+    <template #header>
+      <div style="height: 0;"></div>
+    </template>
     <div class="namecard">
       <div class="namecardAvatar">
         <el-image :src="avatar" :preview-src-list="[avatar]" alt="avatar" />
@@ -13,6 +16,7 @@
         <el-tooltip
           effect="customized"
           :content="userState"
+          :show-arrow="false"
           placement="right">
           <p>{{ lastSeen == '在线' ? '在线' : '离线' }}</p>
         </el-tooltip>
@@ -21,7 +25,7 @@
         <p>{{ "“" + bio + "”" }}</p>
       </div>
       <div class="addFriend" v-if="!messageFrom()">
-        <el-button type="primary" @click="friendRequestVisible = true">发送好友申请</el-button>
+        <el-button plain type="primary" @click="friendRequestVisible = true">发送好友申请</el-button>
       </div>
 
       <el-dialog v-model="friendRequestVisible" width="540px" title="好友申请">
@@ -30,8 +34,8 @@
         </div>
         <template #footer>
           <div>
-            <el-button @click="friendRequestVisible = false">取消</el-button>
-            <el-button type="primary" @click="friendRequest">发送</el-button>
+            <el-button plain type="info" @click="friendRequestVisible = false">取消</el-button>
+            <el-button plain type="primary" @click="friendRequest">发送</el-button>
           </div>
         </template>
       </el-dialog>
@@ -192,28 +196,17 @@ export default {
   width: 100%;
   padding: 8px 0;
   margin: 16px 0;
-  border-top: 1px solid var(--namecard-middle-border);
+  border-top: 1px solid;
+  border-image: var(--namecard-middle-border) 1;
 }
 
 .middle p {
   font-style: italic;
   word-break: break-all;
+  color: var(--namecard-bio-textcolor);
 }
 
 .addFriend {
   margin-top: 16px;
-}
-</style>
-
-<style>
-.el-popper.is-customized {
-  background: var(--namecard-popper-bgcolor);
-  padding: 6px 12px;
-  color: var(--namecard-popper-textcolor);
-}
-
-.el-popper.is-customized .el-popper__arrow::before {
-  background: var(--namecard-popper-bgcolor);
-  right: 0;
 }
 </style>

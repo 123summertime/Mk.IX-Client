@@ -14,7 +14,8 @@
   --neutral-1: #f5f4f1;
   --neutral-2: #cccbc8;
   --neutral-3: #808080;
-  --neutral-4: #1d1c1c;
+  --neutral-4: #404040;
+  --neutral-5: #1d1c1c;
 
   --spical-0: rgba(213, 155, 246, 0.6);   /* 0.6透明度的 --theme-4  */
   --spical-1: rgba(248, 81, 73, 0.2);    /* 0.2透明度的 --color-2  */
@@ -23,8 +24,9 @@
 
 :root {
   /* 字体背景颜色类 */
-  --text: var(--neutral-4);
-  --text-secondary: var(--neutral-3);
+  --text: var(--neutral-5);
+  --text-secondary: var(--neutral-4);
+  --text-tertiary: var(--neutral-3);
   --text-opposite: var(--neutral-1);
   --text-opposite-secondary: var(--neutral-0);
   --bg: var(--neutral-1);
@@ -66,7 +68,7 @@
   --groupItem-attention-textcolor: var(--theme);
   --groupItem-groupName-textcolor: var(--text);
   --groupItem-groupNameActive-textcolor: var(--text-opposite);
-  --groupItem-currMessageContext-textcolor: var(--text-secondary);
+  --groupItem-currMessageContext-textcolor: var(--text-tertiary);
   --groupItem-currMessageContextActive-textcolor: var(--text-opposite);
   --groupItem-time-textcolor: var(--text);
   --groupItem-timeActive-textcolor: var(--text-opposite);
@@ -77,6 +79,7 @@
 /* chatItem */
 :root {
   --chatItem-attentionButton-bgcolor: var(--theme-alternative);
+  --chatItem-attentionButton-textcolor: var(--text);
   --chatItem-flash-bgcolor: var(--theme-alternative);
 }
 
@@ -85,7 +88,8 @@
   --inputBox-inputBoxRoot-bgcolor: transparent;
   --inputBox-bar-bgcolor: transparent;
   --inputBox-barItem-svgcolor: var(--text);
-  --inputBox-barItemDisabled-svgcolor: var(--text-secondary);
+  --inputBox-barItem-hover-svgcolor: var(--theme);
+  --inputBox-barItemDisabled-svgcolor: var(--text-tertiary);
   --inputBox-textarea-bgcolor: transparent;
   --inputBox-textarea-textcolor: var(--text);
   --inputBox-previewAudio-bgcolor: var(--theme);
@@ -98,7 +102,7 @@
   --message-file-bgcolor: var(--theme);
   --message-at-textcolor: var(--text-opposite);
   --message-content-textcolor: var(--text);
-  --message-contentEncrypt-textcolor: var(--text-secondary);
+  --message-contentEncrypt-textcolor: var(--text-tertiary);
   --message-volume-bgcolor: var(--bg);
   --message-progress-bgcolor: var(--spical-0);
   --message-fileRightSide-textcolor: var(--text);
@@ -158,14 +162,14 @@
 :root {
   --eachNotice-hover-bgcolor: var(--bg);
   --eachNotice-item-textcolor: var(--text);
-  --eachNotice-itemRightSide-textcolor: var(--text-secondary);
+  --eachNotice-itemRightSide-textcolor: var(--text-tertiary);
 }
 
 /* eachRequest */
 :root {
   --eachRequest-hover-bgcolor: var(--bg);
   --eachRequest-item-textcolor: var(--text);
-  --eachRequest-itemRightSide-textcolor: var(--text-secondary);
+  --eachRequest-itemRightSide-textcolor: var(--text-tertiary);
 }
 
 /* groupConfig */
@@ -173,22 +177,22 @@
   --groupConfig-generalTitle-border: var(--spical-0);
   --groupConfig-general-border: var(--spical-0);
   --groupConfig-general-hover-bgcolor: var(--spical-0);
-  --groupConfig-general-info-textcolor: var(--text-secondary);
+  --groupConfig-general-info-textcolor: var(--text-tertiary);
   --groupConfig-dangerZoneTitle-border: var(--spical-1);
   --groupConfig-dangerZone-bgcolor: var(--spical-2);
   --groupConfig-dangerZone-hover-bgcolor: var(--spical-1);
   --groupConfig-checker-svgcolor: var(--text);
   --groupConfig-checker-textcolor: var(--text);
+  --groupConfig-dialogContent-textcolor: var(--text-secondary);
 }
 
 /* namecard */
 :root {
   --namecard-username-textcolor: var(--text);
-  --namecard-uid-textcolor: var(--text-secondary);
-  --namecard-state-textcolor: var(--text-secondary);
+  --namecard-uid-textcolor: var(--text-tertiary);
+  --namecard-state-textcolor: var(--text-tertiary);
   --namecard-middle-border: var(--theme);
-  --namecard-popper-bgcolor: var(--bg);
-  --namecard-popper-textcolor: var(--text-secondary);
+  --namecard-bio-textcolor: var(--text);
 }
 
 /* 覆盖el原有样式 */
@@ -196,12 +200,18 @@
   background: var(--bg-secondary) !important;
 }
 
-.el-dialog header span {
+.el-dialog__title {
   color: var(--text);
 }
 
 .el-input__inner {
   color: var(--text);
+}
+
+.el-popper.is-customized, 
+.el-popper.is-customized .el-popper__arrow::before {
+  background: var(--bg);
+  color: var(--text-tertiary);
 }
 
 :root {

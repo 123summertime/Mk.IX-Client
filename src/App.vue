@@ -34,6 +34,6 @@ a {
 }
 
 .el-dialog header span {
-  padding-left: 8px;
+  padding: 0 8px;
 }
 </style>

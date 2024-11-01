@@ -69,7 +69,7 @@
       rate="1:1"
       @cutDown="groupAvatarModified">
       <template #cancel>
-        <el-button @click="editAvatarVisible = false">取消</el-button>
+        <el-button plain type="info" @click="editAvatarVisible = false">取消</el-button>
       </template>
     </ImgCutter>
   </el-dialog>
@@ -78,8 +78,8 @@
   <el-dialog title="修改群名" v-model="editGroupNameVisible" width="640px">
     <el-input v-model="groupName" placeholder="新群名" />
     <template #footer>
-      <el-button @click="editGroupNameVisible = false">取消</el-button>
-      <el-button type="primary" @click="groupNameModified">确认修改</el-button>
+      <el-button plain type="info" @click="editGroupNameVisible = false">取消</el-button>
+      <el-button plain type="primary" @click="groupNameModified">确认修改</el-button>
     </template>
   </el-dialog>
 
@@ -92,8 +92,10 @@
       <el-input v-model="newGroupA" placeholder="入群问题的答案" />
     </div>
     <template #footer>
-      <el-button @click="editGroupQAVisible = false">取消</el-button>
-      <el-button type="primary" @click="groupQAModified">确认修改</el-button>
+      <span class="dialogFooter">
+        <el-button plain type="info" @click="editGroupQAVisible = false">取消</el-button>
+        <el-button plain type="primary" @click="groupQAModified">确认修改</el-button>
+      </span>
     </template>
   </el-dialog>
 
@@ -107,37 +109,45 @@
       <p>为确保消息正常显示，双方必须使用<strong>相同的</strong>密钥。</p>
       <div class="inputLine">
         <el-input v-model="cryptoKey" :maxlength="128" placeholder="密钥" />
-        <el-button type="primary" @click="generateCryptoKey">生成</el-button>
+        <el-button plain type="primary" @click="generateCryptoKey">生成</el-button>
       </div>
     </div>
     <template #footer>
-      <el-button @click="cryptoVisible = false">取消</el-button>
-      <el-button type="primary" @click="setCryptoKey">确认</el-button>
+      <span class="dialogFooter">
+        <el-button plain type="info" @click="cryptoVisible = false">取消</el-button>
+        <el-button plain type="primary" @click="setCryptoKey">确认</el-button>
+      </span>
     </template>
   </el-dialog>
 
   <!-- 清空聊天记录确认 -->
-  <el-dialog v-model="deleteHistoryVisible" width="640px">
+  <el-dialog v-model="deleteHistoryVisible" :show-close="false" width="640px">
+    <template #header>
+      <div style="height: 0;"></div>
+    </template>
     <div class="checker">
       <Warning></Warning>
       <p>确认清空聊天记录?</p>
     </div>
     <template #footer>
-      <el-button @click="deleteHistoryVisible = false">取消</el-button>
-      <el-button type="danger" @click="deleteHistory">确认删除</el-button>
+      <el-button plain type="info" @click="deleteHistoryVisible = false">取消</el-button>
+      <el-button plain type="danger" @click="deleteHistory">确认删除</el-button>
     </template>
   </el-dialog>
 
   <!-- 退出群确认 -->
-  <el-dialog v-model="unsubscribeVisible" width="640px">
+  <el-dialog v-model="unsubscribeVisible" :show-close="false" width="640px">
+    <template #header>
+      <div style="height: 0;"></div>
+    </template>
     <div class="checker">
       <Warning></Warning>
       <p>{{ getRole === 'owner' ? '确认解散群?' : '确认退出群?' }}</p>
     </div>
     <template #footer class="di">
       <el-checkbox class="checkbox" v-model="unsubscribeAndDeleteHistory" label="同时删除本地聊天记录" />
-      <el-button @click="unsubscribeVisible = false">取消</el-button>
-      <el-button type="danger" @click="unsubscribe">{{ getRole === 'owner' ? '确认解散' : '确认退出' }}</el-button>
+      <el-button plain type="info" @click="unsubscribeVisible = false">取消</el-button>
+      <el-button plain type="danger" @click="unsubscribe">{{ getRole === 'owner' ? '确认解散' : '确认退出' }}</el-button>
     </template>
   </el-dialog>
 
@@ -480,6 +490,7 @@ li .dangerItem {
 .arrow {
   flex: 0 0 24px;
   margin-left: 12px;
+  color: var(--groupConfig-general-info-textcolor);
 }
 
 .hiddenArrow {
@@ -547,6 +558,14 @@ li .dangerItem {
   float: left;
 }
 
+:deep(.el-checkbox__label) {
+  color: var(--groupConfig-checker-textcolor);
+}
+
+.dialogContent {
+  padding: 0 8px;
+}
+
 .dialogContent p, 
 .dialogContent .el-input {
   margin-bottom: 16px;
@@ -554,6 +573,14 @@ li .dangerItem {
 
 .dialogContent > :last-child {
   margin-bottom: 0;
+}
+
+.dialogContent p {
+  color: var(--groupConfig-dialogContent-textcolor);
+}
+
+.dialogFooter {
+  padding-right: 8px;
 }
 
 .inputLine {

@@ -48,7 +48,7 @@ export default {
 
     // 计算该语音消息宽度，和语音长度成正比
     getMessageBoxWidth() {
-      const width = 12 * this.message.payload.meta.length + 16
+      const width = 11 * this.message.payload.meta.length + 48
       this.$refs.Bar.style.width = width + 'px'
     },
 
@@ -166,29 +166,31 @@ export default {
 <style scoped>
 .audioMsg {
   display: flex;
-  justify-content: center;
+  align-items: center;
   max-width: 90%;
   height: 48px;
   background: var(--message-common-bgcolor);
   cursor: pointer;
 }
 
-.audioMsg p {
-  font-size: 1.2rem;
-  line-height: 24px;
-}
-
-.beforeBar svg {
-  height: 24px;
+.beforeBar {
+  flex: 0 0 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .beforeBar svg, .afterBar p {
   color: var(--message-content-textcolor);
 }
 
+.afterBar p {
+  font-size: 1.2rem;
+}
+
 .bar {
-  width: 100%;
-  height: 24px;
+  flex: 1;
+  height: 100%;
   margin-left: 8px;
   margin-right: 12px;
 }
@@ -203,6 +205,7 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  height: 100%;
 }
 
 .volume {
@@ -218,7 +221,7 @@ export default {
   left: 0;
   top: 0;
   width: 0;
-  height: 24px;
+  height: 100%;
   background: var(--message-progress-bgcolor);
   mix-blend-mode: darken;
 }
@@ -230,6 +233,18 @@ export default {
 }
 
 @media screen and (max-width: 1200px) {
+  .volume:nth-child(3n + 2) {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 900px) {
+  .volume:nth-child(3n + 1) {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 500px) {
   .volumes {
     display: none;
   }

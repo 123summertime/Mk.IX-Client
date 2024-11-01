@@ -9,35 +9,26 @@
   --color-1: #3eede7;
   --color-2: #f85149;
   --color-3: #00bc12;
+  --color-4: #3e3a65;
+  --color-5: #473765;
+  --color-6: #d489ff;
+  --color-7: #99A2FF;
+  --color-8: #6AD8FD;
+  --color-9: #9D85FA;
+  --color-10: #c77aff;
+  --color-11: #D1C4E9;
 
   --neutral-0: #fffefb;
   --neutral-1: #f5f4f1;
   --neutral-2: #cccbc8;
   --neutral-3: #808080;
-  --neutral-4: #1d1c1c;
-
-  --spical-0: rgba(213, 155, 246, 0.6);   /* 0.6透明度的 --theme-4  */
-  --spical-1: rgba(248, 81, 73, 0.2);    /* 0.2透明度的 --color-2  */
-  --spical-2: rgba(248, 81, 73, 0.03);  /* 0.03透明度的 --color-2 */
+  --neutral-4: #404040;
+  --neutral-5: #1d1c1c;
   
-  
-  --color-4: #3e3a65;
-  --color-5: #473765;
-  --color-9: #343155;
-
-  --color-6: #d489ff;
-  --color-7: #99A2FF;
-  --color-8: #6AD8FD;
-  --color-XI: #9D85FA;
-  --color-X: #c77aff;
-  --color-XII: #D1C4E9;
-
-  --neutral-5: #404040;
-
-  --mask-0: rgba(245, 244, 241, 0.1);
-  --mask-1: rgba(199, 122, 255, 0.2);
-  --mask-3: rgba(62, 58, 101, 0.5);
-  
+  --spical-0: rgba(213, 155, 246, 0.6);
+  --spical-1: rgba(248, 81, 73, 0.2);
+  --spical-2: rgba(248, 81, 73, 0.03);
+  --spical-3: rgba(199, 122, 255, 0.2);
 }
 
 :root {
@@ -46,8 +37,8 @@
   --text-secondary: var(--neutral-1);
   --text-tertiary: var(--neutral-2);
   --text-gray: var(--neutral-3);
-  --text-opposite: var(--neutral-4);
-  --text-opposite-secondary: var(--neutral-5);
+  --text-opposite: var(--neutral-5);
+  --text-opposite-secondary: var(--neutral-4);
 
   --bg: linear-gradient(180deg, var(--color-4), var(--color-5));
   --bg-secondary: var(--color-4);
@@ -81,10 +72,10 @@
 
 /* groupItem */
 :root {
-  --groupItem-hover-bgcolor: var(--mask-1);
-  --groupItem-pinned-bgcolor: var(--mask-1);
+  --groupItem-hover-bgcolor: var(--spical-3);
+  --groupItem-pinned-bgcolor: var(--spical-3);
   --groupItem-normal-bgcolor: transparent;
-  --groupItem-active-bgcolor: linear-gradient(135deg, var(--color-XI), var(--color-X));
+  --groupItem-active-bgcolor: linear-gradient(135deg, var(--color-9), var(--color-10));
   --groupItem-attention-textcolor: var(--theme);
   --groupItem-groupName-textcolor: var(--text-tertiary);
   --groupItem-groupNameActive-textcolor: var(--text);
@@ -98,8 +89,9 @@
 
 /* chatItem */
 :root {
-  --chatItem-attentionButton-bgcolor: var(--theme-alternative);
-  --chatItem-flash-bgcolor: var(--theme-alternative);
+  --chatItem-attentionButton-bgcolor: var(--theme);
+  --chatItem-attentionButton-textcolor: var(--text);
+  --chatItem-flash-bgcolor: var(--spical-3);
 }
 
 /* inputBox */
@@ -107,6 +99,7 @@
   --inputBox-inputBoxRoot-bgcolor: transparent;
   --inputBox-bar-bgcolor: transparent;
   --inputBox-barItem-svgcolor: var(--text-secondary);
+  --inputBox-barItem-hover-svgcolor: var(--color-8);
   --inputBox-barItemDisabled-svgcolor: var(--text-gray);
   --inputBox-textarea-bgcolor: transparent;
   --inputBox-textarea-textcolor: var(--text-secondary);
@@ -115,14 +108,14 @@
 
 /* messageType */
 :root {
-  --message-common-bgcolor: var(--mask-1);
-  --message-file-bgcolor: var(--mask-1);
-  --message-at-textcolor: var(--color-7);
+  --message-common-bgcolor: var(--spical-3);
+  --message-file-bgcolor: var(--spical-3);
+  --message-at-textcolor: var(--color-8);
   --message-content-textcolor: var(--text-secondary);
   --message-contentEncrypt-textcolor: var(--text-tertiary);
   --message-volume-bgcolor: var(--text-secondary);
-  --message-progress-bgcolor: var(--mask-1);
-  --message-fileRightSide-textcolor: var(--color-7);
+  --message-progress-bgcolor: var(--spical-3);
+  --message-fileRightSide-textcolor: var(--color-8);
   --message-time-textcolor: var(--text-tertiary);
   --message-username-textcolor: var(--text-secondary);
   --message-nameplate-textcolor: var(--text-opposite);
@@ -130,8 +123,8 @@
 
 /* atBar */
 :root {
-  --atBar-atCard-bgcolor: var(--mask-1);
-  --atBar-atCard-textcolor: var(--color-7);
+  --atBar-atCard-bgcolor: var(--spical-3);
+  --atBar-atCard-textcolor: var(--color-8);
   --atBar-atCard-svgcolor: var(--text);
 }
 
@@ -148,21 +141,21 @@
   --eachMember-oper-svgcolor: var(--text);
   --eachMember-checker-svgcolor: var(--text);
   --eachMember-checker-textcolor: var(--text);
-  --eachMember-hover-bgcolor: var(--mask-1);
+  --eachMember-hover-bgcolor: var(--spical-3);
 }
 
 /* groupSelector */
 :root { 
-  --groupSelector-hover-bgcolor: var(--mask-1);
-  --groupSelector-selected-bgcolor: linear-gradient(135deg, var(--color-XI), var(--color-X));
+  --groupSelector-hover-bgcolor: var(--spical-3);
+  --groupSelector-selected-bgcolor: linear-gradient(135deg, var(--color-9), var(--color-10));
   --groupSelector-groupName-textcolor: var(--text);
 }
 
 /* messageMenu */
 :root {
-  --messageMenu-msgMenuRoot-bgcolor: var(--color-XII);
+  --messageMenu-msgMenuRoot-bgcolor: var(--color-11);
   --messageMenu-item-textcolor: var(--text-opposite);
-  --messageMenu-item-hover-bgcolor: var(--color-XI);
+  --messageMenu-item-hover-bgcolor: var(--color-9);
 }
 
 /* tools */
@@ -177,14 +170,14 @@
 
 /* eachNotice */
 :root {
-  --eachNotice-hover-bgcolor: var(--mask-1);
+  --eachNotice-hover-bgcolor: var(--spical-3);
   --eachNotice-item-textcolor: var(--text-secondary);
   --eachNotice-itemRightSide-textcolor: var(--text-tertiary);
 }
 
 /* eachRequest */
 :root {
-  --eachRequest-hover-bgcolor: var(--mask-1);
+  --eachRequest-hover-bgcolor: var(--spical-3);
   --eachRequest-item-textcolor: var(--text-secondary);
   --eachRequest-itemRightSide-textcolor: var(--text-tertiary);
 }
@@ -200,6 +193,7 @@
   --groupConfig-dangerZone-hover-bgcolor: var(--spical-1);
   --groupConfig-checker-svgcolor: var(--text);
   --groupConfig-checker-textcolor: var(--text);
+  --groupConfig-dialogContent-textcolor: var(--text);
 }
 
 /* namecard */
@@ -207,9 +201,8 @@
   --namecard-username-textcolor: var(--text);
   --namecard-uid-textcolor: var(--text-tertiary);
   --namecard-state-textcolor: var(--text-tertiary);
-  --namecard-middle-border: var(--theme);
-  --namecard-popper-bgcolor: var(--bg);
-  --namecard-popper-textcolor: var(--text-tertiary);
+  --namecard-middle-border: var(--border);
+  --namecard-bio-textcolor: var(--text-secondary);
 }
 
 /* 覆盖el原有样式 */
@@ -217,12 +210,22 @@
   background: var(--bg-secondary) !important;
 }
 
-.el-dialog header span {
+.el-dialog__title {
   color: var(--text);
 }
 
 .el-input__inner {
   color: var(--text-secondary);
+}
+
+.el-button {
+  background: transparent;
+}
+
+.el-popper.is-customized{
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  z-index: 10000;
 }
 
 :root {
@@ -232,6 +235,5 @@
   --el-color-primary-light-7: var(--theme-1) !important;
   --el-color-primary-light-8: var(--theme-0) !important;
   --el-color-primary-light-9: var(--theme-0) !important;
-  --el-button-hover-text-color: var(--text-opposite-secondary) !important;
   --el-fill-color-blank: var(--text-opposite-secondary) !important;
 }

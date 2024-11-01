@@ -351,6 +351,7 @@ export default {
 
 .userInfo {
   display: flex;
+  align-items: center;
   width: 100%;
   height: 64px;
   padding: 8px 16px;
@@ -368,9 +369,7 @@ export default {
 }
 
 .userInfo p {
-  height: 48px;
   font-size: 1.2rem;
-  line-height: 48px;
   margin-left: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -381,7 +380,7 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: calc(100% - 64px - 48px); /* .userInfo 64px tools 48px */
+  height: calc(100% - 64px - 48px); /* .userInfo 64px .tools 48px */
   overflow: scroll;
 }
 
@@ -391,7 +390,6 @@ export default {
 
 .groupItem {
   width: 100%;
-  order: 2147483647;
 }
 
 /* rightSide */
@@ -411,20 +409,19 @@ export default {
 
 .groupToolBar {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 48px;
+  height: 100%;
   color: var(--chatPage-groupName-textcolor);
 }
 
 .groupToolBar p {
   font-size: 1.2rem;
-  line-height: 48px;
 }
 
 .groupToolBar svg {
-  height: 32px;
-  margin: 8px 0;
+  height: 75%;
   cursor: pointer;
 }
 

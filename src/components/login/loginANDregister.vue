@@ -24,8 +24,8 @@
       <p class="token">{{ token }}</p>
     </div>
     <template #footer>
-      <el-button @click="copyToken(token)">复制</el-button>
-      <el-button type="primary" @click="tokenVisible = false">关闭</el-button>
+      <el-button plain type="info" @click="copyToken(token)">复制</el-button>
+      <el-button plain type="primary" @click="tokenVisible = false">关闭</el-button>
     </template>
   </el-dialog>
 
@@ -34,8 +34,8 @@
       <i>您的uuid为</i><i class="account">{{ accountORusername }}</i>
     </div>
     <template #footer>
-      <el-button @click="copyToken(accountORusername)">复制</el-button>
-      <el-button type="primary" @click="gotoLogin">去登录</el-button>
+      <el-button plain type="info" @click="copyToken(accountORusername)">复制</el-button>
+      <el-button plain type="primary" @click="gotoLogin">去登录</el-button>
     </template>
   </el-dialog>
 

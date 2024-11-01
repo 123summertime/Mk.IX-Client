@@ -15,7 +15,7 @@ export default {
 
 <style scoped>
 .broadcast {
-  max-width: calc(100% - 112px);
+  width: calc(100% - 112px);
   margin: 0 auto;
   background: var(--message-common-bgcolor);
 }

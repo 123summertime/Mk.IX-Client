@@ -282,11 +282,14 @@ export default {
 }
 
 .attentionButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: fixed;
-  top: 25%;
+  top: 96px;
   right: 0;
   height: 48px;
-  padding: 8px 20px 8px 32px;
+  padding: 8px 24px 8px 24px;
   border-top-left-radius: 24px;
   border-bottom-left-radius: 24px;
   background: var(--chatItem-attentionButton-bgcolor);
@@ -294,9 +297,8 @@ export default {
 }
 
 .attentionButton p {
-  height: 100%;
   font-size: 1.2rem;
-  line-height: 32px;
+  color: var(--chatItem-attentionButton-textcolor);
 }
 
 @keyframes flash {

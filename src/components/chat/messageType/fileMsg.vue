@@ -17,8 +17,8 @@
       <div v-else>
         <canvas width="64" height="64" ref="progress"></canvas>
         <p v-if="download.state == 'downloading'" class="iconInnerText">{{ download.rate.toFixed(0) + '%' }}</p>
-        <Check v-else-if="download.state == 'success'" color="#67C23A" class="iconInnerText"></Check>
-        <Close v-else color="#F56C6C" class="iconInnerText"></Close>
+        <Check v-else-if="download.state == 'success'" :color="getGreenColor" class="iconInnerText"></Check>
+        <Close v-else :color="getRedColor" class="iconInnerText"></Close>
       </div>
     </div>
   </div>
@@ -56,9 +56,9 @@ export default {
           this.download.speed = event.rate ?? 0
           this.download.rate = event.progress * 100 ?? 0
 
-          this.canvasDrawer(this.download.rate, '#E5EAF3', '#409EFF')
+          this.canvasDrawer(this.download.rate, this.getNeutralColor, this.getGreenColor)
           if (this.download.rate >= 100) {
-            this.canvasDrawer(0, '#67C23A', '#114514')
+            this.canvasDrawer(0, this.getGreenColor, '#114514')
             this.download.state = "success"
           }
         }
@@ -69,7 +69,7 @@ export default {
         link.download = this.message.payload.name
         link.click()
       }).catch(err => {
-        this.canvasDrawer(0, '#F56C6C', '#114514')
+        this.canvasDrawer(0, this.getRedColor, '#114514')
         this.download.state = "failed"
         ElMessage({
           message: `下载文件失败`,
@@ -163,6 +163,18 @@ export default {
       }
       return "还需" + (time / 60 / 60).toFixed(0) + "时"
     },
+
+    getNeutralColor() {
+      return getComputedStyle(document.documentElement).getPropertyValue('--neutral-2').trim()
+    },
+
+    getGreenColor() {
+      return getComputedStyle(document.documentElement).getPropertyValue('--color-3').trim()
+    },
+
+    getRedColor() {
+      return getComputedStyle(document.documentElement).getPropertyValue('--color-2').trim()
+    }
   },
 
   mounted() {
