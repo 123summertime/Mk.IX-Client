@@ -103,7 +103,9 @@
   --inputBox-barItemDisabled-svgcolor: var(--text-gray);
   --inputBox-textarea-bgcolor: transparent;
   --inputBox-textarea-textcolor: var(--text-secondary);
-  --inputBox-previewAudio-bgcolor: var(--theme);
+  --inputBox-perviewFile-textcolor: var(--text-tertiary);
+  --inputBox-msgName-textcolor: var(--text-secondary);
+  --inputBox-msgSize-textcolor: var(--text-secondary);
 }
 
 /* messageType */

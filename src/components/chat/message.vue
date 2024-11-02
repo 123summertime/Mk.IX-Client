@@ -248,7 +248,7 @@ export default {
 
 .upper {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   height: 24px;
   white-space: nowrap;
   direction: ltr;
@@ -262,16 +262,16 @@ export default {
   color: var(--message-nameplate-textcolor);
 }
 
+.username {
+  color: var(--message-username-textcolor);
+}
+
 .ownerNameplate {
   background: var(--owner);
 }
 
 .adminNameplate {
   background: var(--admin);
-}
-
-.username {
-  color: var(--message-username-textcolor);
 }
 
 .lower {

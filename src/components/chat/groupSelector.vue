@@ -1,7 +1,6 @@
 <template>
   <el-dialog
     v-model="visible"
-    width="640px"
     :title="computedTitle"
     :show-close="false"
     :close-on-click-modal="false"
@@ -17,7 +16,7 @@
     <template #footer>
       <div>
         <el-button plain type="info" @click="canceled">取消</el-button>
-        <el-button plain type="primary" :disabled="groupID === ''" @click="selected">确定</el-button>
+        <el-button plain type="primary" @click="selected">确定</el-button>
       </div>
     </template>
   </el-dialog>
@@ -53,6 +52,7 @@ export default {
     },
 
     selected() {
+      if (this.groupID === '') { return }
       this.$emit('groupSelectorSelected', this.groupID)
     },
 

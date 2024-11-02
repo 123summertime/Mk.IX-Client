@@ -232,19 +232,14 @@ export default {
   transform: translateY(-12px);
 }
 
-@media screen and (max-width: 1200px) {
-  .volume:nth-child(3n + 2) {
+
+@media screen and (max-width: 768px) {
+  .volume:nth-child(2n) {
     display: none;
   }
 }
 
-@media screen and (max-width: 900px) {
-  .volume:nth-child(3n + 1) {
-    display: none;
-  }
-}
-
-@media screen and (max-width: 500px) {
+@media screen and (max-width: 480px) {
   .volumes {
     display: none;
   }

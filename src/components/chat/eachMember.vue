@@ -26,7 +26,7 @@
       :namecardTrigger="namecardTrigger">
     </namecard>
 
-    <el-dialog v-model="checkerVisible" width="640px">
+    <el-dialog v-model="checkerVisible">
       <template #header>
         <div style="height: 0;"></div>
       </template>
@@ -237,7 +237,7 @@ export default {
 .oper {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: right;
   flex: 0 0 96px;
 }
 
@@ -246,6 +246,7 @@ export default {
   justify-content: center;
   align-items: center;
   flex: 0 0 24px;
+  margin-left: 12px;
 }
 
 .oper div svg {

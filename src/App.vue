@@ -17,7 +17,8 @@
   font-family: Microsoft Yahei;
 }
 
-em, i {
+em,
+i {
   font-style: normal;
 }
 
@@ -33,7 +34,30 @@ a {
   text-decoration: none;
 }
 
-.el-dialog header span {
-  padding: 0 8px;
+/* <=480px */
+@media (max-width: 480px) {
+  .el-dialog {
+    width: 480px !important;
+  }
+}
+
+/* >480px */
+@media (min-width: 481px) {
+  .el-dialog {
+    width: 100vw !important;
+  }
+}
+
+/* >640px */
+@media (min-width: 640px) {
+  .el-dialog {
+    width: 640px !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
 }
 </style>

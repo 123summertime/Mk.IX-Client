@@ -79,6 +79,7 @@ export default {
         image: { favorite: true, copy: true, delete: true, forward: true, revoke: this.checkPermissions },
         file: { favorite: false, copy: false, delete: true, forward: true, revoke: this.checkPermissions },
         revoke: { favorite: false, copy: false, delete: true, forward: false, revoke: false },
+        audio: { favorite: false, copy: false, delete: true, forward: false, revoke: this.checkPermissions },
       }
       this.display = displayMapping[this.message.type] || displayMapping.file
     },
@@ -153,7 +154,7 @@ export default {
   border-radius: 8px;
   background: var(--messageMenu-msgMenuRoot-bgcolor);
   z-index: 10000;
-  opacity: 0.9;
+  opacity: 0.93;
 }
 
 .msgMenuRoot div {

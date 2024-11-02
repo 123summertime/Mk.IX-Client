@@ -14,8 +14,8 @@
     </div>
   </div>
 
-  <!-- 群验证 -->
-  <el-dialog v-model="mailVisible" class="mailDialog" width="640px">
+  <!-- 群通知/验证 -->
+  <el-dialog v-model="mailVisible" :show-close="false" class="mailDialog" width="640px">
     <el-tabs v-model="mailTab">
       <el-tab-pane label="通知" name="notice">
         <div class="mailItems" @scroll="onScroll" ref="NoticeList">
@@ -426,12 +426,9 @@ export default {
   display: none;
 }
 
-.buildGroup {
-  padding: 0 8px;
-}
-
+.buildGroup, 
 .buildGroupFooter {
-  padding-right: 8px;
+  padding: 0 8px;
 }
 
 .groupOpersItem {
@@ -524,7 +521,7 @@ export default {
 }
 
 .searchDialog .el-dialog__body,
-.mailDialog .el-dialog__body{
+.mailDialog .el-dialog__body {
   padding-top: 0;
 }
 </style>

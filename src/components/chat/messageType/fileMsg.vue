@@ -17,8 +17,8 @@
       <div v-else>
         <canvas width="64" height="64" ref="progress"></canvas>
         <p v-if="download.state == 'downloading'" class="iconInnerText">{{ download.rate.toFixed(0) + '%' }}</p>
-        <Check v-else-if="download.state == 'success'" :color="getGreenColor" class="iconInnerText"></Check>
-        <Close v-else :color="getRedColor" class="iconInnerText"></Close>
+        <Check v-else-if="download.state == 'success'" :style="{ color: getGreenColor }" class="iconInnerText"></Check>
+        <Close v-else :style="{ color: getRedColor }" class="iconInnerText"></Close>
       </div>
     </div>
   </div>

@@ -44,8 +44,7 @@
     <!-- 确认遮罩层 -->
     <el-dialog v-model="visible" title="发送确认" width="640px" :show-close="false" :destroy-on-close="true">
       <img class="previewImg" :src="payload.content" v-if="payload.type === 'image'" />
-      <audioMsg class="previewAudio" v-else-if="payload.type === 'audio'" :group="group" :message="audioMessagePreview">
-      </audioMsg>
+      <audioMsg class="previewAudio" v-else-if="payload.type === 'audio'" :group="group" :message="audioMessagePreview"></audioMsg>
       <p class="previewFile" v-else>{{ payload.name.split(".").slice(-1)[0] + "文件" }}</p>
       <template #footer>
         <span class="footer">
@@ -501,7 +500,6 @@ textarea::-webkit-scrollbar {
   display: inline-flex;
   border-radius: 12px;
   padding: 12px 16px;
-  background: var(--inputBox-previewAudio-bgcolor);
   cursor: pointer;
 }
 
@@ -510,8 +508,8 @@ textarea::-webkit-scrollbar {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: center;
   margin: 0 auto;
+  color: var(--inputBox-perviewFile-textcolor);
 }
 
 .footer,
@@ -539,11 +537,13 @@ textarea::-webkit-scrollbar {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--inputBox-msgName-textcolor);
 }
 
 .msgSize {
   flex-grow: 1;
   margin-left: 16px;
+  color: var(--inputBox-msgSize-textcolor);
 }
 
 .buttons button:nth-child(2) {

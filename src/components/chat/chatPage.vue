@@ -1,5 +1,5 @@
 <template>
-  <div class="chatPageRoot">
+  <div class="chatPageRoot" ref="Root">
 
     <div class="leftSide" ref="leftSide">
       <div class="userInfo">
@@ -24,6 +24,7 @@
     <div class="rightSide" ref="rightSide">
       <div class="header">
         <div class="groupToolBar" v-show="currGroupID">
+          <ArrowLeft class="back" @click="() => { mobileSwitchSide(); currGroupID = '' }"></ArrowLeft>
           <p>{{ currGroupName }}</p>
           <MoreFilled @click="drawer = !drawer"></MoreFilled>
           <el-drawer v-model="drawer" :with-header="false" :destroy-on-close="true">
@@ -98,6 +99,10 @@ export default {
   },
 
   methods: {
+    x1() {
+      return window.innerHeight + " " + window.innerWidth
+    },
+
     // 初始化，获取用户/群基本信息，建立websocket连接
     async initialization() {
       const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/me`
@@ -127,7 +132,6 @@ export default {
           this.getGroupInfo({group}, false)
         }
       }).catch(err => {
-        console.log(err)
         ElMessage({
           message: `初始化失败 ${err.response.data.detail}`,
           duration: 6000,
@@ -194,6 +198,13 @@ export default {
       this.currGroupID = id
       this.currGroupName = name
       this.currGroupAvailable = available
+      if (window.innerWidth <= 768) {
+        this.mobileSwitchSide()
+      }
+    },
+
+    mobileSwitchSide() {
+      this.$refs.Root.classList.toggle("animate")
     },
 
     // 左边群列表和右边消息区的分割线设置
@@ -203,7 +214,6 @@ export default {
       if (rate > 0.125 && rate < 0.5) {
         this.$refs.groupSplitter.$el.style.left = posX - 8 + "px"
         this.$refs.leftSide.style.width = posX + "px"
-        this.$refs.rightSide.style.width = window.innerWidth - posX + "px"
         localStorage.setItem('groupWidth', posX)
       }
     },
@@ -335,8 +345,6 @@ export default {
   display: flex;
   width: 100vw;
   height: 100vh;
-  min-width: 600px;
-  min-height: 400px;
   background: var(--chatPage-chatPageRoot-bgcolor);
 }
 
@@ -344,9 +352,9 @@ export default {
 .leftSide {
   position: relative;
   width: 20vw;
-  max-width: 50%;
   height: 100%;
   background: var(--chatPage-leftSide-bgcolor);
+  overflow: hidden;
 }
 
 .userInfo {
@@ -394,9 +402,9 @@ export default {
 
 /* rightSide */
 .rightSide {
-  min-width: 400px;
+  flex: 1;
   height: 100%;
-  flex-grow: 1;
+  overflow: hidden;
 }
 
 .header {
@@ -404,7 +412,7 @@ export default {
   width: 100%;
   height: 64px;
   background: var(--chatPage-header-bgcolor);
-  padding: 8px 24px;
+  padding: 8px 0;
 }
 
 .groupToolBar {
@@ -413,15 +421,24 @@ export default {
   justify-content: space-between;
   width: 100%;
   height: 100%;
+  padding: 0 24px;
   color: var(--chatPage-groupName-textcolor);
+}
+
+.back {
+  display: none;
 }
 
 .groupToolBar p {
   font-size: 1.2rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .groupToolBar svg {
-  height: 75%;
+  width: 36px;
+  height: 36px;
   cursor: pointer;
 }
 
@@ -484,6 +501,39 @@ export default {
 
 .inputSplitter:hover {
   cursor: ns-resize;
+}
+
+@media screen and (max-width: 768px) {
+  .chatPageRoot {
+    min-height: 100vh;
+  }
+
+  .leftSide {
+    width: 100%;
+    transition: width 0.2s ease;
+  }
+  
+  .rightSide {
+    width: 0;
+    transition: width 0.2s ease;
+  }
+
+  .animate .leftSide {
+    width: 0;
+  }
+
+  .animate .rightSide {
+    width: 100%;
+  }
+
+  .groupSplitter, 
+  .inputSplitter {
+    display: none;
+  }
+
+  .back {
+    display: block;
+  }
 }
 </style>
 

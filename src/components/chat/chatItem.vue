@@ -248,8 +248,10 @@ export default {
     // 切换群后，自动滚动到最底部
     active: {
       handler() {
-        this.$nextTick(function () {
-          this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+        this.$nextTick(() => {
+          requestAnimationFrame(() => {
+            this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+          })
         })
       }
     },
