@@ -31,6 +31,7 @@ export default {
     admins: Object,
     active: Boolean,
     available: Boolean,
+    delete: Object,
   },
 
   data() {
@@ -253,6 +254,15 @@ export default {
             this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
           })
         })
+      }
+    },
+
+    // 清空消息
+    delete: {
+      handler(newVal) {
+        if (newVal.group === this.group) {
+          this.messageList = []
+        }
       }
     },
 

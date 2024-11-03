@@ -186,8 +186,8 @@ export default {
 <style scoped>
 .eachMemberRoot {
   display: flex;
-  height: 64px;
-  padding: 8px;
+  height: 4rem;
+  padding: 0.5rem;
   border-radius: 8px;
   justify-content: space-between;
 }
@@ -203,22 +203,23 @@ export default {
 }
 
 .info img {
-  width: 48px;
-  height: 48px;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
   cursor: pointer;
 }
 
 .nameplate {
-  margin-left: 12px;
-  line-height: 24px;
-  padding: 0 6px;
-  border-radius: 10px;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  margin-left: 0.5rem;  
+  padding: 0 0.5rem;
+  border-radius: 6px;
   color: var(--eachMember-nameplate-textcolor);
 }
 
 .name {
-  margin-left: 12px;
+  margin-left: 0.5rem;
   color: var(--eachMember-name-textcolor);
 }
 
@@ -235,18 +236,19 @@ export default {
 }
 
 .oper {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  justify-content: right;
-  flex: 0 0 96px;
+  justify-content: center;
 }
 
 .oper div {
+  flex: 0 0 1.5rem;
+  width: 1.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 0 0 24px;
-  margin-left: 12px;
+  margin-left: 0.8rem;
 }
 
 .oper div svg {
@@ -267,11 +269,11 @@ export default {
   display: flex;
   align-items: center;
   width: 100%;
-  height: 48px;
+  height: 3rem;
 }
 
 .checker svg {
-  flex: 0 0 48px;
+  flex: 0 0 3rem;
   color: var(--eachMember-checker-svgcolor);
 }
 

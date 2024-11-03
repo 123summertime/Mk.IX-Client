@@ -93,8 +93,8 @@ export default {
 .request {
   display: flex;
   align-items: center;
-  height: 64px;
-  padding: 8px;
+  height: 4rem;
+  padding: 0.5rem;
   border-radius: 8px;
   order: 2147483647;
 }
@@ -104,13 +104,15 @@ export default {
 }
 
 .request .image {
+  flex: 0 0 3rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 0 0 48px;
 }
 
 .image img {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
 }
 
@@ -119,7 +121,8 @@ export default {
   flex-direction: column;
   justify-content: space-around;
   flex: 1;
-  margin: 0 12px;
+  height: 100%;
+  margin: 0 0.8rem;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -137,7 +140,7 @@ export default {
 
 .time {
   flex: 0 0 auto;
-  margin-right: 24px;
+  margin-right: 16px;
   color: var(--eachRequest-itemRightSide-textcolor);
 }
 
@@ -147,10 +150,9 @@ export default {
 }
 
 .requestResponse {
+  flex: 0 0 4rem;
   display: flex;
-  justify-content: space-around;
-  flex: 0 0 80px;
-  line-height: 48px;
+  justify-content: space-between;
   white-space: nowrap;
 }
 
@@ -162,14 +164,14 @@ export default {
   color: var(--positive);
 }
 
-.requestOpers svg {
-  width: 24px;
-  cursor: pointer;
-  color: var(--eachRequest-itemRightSide-textcolor);
-}
-
 .requestOpers svg:hover {
   transform: scale(1.2);
+}
+
+.requestOpers svg {
+  width: 1.5rem;
+  cursor: pointer;
+  color: var(--eachRequest-itemRightSide-textcolor);
 }
 
 .accept {
@@ -178,5 +180,11 @@ export default {
 
 .reject {
   color: var(--negative);
+}
+
+@media screen and (max-width: 768px) {
+  .time {
+    display: none;
+  }
 }
 </style>

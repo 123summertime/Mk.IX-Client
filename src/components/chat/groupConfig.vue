@@ -61,10 +61,10 @@
   </div>
 
   <!-- 修改群头像 -->
-  <el-dialog v-model="editAvatarVisible" width="640px">
+  <el-dialog v-model="editAvatarVisible" :show-close="false" width="640px">
     <ImgCutter class="imgCutter"
       :isModal="false"
-      :boxWidth="600"
+      :boxWidth="getImgCutterWidth"
       fileType="webp"
       rate="1:1"
       @cutDown="groupAvatarModified">
@@ -104,7 +104,6 @@
     <div class="dialogContent">
       <p><strong>对称加密</strong>，只有拥有密钥的群成员才能解读你发送的内容。</p>
       <p>消息的<strong>加密与解密</strong>均在本地完成，加密后，服务器也无法获取消息的具体内容。</p>
-      <!-- <p>加密消息若解密失败，将被直接<strong>丢弃</strong>，即使之后提供正确的密钥也无法恢复。</p> -->
       <p>加密只对<strong>文本及图片</strong>类型消息有效。空密钥即为关闭加密功能。</p>
       <p>为确保消息正常显示，双方必须使用<strong>相同的</strong>密钥。</p>
       <div class="inputLine">
@@ -347,7 +346,7 @@ export default {
 
     // 处理清空历史记录
     async deleteHistory() {
-      this.$emit('deleteHistory', this.info.group)
+      this.$emit('deleteHistory', {group: this.info.group, available: this.available})
       this.deleteHistoryVisible = false
     },
 
@@ -420,6 +419,10 @@ export default {
       if (this.info.admins.admin[account]) return "admin"
       return "user"
     },
+
+    getImgCutterWidth() {
+      return Math.min(600, window.innerWidth - 30)
+    }
   },
 
   mounted() {
@@ -444,7 +447,7 @@ export default {
 .groupConfigRoot .title {
   display: inline-block;
   border-bottom: 2px solid var(--groupConfig-generalTitle-border);
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .groupConfigRoot .title p {
@@ -460,12 +463,12 @@ ul li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
+  padding: 1rem;
   cursor: pointer;
 }
 
 .avatar {
-  height: 160px;
+  height: 10rem;
 }
 
 .avatar img {
@@ -488,7 +491,7 @@ li .dangerItem {
 }
 
 .arrow {
-  flex: 0 0 24px;
+  flex: 0 0 1.5rem;
   margin-left: 12px;
   color: var(--groupConfig-general-info-textcolor);
 }
@@ -541,13 +544,13 @@ li .dangerItem {
 }
 
 .checker svg {
-  flex: 0 0 48px;
+  flex: 0 0 3rem;
   color: var(--groupConfig-checker-svgcolor);
 }
 
 .checker p {
   flex: 1;
-  margin-left: 12px;
+  margin-left: 0.8rem;
   color: var(--groupConfig-checker-textcolor);
   white-space: nowrap;
   overflow: hidden;

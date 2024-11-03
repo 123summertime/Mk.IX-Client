@@ -46,8 +46,8 @@ export default {
   display: flex;
   align-items: center;
   width: 100%;
-  height: 64px;
-  padding: 8px;
+  height: 4rem;
+  padding: 0.5rem;
   border-radius: 8px;
 }
 
@@ -56,7 +56,7 @@ export default {
 }
 
 .icon {
-  flex: 0 0 48px;
+  flex: 0 0 3rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -66,7 +66,7 @@ export default {
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
-  margin: 0 12px;
+  margin: 0 0.8rem;
   color: var(--eachNotice-item-textcolor);
 }
 
@@ -78,22 +78,21 @@ export default {
 .time {
   flex: 0 0 auto;
   font-size: 0.8rem;
-  line-height: 1rem;
   opacity: 0.8;
   white-space: nowrap;
-  margin-right: 24px;
+  margin-right: 1rem;
   color: var(--eachNotice-itemRightSide-textcolor);
 }
 
 .opers {
-  flex: 0 0 24px;
+  flex: 0 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .opers svg {
-  width: 24px;
+  width: 1.5rem;
   cursor: pointer;
   color: var(--eachNotice-itemRightSide-textcolor);
 }

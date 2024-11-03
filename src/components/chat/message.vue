@@ -223,10 +223,10 @@ export default {
 .avatar img {
   position: relative;
   display: block;
-  width: 48px;
-  height: 48px;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
-  transform: translateY(12px);
+  transform: translateY(0.8rem);
   cursor: pointer;
 }
 
@@ -243,21 +243,22 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   max-width: 75%;
-  margin: 0 8px;
+  margin: 0 0.5rem;
 }
 
 .upper {
   display: flex;
-  align-items: center;
-  height: 24px;
+  align-items: flex-end;
+  height: 1.5rem;
   white-space: nowrap;
   direction: ltr;
 }
 
 .nameplate {
-  line-height: 24px;
-  margin-right: 6px;
-  padding: 0 6px;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  margin-right: 0.5rem;
+  padding: 0 0.5rem;
   border-radius: 6px;
   color: var(--message-nameplate-textcolor);
 }
@@ -278,14 +279,14 @@ export default {
   display: flex;
   align-items: flex-end;
   max-width: 100%;
-  margin-top: 8px;
+  margin-top: 0.5rem;
 }
 
 .payload {
   word-wrap: break-word;
   white-space: pre-wrap;
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: 0.8rem 1rem;
   direction: ltr;
 }
 
@@ -301,5 +302,11 @@ export default {
   display: none;
   position: absolute;
   direction: ltr;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    max-width: 82.5%;
+  }
 }
 </style>

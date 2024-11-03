@@ -50,6 +50,7 @@
             :name="item.name"
             :available="item.available"
             :active="item.group === currGroupID"
+            :delete="currDeleteHistory"
             v-show="currGroupID === item.group"
             class="conversation"></chatItem>
         </div>
@@ -89,6 +90,7 @@ export default {
 
       currGroupID: "",
       currGroupName: "",
+      currDeleteHistory: {},
       currGroupAvailable: true,
 
       visible: false,
@@ -99,10 +101,6 @@ export default {
   },
 
   methods: {
-    x1() {
-      return window.innerHeight + " " + window.innerWidth
-    },
-
     // 初始化，获取用户/群基本信息，建立websocket连接
     async initialization() {
       const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/me`
@@ -198,7 +196,7 @@ export default {
       this.currGroupID = id
       this.currGroupName = name
       this.currGroupAvailable = available
-      if (window.innerWidth <= 768) {
+      if (this.isMobileDevice) {
         this.mobileSwitchSide()
       }
     },
@@ -282,29 +280,36 @@ export default {
 
     // 加入某群后
     async joinGroupSuccess(info) {
-      const res = await this.getAdminsInfo(info.target)
-      const groupInfo = await queryInfo('Group', info.targetKey, info.target)
+      const res = await this.getAdminsInfo(info.group)
+      const groupInfo = await queryInfo('Group', info.targetKey, info.group)
       const owner = { [res.owner.uuid]: res.owner.lastUpdate }
       const admin = {}
       res.admin.forEach(i => { admin[i.uuid] = i.lastUpdate })
       const element = { ...groupInfo, admins: { owner, admin }, available: true }
-      const idx = this.groupList.findIndex(i => i.group === info.target)
+      const idx = this.groupList.findIndex(i => i.group === info.group)
       if (idx != -1) {
         this.groupList.splice(idx, 1)
       }
       this.groupList.push(element)
-      if (this.currGroupID === info.target) {
+      if (this.currGroupID === info.group) {
         this.currGroupAvailable = true
       }
     },
 
     // 删除某群历史记录
-    deleteHistory(group) {
+    deleteHistory(info) {
+      const { group, available } = info
       this.drawer = false
       this.currGroupID = ""
       this.currGroupName = ""
-      this.$store.state.groupDB[group].deleteDB().then(() => {
-        this.groupList.splice(this.groupList.findIndex(i => i.group === group), 1)
+      this.currDeleteHistory = { group, random: Math.random() } // 如果清除同一个群的历史记录2次，group不变random会变保证被chatItem watch到
+      this.$store.state.groupDB[group].deleteDB().then(() => { 
+        if (this.isMobileDevice) {
+          this.mobileSwitchSide()
+        }
+        if (!available) {
+          this.groupList.splice(this.groupList.findIndex(i => i.group === group), 1)
+        }
         ElMessage.success("清空聊天记录成功")
       }).catch(err => {
         ElMessage({
@@ -318,6 +323,12 @@ export default {
     logout() {
       localStorage.removeItem('token')
       router.push('/login')
+    },
+  },
+
+  computed: {
+    isMobileDevice() {
+      return window.innerWidth <= 768
     },
   },
 
@@ -437,14 +448,13 @@ export default {
 }
 
 .groupToolBar svg {
-  width: 36px;
-  height: 36px;
+  width: 2rem;
+  height: 2rem;
   cursor: pointer;
 }
 
 :deep(.el-drawer) {
   max-width: 600px;
-  min-width: 400px;
   background: var(--chatPage-drawer-bgcolor);
 }
 
@@ -504,10 +514,6 @@ export default {
 }
 
 @media screen and (max-width: 768px) {
-  .chatPageRoot {
-    min-height: 100vh;
-  }
-
   .leftSide {
     width: 100%;
     transition: width 0.2s ease;

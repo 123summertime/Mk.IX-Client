@@ -48,7 +48,6 @@ export default {
 
 .atCard {
   display: flex;
-  flex: 0 0 auto;
   align-items: center;
   padding: 4px 12px;
   margin-right: 8px;
@@ -62,9 +61,10 @@ export default {
 }
 
 svg {
-  height: 20px;
+  height: 1.2rem;
   margin-left: 4px;
-  cursor: pointer;
   color: var(--atBar-atCard-svgcolor);
+  cursor: pointer;
+  transform: translateY(1px);
 }
 </style>

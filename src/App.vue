@@ -13,7 +13,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-size: 16px;
   font-family: Microsoft Yahei;
 }
 
@@ -34,30 +33,37 @@ a {
   text-decoration: none;
 }
 
-/* <=480px */
-@media (max-width: 480px) {
-  .el-dialog {
-    width: 480px !important;
-  }
+.el-dialog p {
+  font-size: 1rem;
 }
 
-/* >480px */
-@media (min-width: 481px) {
-  .el-dialog {
-    width: 100vw !important;
-  }
-}
-
-/* >640px */
-@media (min-width: 640px) {
-  .el-dialog {
-    width: 640px !important;
+@media screen and (min-width: 768px) {
+  html {
+    font-size: 16px;
   }
 }
 
 @media screen and (max-width: 768px) {
+  .el-dialog {
+    width: min(600px, 100vw) !important;
+  }
+
+  .el-drawer {
+    width: 90vw !important;
+  }
+
   html {
     font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .el-dialog {
+    width: max(240px, 100vw) !important;
+  }
+
+  html {
+    font-size: 12px;
   }
 }
 </style>

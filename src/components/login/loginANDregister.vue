@@ -181,7 +181,6 @@ export default {
 
 .subTitle {
   display: block;
-  font-size: 1rem;
   margin-top: 32px;
   margin-bottom: 8px;
   color: var(--el-color-black);

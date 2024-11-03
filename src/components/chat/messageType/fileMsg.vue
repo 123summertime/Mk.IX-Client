@@ -55,7 +55,6 @@ export default {
         onDownloadProgress: event => {
           this.download.speed = event.rate ?? 0
           this.download.rate = event.progress * 100 ?? 0
-
           this.canvasDrawer(this.download.rate, this.getNeutralColor, this.getGreenColor)
           if (this.download.rate >= 100) {
             this.canvasDrawer(0, this.getGreenColor, '#114514')
@@ -106,8 +105,8 @@ export default {
 
     // 计算文件大小 转化为可读的形式
     fileSize(size) {
-      const mb = 2 ** 20
-      const kb = 2 ** 10
+      const mb = 1 << 20
+      const kb = 1 << 10
 
       size = Number(size)
       if (size >= mb) {

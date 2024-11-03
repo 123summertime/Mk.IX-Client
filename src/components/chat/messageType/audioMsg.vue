@@ -174,7 +174,7 @@ export default {
 }
 
 .beforeBar {
-  flex: 0 0 24px;
+  flex: 0 0 1.5rem;
   display: flex;
   justify-content: center;
   align-items: center;

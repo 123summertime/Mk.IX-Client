@@ -231,6 +231,8 @@ export default {
 }
 
 .groupInfo {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   height: 100%;
   margin: 0 12px;
@@ -238,6 +240,7 @@ export default {
 }
 
 .groupName {
+  height: 60%;
   font-size: 1.2rem;
   color: var(--groupItem-groupName-textcolor);
 }
@@ -253,6 +256,7 @@ export default {
 
 .currMessageContext {
   width: 100%;
+  height: 40%;
   color: var(--groupItem-currMessageContext-textcolor);
 }
 

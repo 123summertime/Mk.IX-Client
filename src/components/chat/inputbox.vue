@@ -348,8 +348,8 @@ export default {
 
   computed: {
     fileSize() {
-      const mb = 2 ** 20
-      const kb = 2 ** 10
+      const mb = 1 << 20
+      const kb = 1 << 10
       if (this.payload.size >= mb) {
         return (this.payload.size / mb).toFixed(2) + "MB"
       }
@@ -411,9 +411,10 @@ export default {
 
 .bar {
   display: flex;
+  align-items: center;
   width: 100%;
-  height: 48px;
-  padding: 8px 24px;
+  height: 3rem;
+  padding: 0 24px;
   background: var(--inputBox-bar-bgcolor);
 }
 
@@ -422,7 +423,10 @@ input[type="file"] {
 }
 
 .barItem {
-  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2rem;
   cursor: pointer;
   background: transparent;
   margin-right: 24px;
@@ -444,9 +448,8 @@ input[type="file"] {
 
 .icon {
   display: block;
+  width: 100%;
   height: 100%;
-  margin: 0 auto;
-  outline: none;
 }
 
 /* main */

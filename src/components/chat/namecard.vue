@@ -172,7 +172,7 @@ export default {
 }
 
 .state div {
-  flex: 0 0 16px;
+  flex: 0 0 1rem;
   display: flex;
   justify-content: center;
   align-items: center;

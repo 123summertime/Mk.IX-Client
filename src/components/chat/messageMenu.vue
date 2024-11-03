@@ -168,7 +168,7 @@ export default {
 }
 
 .msgMenuRoot div svg {
-  height: 100%;
+  height: 1.2rem;
   color: var(--messageMenu-item-textcolor);
 }
 
