@@ -12,7 +12,7 @@ export const queryInfo = async function (table, lastUpdate, uuid) {
       Group: { group: uuid }
     }
 
-    const res = await infoDB.query(table, queryConditions[table]);
+    const res = await infoDB.query(table, queryConditions[table])
     if (res && (res.time === lastUpdate || !lastUpdate)) {
       return res
     }

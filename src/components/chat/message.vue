@@ -8,9 +8,10 @@
     <div :class="messageFrom() ? 'message bySelf' : 'message'" v-else>
       <div class="avatar"
         @click="showNamecard"
-        @mousedown="newAt"
+        @mousedown="longPressNewAt"
         @mouseup="cancelAt"
-        @mouseleave="cancelAt">
+        @mouseleave="cancelAt"
+        @contextmenu.prevent="dispatchNewAt">
         <img :src="message.avatar">
       </div>
       <div class="container">
@@ -163,18 +164,28 @@ export default {
     },
 
     // 长按头像@别人
-    newAt() {
+    longPressNewAt() {
       this.isLongPress = false
       if (this.messageFrom()) { return }
 
       const activeDelay = 400
       this.longPressTimer = setTimeout(() => {
         this.isLongPress = true
-        this.$store.dispatch("getNewAt", {
-          uuid: this.message.uuid,
-          username: this.message.username,
-        })
+        this.dispatchNewAt()
       }, activeDelay)
+    },
+
+    // 右键头像@别人
+    rightPressNewAt(event) {
+      event.preventDefault()
+      this.dispatchNewAt()
+    },
+
+    dispatchNewAt() {
+      this.$store.dispatch("getNewAt", {
+        uuid: this.message.uuid,
+        username: this.message.username,
+      })
     },
 
     cancelAt() {
@@ -217,7 +228,7 @@ export default {
 <style scoped>
 .messageRoot {
   position: relative;
-  padding: 12px 24px;
+  padding: 0.8rem 1.5rem;
 }
 
 .avatar img {
@@ -306,7 +317,7 @@ export default {
 
 @media screen and (max-width: 768px) {
   .container {
-    max-width: 82.5%;
+    max-width: calc(100% - 4rem);
   }
 }
 </style>

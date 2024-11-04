@@ -162,7 +162,11 @@ export default {
 
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/upload`
       axios.post(URL, FD, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+        onUploadProgress: progressEvent => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          console.log(`Upload progress: ${percentCompleted}%`);
+        }
       }).catch(err => {
         ElMessage({
           message: `上传失败 ${err.response.data.detail}`,

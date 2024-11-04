@@ -1,11 +1,11 @@
 <template>
   <div class="favoriteRoot">
-    <div class="imgsOuter" @scroll="onScroll" ref="ImgsOuter">
+    <div v-if="favoriteImgs.length" class="imgsOuter" @scroll="onScroll" ref="ImgsOuter">
       <div class="imgs">
         <div class="eachImg" v-for="img, idx in favoriteImgs" :key="img.time">
           <el-popover 
           placement="top" 
-          :width="260"
+          :width="230"
           :show-arrow="false"
           trigger="click" 
           effect="customized" 
@@ -22,6 +22,9 @@
         </div>
       </div>
     </div>
+    <div class="empty" v-else>
+      <p>{{ emptyText }}</p>
+    </div>
   </div>
 </template>
 
@@ -32,6 +35,7 @@ export default {
       page: 0,
       step: 50,
       favoriteImgs: [],
+      emptyText: "",
       DB: null,
     }
   },
@@ -46,6 +50,9 @@ export default {
       let imgs = await this.DB.queryRange('Image', this.page * this.step, this.step, false)
       for (const img of imgs) {
         this.favoriteImgs.push(img)
+      }
+      if (!this.favoriteImgs.length) {
+        this.emptyText = "右键图片消息可以添加图片哦(*^▽^*)"
       }
       this.page += 1
     },
@@ -130,5 +137,17 @@ export default {
   display: flex;
   justify-content: center;
   width: 100%;
+}
+
+.empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty p {
+  font-size: 1.2rem;
+  margin-top: 8px;
+  color: var(--favorite-favoriteEmpty-textcolor);
 }
 </style>

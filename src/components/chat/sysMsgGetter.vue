@@ -30,14 +30,14 @@ export default {
         // 你已加入了新群
         joined: () => {
           ElMessage.success(`你已成功加入 ${payload}`)
-          this.$emit('joined', msg)
+          this.$emit('joined', { group: target, lastUpdate: targetKey})
         },
         // 新的好友申请
         friend: () => { this.$emit('newFriendRequest', msg) },
         // 好友申请通过
         friended: () => {
           ElMessage.success(`你已成功加入 ${payload}`)
-          this.$emit('joined', msg)
+          this.$emit('joined', { group: target, lastUpdate: targetKey})
         },
         // 通知消息
         notice: () => {

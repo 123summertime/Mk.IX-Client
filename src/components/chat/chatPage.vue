@@ -220,7 +220,7 @@ export default {
     inputSplitter(pos) {
       const posY = pos.y
       const rate = posY / window.innerHeight
-      if (rate > 0.5 && rate < 0.8) {
+      if (rate > 0.5 && rate < 0.9) {
         this.$refs.inputSplitter.$el.style.bottom = window.innerHeight - posY - 8 + "px"
         this.$refs.inputBox.$el.style.height = window.innerHeight - posY + "px"
         localStorage.setItem('inputTop', posY)
@@ -280,6 +280,7 @@ export default {
 
     // 加入某群后
     async joinGroupSuccess(info) {
+      console.log(info)
       const res = await this.getAdminsInfo(info.group)
       const groupInfo = await queryInfo('Group', info.targetKey, info.group)
       const owner = { [res.owner.uuid]: res.owner.lastUpdate }
@@ -399,7 +400,7 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: calc(100% - 64px - 48px); /* .userInfo 64px .tools 48px */
+  height: calc(100% - 64px - 3rem); /* .userInfo 64px .tools 3rem */
   overflow: scroll;
 }
 
@@ -471,8 +472,8 @@ export default {
   position: relative;
   width: 100%;
   flex-grow: 1;
-  border-top: 1px solid;
-  border-bottom: 1px solid;
+  border-top: 2px solid;
+  border-bottom: 2px solid;
   border-image: var(--chatPage-center-border) 1;
 }
 
@@ -484,7 +485,7 @@ export default {
 
 .inputBox {
   width: 100%;
-  height: 25%;
+  height: 20%;
   max-height: 50%;
 }
 
@@ -539,6 +540,16 @@ export default {
 
   .back {
     display: block;
+  }
+
+  .groupList {
+    border-top: 2px solid;
+    border-bottom: 2px solid;
+    border-image: var(--chatPage-center-border) 1;
+  }
+
+  .userInfo p, .groupToolBar p {
+    font-size: 1.5rem;
   }
 }
 </style>

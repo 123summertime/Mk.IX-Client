@@ -15,13 +15,13 @@ export default {
 
 <style scoped>
 .broadcast {
-  width: calc(100% - 112px);
-  max-height: 128px;
+  width: calc(100% - 7rem);
   margin: 0 auto;
   background: var(--message-common-bgcolor);
 }
 
 .broadcast p {
+  height: 100%;
   text-align: center;
   color: var(--message-content-textcolor);
   text-overflow: ellipsis;

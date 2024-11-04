@@ -565,10 +565,6 @@ li .dangerItem {
   color: var(--groupConfig-checker-textcolor);
 }
 
-.dialogContent {
-  padding: 0 8px;
-}
-
 .dialogContent p, 
 .dialogContent .el-input {
   margin-bottom: 16px;
@@ -580,10 +576,6 @@ li .dangerItem {
 
 .dialogContent p {
   color: var(--groupConfig-dialogContent-textcolor);
-}
-
-.dialogFooter {
-  padding-right: 8px;
 }
 
 .inputLine {

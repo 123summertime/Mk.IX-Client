@@ -186,23 +186,22 @@ export default {
 <style scoped>
 .fileMsg {
   display: flex;
-  justify-content: space-between;
   width: 300px;
-  max-width: 90%;
+  max-width: calc(100% - 3rem);
   height: 100px;
   background: var(--message-file-bgcolor);
   cursor: pointer;
 }
 
 .fileMsgInnerL {
+  width: calc(100% - 64px);
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  max-width: 192px;
   justify-content: space-around;
 }
 
 .fileMsgInnerL p {
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -213,6 +212,7 @@ export default {
 }
 
 .fileMsgInnerR {
+  flex: 0 0 64px;
   position: relative;
   width: 64px;
   height: 64px;
@@ -242,15 +242,5 @@ export default {
   width: 64px;
   height: 64px;
   color: var(--message-fileRightSide-textcolor);
-}
-
-@media screen and (max-width: 1000px) {
-  .fileMsgInnerL {
-    max-width: 100%;
-  }
-
-  .fileMsgInnerR {
-    display: none;
-  }
 }
 </style>

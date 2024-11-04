@@ -121,6 +121,7 @@
 
 /* favorite */
 :root { 
+  --favorite-favoriteEmpty-textcolor: var(--text);
   --favorite-favoriteRoot-bgcolor: var(--bg);
   --favorite-eachImg-hover-bgcolor: transparent;
 }

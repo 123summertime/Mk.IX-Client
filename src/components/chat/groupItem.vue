@@ -240,7 +240,7 @@ export default {
 }
 
 .groupName {
-  height: 60%;
+  height: 55%;
   font-size: 1.2rem;
   color: var(--groupItem-groupName-textcolor);
 }
@@ -256,7 +256,7 @@ export default {
 
 .currMessageContext {
   width: 100%;
-  height: 40%;
+  height: 45%;
   color: var(--groupItem-currMessageContext-textcolor);
 }
 
@@ -266,6 +266,7 @@ export default {
 
 .rightSide {
   flex: 0 0 auto;
+  min-width: 36px;
   display: flex;
   flex-direction: column;
   align-items: end;
@@ -286,8 +287,8 @@ export default {
 .unread {
   height: 20px;
   margin: 2px 0;
-  padding: 0 4px;
-  border-radius: 4px;
+  padding: 0 8px;
+  border-radius: 6px;
   font-size: 0.8rem;
   line-height: 20px;
   text-align: center;

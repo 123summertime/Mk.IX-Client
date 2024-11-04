@@ -3,8 +3,10 @@
     <div title="设置" @click="gotoSetting">
       <Tools></Tools>
     </div>
-    <div title="收件箱" @click="mailVisible = true">
-      <Bell></Bell>
+    <div title="收件箱" @click="() => { mailVisible = true; unreadMailCount = 0 }">
+      <el-badge :value="unreadMailCount" color="var(--negative)" :show-zero="false">
+        <Bell></Bell>
+      </el-badge>
     </div>
     <div title="创建群" @click="makeVisible = true">
       <Plus></Plus>
@@ -71,8 +73,8 @@
             </div>
           </div>
           <div class="searchResultR">
-            <el-button plain type="primary" class="searchResultOper" @click="byQuestionVisible = true">回答入群问题</el-button>
-            <el-button plain type="primary" class="searchResultOper" @click="byRequsetVisible = true">发送申请</el-button>
+            <el-button plain :size="buttonSize" type="primary" @click="byQuestionVisible = true">回答问题</el-button>
+            <el-button plain :size="buttonSize" type="primary" @click="byRequsetVisible = true">发送申请</el-button>
           </div>
         </div>
       </el-tab-pane>
@@ -150,6 +152,7 @@ export default {
       makeVisible: false,
       mailVisible: false,
       mailTab: "notice",
+      unreadMailCount: 0,
 
       noticeList: [],
       requestList: [],
@@ -319,6 +322,7 @@ export default {
       const idx = this.requestList.findIndex(i => i.time === time)
       if (idx === -1) {  // 新入群申请
         this.requestList.push({ time, type, target, state, senderID, payload, senderAvatar, username, groupAvatar, groupName })
+        if (!this.mailVisible && state === "等待审核") { this.unreadMailCount += 1 }
       } else {  // 更新入群申请(自己/其它管理员已审核过了)
         this.requestList[idx] = { time, type, target, state, senderID, payload, senderAvatar, username, groupAvatar, groupName }
       }
@@ -333,6 +337,7 @@ export default {
       const idx = this.requestList.findIndex(i => i.time === time)
       if (idx === -1) {
         this.requestList.push({ time, type, state, senderID, payload, senderAvatar, username })
+        if (!this.mailVisible && state === "等待审核") { this.unreadMailCount += 1 }
       } else {
         this.requestList[idx] = { time, type, state, senderID, payload, senderAvatar, username }
       }
@@ -366,6 +371,9 @@ export default {
         subType: noticeMsg.subType, 
         payload: noticeMsg.payload,
       })
+      if (!this.mailVisible) {
+        this.unreadMailCount += 1
+      }
     },
 
     deleteNotice(time) {
@@ -380,6 +388,12 @@ export default {
       if (this.$refs.NoticeList.scrollTop <= threshold) {
         await this.loadNoticeHistory()
       }
+    },
+  },
+
+  computed: {
+    buttonSize() {
+      return window.innerWidth <= 768 ? "small" : "default"
     },
   },
 
@@ -403,8 +417,8 @@ export default {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  height: 48px;
-  padding: 8px 16px;
+  height: 3rem;
+  padding: 0.5rem 16px;
   background: var(--tools-toolsRoot-bgcolor);
 }
 
@@ -462,6 +476,7 @@ export default {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   border-top: 1px solid;
   border-image: var(--tools-searchResult-border) 1;
   padding-top: 20px;
@@ -473,10 +488,10 @@ export default {
 
 .searchResultL img {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 4rem;
+  height: 4rem;
   border-radius: 50%;
-  margin-right: 32px;
+  margin-right: 1rem;
 }
 
 .searchResultM {
@@ -495,7 +510,7 @@ export default {
 
 .searchResultR {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 }
 

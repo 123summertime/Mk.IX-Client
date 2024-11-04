@@ -77,10 +77,10 @@
   --groupItem-normal-bgcolor: transparent;
   --groupItem-active-bgcolor: linear-gradient(135deg, var(--color-9), var(--color-10));
   --groupItem-attention-textcolor: var(--theme);
-  --groupItem-groupName-textcolor: var(--text-tertiary);
+  --groupItem-groupName-textcolor: var(--text-secondary);
   --groupItem-groupNameActive-textcolor: var(--text);
   --groupItem-currMessageContext-textcolor: var(--text-tertiary);
-  --groupItem-currMessageContextActive-textcolor: var(--text);
+  --groupItem-currMessageContextActive-textcolor: var(--text-secondary);
   --groupItem-time-textcolor: var(--text-tertiary);
   --groupItem-timeActive-textcolor: var(--text);
   --groupItem-unread-bgcolor: var(--theme);
@@ -132,6 +132,7 @@
 
 /* favorite */
 :root { 
+  --favorite-favoriteEmpty-textcolor: var(--text-secondary);
   --favorite-favoriteRoot-bgcolor: transparent;
   --favorite-eachImg-hover-bgcolor: transparent;
 }
