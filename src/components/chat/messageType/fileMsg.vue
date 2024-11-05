@@ -46,8 +46,9 @@ export default {
   methods: {
     // 下载文件，同时更新进度条
     downloading() {
-      this.download.state = "downloading"
+      if (this.download.state === "downloading") { return }
 
+      this.download.state = "downloading"
       const url = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/download/${this.message.payload.content}`
       axios.get(url, {
         responseType: 'blob',
@@ -150,7 +151,6 @@ export default {
       const remain = this.message.payload.size * (100 - this.download.rate) / 100
       const speed = this.download.speed
       const time = remain / speed
-
       if (!Number.isFinite(time)) {
         return ""
       }
@@ -158,9 +158,9 @@ export default {
         return "还需" + time.toFixed(0) + "秒"
       }
       if (time <= 60 * 60) {
-        return "还需" + (time / 60).toFixed(0) + "分"
+        return "还需" + (time / 60).toFixed(0) + "分" + (time % 60).toFixed(0) + "秒"
       }
-      return "还需" + (time / 60 / 60).toFixed(0) + "时"
+      return "还需" + (time / 3600).toFixed(0) + "时" + (time % 3600).toFixed(0) + "分"
     },
 
     getNeutralColor() {
@@ -198,6 +198,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  padding-right: 4px;
 }
 
 .fileMsgInnerL p {
@@ -206,8 +207,12 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .fileMsgInnerL p, .fileMsgInnerL p i {
+  color: var(--message-contentSec-textcolor);
+}
+
+.fileMsgInnerL p:first-child {
+  font-size: 1.2rem;
   color: var(--message-content-textcolor);
 }
 

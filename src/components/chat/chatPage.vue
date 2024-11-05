@@ -571,6 +571,7 @@ chatPage
   ├─ inputBox
   │     ├─ atBar
   │     ├─ favorite
+  │     ├─ upload
   │     └─ audioMsg
   └─ chatItem
         └─ message

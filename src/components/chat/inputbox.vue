@@ -28,18 +28,18 @@
       </div>
     </div>
 
-      <div class="main">
-        <atBar class="atBar" 
-        :atList="atList" 
-        :style="{ display: favoriteVisible ? 'none' : 'block' }"
-        @deleteAt="deleteAt" ></atBar>
-        <textarea v-model=input 
-         :disabled="!available" 
-         :style="{ color: favoriteVisible ? 'transparent' : '' }"
-         v-on:paste="pasteImg" 
-         @keydown="onKeyDown"></textarea>
-        <favorite class="favorite" v-if="favoriteVisible" @sendFavoriteImg="sendFavoriteImg"></favorite>
-      </div>
+    <div class="main">
+      <atBar class="atBar" 
+      :atList="atList" 
+      :style="{ display: favoriteVisible ? 'none' : 'block' }"
+      @deleteAt="deleteAt" ></atBar>
+      <textarea v-model=input 
+        :disabled="!available" 
+        :style="{ color: favoriteVisible ? 'transparent' : '' }"
+        v-on:paste="pasteImg" 
+        @keydown="onKeyDown"></textarea>
+      <favorite class="favorite" v-if="favoriteVisible" @sendFavoriteImg="sendFavoriteImg"></favorite>
+    </div>
 
     <!-- 确认遮罩层 -->
     <el-dialog v-model="visible" title="发送确认" width="640px" :show-close="false" :destroy-on-close="true">
@@ -50,7 +50,7 @@
         <span class="footer">
           <div class="fileInfo">
             <div class="msgName" :title="payload.name">{{ payload.name }}</div>
-            <div class="msgSize" :title="fileSize">{{ fileSize }}</div>
+            <div class="msgSize" :title="fileSize(payload.size)">{{ fileSize(payload.size) }}</div>
           </div>
           <div class="buttons">
             <el-button plain type="primary" @click="confirmedSending">确认</el-button>
@@ -59,6 +59,13 @@
         </span>
       </template>
     </el-dialog>
+
+    <upload 
+    :title="payload.name" 
+    :speed="uploadSpeed"
+    :progress="uploadProgress"
+    :show="showUploadBox"
+    :failed="uploadFailed"></upload>
 
   </div>
 </template>
@@ -69,6 +76,7 @@ import axios from 'axios'
 
 import atBar from './atBar.vue'
 import favorite from './favorite.vue'
+import upload from './upload.vue'
 import audioMsg from './messageType/audioMsg.vue'
 
 export default {
@@ -91,6 +99,13 @@ export default {
         timer: null,
         recording: false,
       },
+
+      uploadSpeed: "",
+      uploadProgress: 0,
+      showUploadBox: false,
+      uploadFailed: false,
+      uploading: false,
+
       visible: false,
       favoriteVisible: false,
       atList: new Set(),  // 存储@其他人的JSON字符串，包含属性uuid, username
@@ -156,23 +171,49 @@ export default {
 
     // 发送文件类型消息
     sendingFile() {
+      if (this.uploading) {
+        ElMessage({
+          message: "文件正在上传中，请等待当前文件上传完成。",
+          duration: 6000,
+          type: "error",
+        })
+      }
+
       const FD = new FormData()
       FD.append('file', this.payload.content)
       FD.append('fileType', this.payload.type)
 
       const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/upload`
+
+      let lastLoaded = 0
+      let lastTimestamp = Date.now()
+      this.uploadProgress = 0
+      this.uploadFailed = false
+      this.uploading = true
+      this.showUploadBox = true
+
       axios.post(URL, FD, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-        onUploadProgress: progressEvent => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          console.log(`Upload progress: ${percentCompleted}%`);
+        onUploadProgress: event => {
+          const currentLoaded = event.loaded
+          const total = event.total
+          this.uploadProgress = Math.round((currentLoaded * 100) / total)
+
+          const currentTime = Date.now()
+          const timeDelta = (currentTime - lastTimestamp) / 1000
+          const bytesDelta = currentLoaded - lastLoaded
+          this.uploadSpeed = this.fileSize(bytesDelta / timeDelta)
+
+          lastLoaded = currentLoaded
+          lastTimestamp = currentTime
         }
+      }).then(() => {
+        this.uploading = false
+        setTimeout(() => {
+          this.showUploadBox = false
+        }, 6000);
       }).catch(err => {
-        ElMessage({
-          message: `上传失败 ${err.response.data.detail}`,
-          duration: 6000,
-          type: "error",
-        })
+        this.uploadFailed = true
       })
     },
 
@@ -310,6 +351,18 @@ export default {
       }, 1000)
     },
 
+    fileSize(size) {
+      const mb = 1 << 20
+      const kb = 1 << 10
+      if (size >= mb) {
+        return (size / mb).toFixed(2) + "MB"
+      }
+      if (size >= kb) {
+        return (size / kb).toFixed(2) + "KB"
+      }
+      return size + "B"
+    },
+
     beforeSending() {
       this.visible = true
     },
@@ -351,18 +404,6 @@ export default {
   },
 
   computed: {
-    fileSize() {
-      const mb = 1 << 20
-      const kb = 1 << 10
-      if (this.payload.size >= mb) {
-        return (this.payload.size / mb).toFixed(2) + "MB"
-      }
-      if (this.payload.size >= kb) {
-        return (this.payload.size / kb).toFixed(2) + "KB"
-      }
-      return this.payload.size + "B"
-    },
-
     // 语音消息发送前预览
     audioMessagePreview() {
       return {
@@ -400,6 +441,7 @@ export default {
   components: {
     atBar,
     favorite,
+    upload,
     audioMsg,
   },
 
@@ -412,7 +454,6 @@ export default {
 }
 
 /* bar */
-
 .bar {
   display: flex;
   align-items: center;

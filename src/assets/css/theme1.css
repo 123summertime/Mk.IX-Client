@@ -103,6 +103,7 @@
   --message-file-bgcolor: var(--theme);
   --message-at-textcolor: var(--text-opposite);
   --message-content-textcolor: var(--text);
+  --message-contentSec-textcolor: var(--text-secondary);
   --message-contentEncrypt-textcolor: var(--text-tertiary);
   --message-volume-bgcolor: var(--bg);
   --message-progress-bgcolor: var(--spical-0);
@@ -195,6 +196,14 @@
   --namecard-state-textcolor: var(--text-tertiary);
   --namecard-middle-border: var(--theme);
   --namecard-bio-textcolor: var(--text);
+}
+
+/* upload */
+:root {
+  --upload-uploadRoot-bgcolor: var(--theme-alternative);
+  --upload-progress-textcolor: var(--text);
+  --upload-progress-bgcolor: var(--color-3);
+  --upload-progressBottom-bgcolor: var(--neutral-0);
 }
 
 /* 覆盖el原有样式 */
