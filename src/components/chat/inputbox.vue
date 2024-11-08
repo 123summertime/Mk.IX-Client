@@ -211,7 +211,7 @@ export default {
         this.uploading = false
         setTimeout(() => {
           this.showUploadBox = false
-        }, 6000);
+        }, 4000)
       }).catch(err => {
         this.uploadFailed = true
       })

@@ -130,7 +130,6 @@
 import axios from 'axios'
 import Dexie from 'dexie'
 
-import router from './../../router/index.js'
 import sysMsgGetter from './sysMsgGetter.vue'
 import namecard from './namecard.vue'
 import eachNotice from './eachNotice.vue'
@@ -141,7 +140,8 @@ import { dbCRUD } from '../../assets/dbCRUD.js'
 
 export default {
   emits: [
-    'joinGroupSuccess'
+    'joinGroupSuccess',
+    'gotoSetting',
   ],
 
   data() {
@@ -182,7 +182,7 @@ export default {
 
   methods: {
     gotoSetting() {
-      router.push('/setting')
+      this.$emit('gotoSetting')
     },
 
     // 创建一个群聊

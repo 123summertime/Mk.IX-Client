@@ -6,7 +6,7 @@
     <ul class="general">
       <li class="avatar">
         <p>群头像</p>
-        <img class="groupAvatar" :src="info.avatar" title="点击修改头像" @click="beforeModifyAvatar" />
+        <img :src="info.avatar" title="点击修改头像" @click="beforeModifyAvatar" />
         <ArrowRight class="arrow hiddenArrow" />
       </li>
 
@@ -242,8 +242,8 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         this.editGroupNameVisible = false
-        ElMessage.success("修改成功")
         this.$emit('groupNameModified', { group: this.info.group, name: this.groupName })
+        ElMessage.success("修改成功")
       }).catch(err => {
         ElMessage({
           message: `修改失败 ${err.response.data.detail}`,
@@ -268,8 +268,8 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         this.editAvatarVisible = false
-        ElMessage.success("修改成功")
         this.$emit('groupAvatarModified', { group: this.info.group, avatar: base64 })
+        ElMessage.success("修改成功")
       }).catch(err => {
         ElMessage({
           message: `修改失败 ${err.response.data.detail}`,
@@ -441,13 +441,14 @@ export default {
 
 <style scoped>
 .groupConfigRoot {
-  background: var(--groupConfig-groupConfigRoot-bgcolor);
+  background: var(--drawer-groupConfigRoot-bgcolor);
 }
 
 .groupConfigRoot .title {
   display: inline-block;
-  border-bottom: 2px solid var(--groupConfig-generalTitle-border);
+  border-bottom: 2px solid var(--drawer-generalTitle-border);
   margin-bottom: 1rem;
+  color: var(--drawer-generalTitle-textcolor);
 }
 
 .groupConfigRoot .title p {
@@ -480,10 +481,11 @@ ul li {
 li p:nth-of-type(1) {
   flex: 1 0 auto;
   font-size: 1.2rem;
+  color: var(--drawer-general-subTitle-textcolor);
 }
 
 li p:nth-of-type(2) {
-  color: var(--groupConfig-general-info-textcolor);
+  color: var(--drawer-general-info-textcolor);
 }
 
 li .dangerItem {
@@ -493,7 +495,7 @@ li .dangerItem {
 .arrow {
   flex: 0 0 1.5rem;
   margin-left: 12px;
-  color: var(--groupConfig-general-info-textcolor);
+  color: var(--drawer-general-info-textcolor);
 }
 
 .hiddenArrow {
@@ -501,28 +503,28 @@ li .dangerItem {
 }
 
 .general {
-  border: 2px solid var(--groupConfig-general-border);
+  border: 2px solid var(--drawer-general-border);
   border-radius: 8px;
   margin-bottom: 32px;
 }
 
 .general li:hover {
-  background: var(--groupConfig-general-hover-bgcolor);
+  background: var(--drawer-general-hover-bgcolor);
 }
 
 .dangerZone {
-  border: 2px solid var(--groupConfig-dangerZoneTitle-border);
+  border: 2px solid var(--drawer-dangerZoneTitle-border);
   border-radius: 8px;
   background-image: repeating-linear-gradient(
     -45deg, 
-    var(--groupConfig-dangerZone-bgcolor), 
-    var(--groupConfig-dangerZone-bgcolor) 8px, 
+    var(--drawer-dangerZone-bgcolor), 
+    var(--drawer-dangerZone-bgcolor) 8px, 
     transparent 8px, 
     transparent 24px);
 }
 
 .dangerZone li:hover {
-  background: var(--groupConfig-dangerZone-hover-bgcolor);
+  background: var(--drawer-dangerZone-hover-bgcolor);
 }
 
 .list {
@@ -545,13 +547,13 @@ li .dangerItem {
 
 .checker svg {
   flex: 0 0 3rem;
-  color: var(--groupConfig-checker-svgcolor);
+  color: var(--drawer-checker-svgcolor);
 }
 
 .checker p {
   flex: 1;
   margin-left: 0.8rem;
-  color: var(--groupConfig-checker-textcolor);
+  color: var(--drawer-checker-textcolor);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -562,7 +564,7 @@ li .dangerItem {
 }
 
 :deep(.el-checkbox__label) {
-  color: var(--groupConfig-checker-textcolor);
+  color: var(--drawer-checker-textcolor);
 }
 
 .dialogContent p, 
@@ -575,7 +577,7 @@ li .dangerItem {
 }
 
 .dialogContent p {
-  color: var(--groupConfig-dialogContent-textcolor);
+  color: var(--drawer-dialogContent-textcolor);
 }
 
 .inputLine {

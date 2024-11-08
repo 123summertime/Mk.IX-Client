@@ -175,18 +175,20 @@
   --eachRequest-itemRightSide-textcolor: var(--text-tertiary);
 }
 
-/* groupConfig */
+/* groupConfig && setting */
 :root {
-  --groupConfig-generalTitle-border: var(--spical-0);
-  --groupConfig-general-border: var(--spical-0);
-  --groupConfig-general-hover-bgcolor: var(--spical-0);
-  --groupConfig-general-info-textcolor: var(--text-tertiary);
-  --groupConfig-dangerZoneTitle-border: var(--spical-1);
-  --groupConfig-dangerZone-bgcolor: var(--spical-2);
-  --groupConfig-dangerZone-hover-bgcolor: var(--spical-1);
-  --groupConfig-checker-svgcolor: var(--text);
-  --groupConfig-checker-textcolor: var(--text);
-  --groupConfig-dialogContent-textcolor: var(--text-secondary);
+  --drawer-generalTitle-border: var(--spical-0);
+  --drawer-generalTitle-textcolor: var(--text);
+  --drawer-general-border: var(--spical-0);
+  --drawer-general-hover-bgcolor: var(--spical-0);
+  --drawer-general-subTitle-textcolor: var(--text-secondary);
+  --drawer-general-info-textcolor: var(--text-tertiary);
+  --drawer-dangerZoneTitle-border: var(--spical-1);
+  --drawer-dangerZone-bgcolor: var(--spical-2);
+  --drawer-dangerZone-hover-bgcolor: var(--spical-1);
+  --drawer-checker-svgcolor: var(--text);
+  --drawer-checker-textcolor: var(--text);
+  --drawer-dialogContent-textcolor: var(--text-secondary);
 }
 
 /* namecard */

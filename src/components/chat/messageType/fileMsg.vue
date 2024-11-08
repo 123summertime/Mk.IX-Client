@@ -63,11 +63,14 @@ export default {
           }
         }
       }).then(res => {
-        const blob = new Blob([res.data])
+        let blob = new Blob([res.data])
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = this.message.payload.name
         link.click()
+        // 清理
+        URL.revokeObjectURL(link.href)
+        blob = null
       }).catch(err => {
         this.canvasDrawer(0, this.getRedColor, '#114514')
         this.download.state = "failed"

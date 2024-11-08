@@ -16,7 +16,15 @@
           @click="currGroupChange(item.group, item.name, item.available)"
           class="groupItem"></groupItem>
       </div>
-      <tools @joinGroupSuccess="joinGroupSuccess"></tools>
+      <tools @joinGroupSuccess="joinGroupSuccess" @gotoSetting="settingVisible = true"></tools>
+      <el-drawer v-model="settingVisible" direction="ltr" :with-header="false" :destroy-on-close="true">
+        <setting 
+          :uuid="uuid" 
+          :username="username"
+          :avatar="avatar"
+          @userAvatarModified="newAvatar => avatar = newAvatar"
+          @usernameModified="newUsername => username = newUsername"></setting>
+      </el-drawer>
     </div>
 
     <splitter @splitter="groupSplitter" class="groupSplitter" ref="groupSplitter"></splitter>
@@ -77,6 +85,7 @@ import chatItem from './chatItem.vue'
 import inputBox from './inputbox.vue'
 import splitter from './splitter.vue'
 import groupConfig from './groupConfig.vue'
+import setting from './setting.vue'
 
 import theme1 from './../../assets/css/theme1.css?inline'
 import theme2 from './../../assets/css/theme2.css?inline'
@@ -95,6 +104,7 @@ export default {
 
       visible: false,
       drawer: false,
+      settingVisible: false,
       pinned: {},
       groupList: [], // [{group:String, avatar:String, name:String, admins: Object, available: Boolean}]
     }
@@ -347,6 +357,7 @@ export default {
     inputBox,
     splitter,
     groupConfig,
+    setting,
   }
 }
 </script>
@@ -459,6 +470,10 @@ export default {
   background: var(--chatPage-drawer-bgcolor);
 }
 
+:deep(.el-drawer__body)::-webkit-scrollbar {
+  display: none;
+}
+
 .center {
   position: relative;
   display: flex;
@@ -560,6 +575,7 @@ export default {
 chatPage
   ├─ groupItem
   ├─ splitter
+  ├─ setting
   ├─ tools
   │     ├─ namecard
   │     ├─ sysMsgGetter

@@ -44,7 +44,9 @@ export default {
   watch: {
     progress: {
       handler() {
-        this.$refs.Progress.style.width = this.progress + '%'
+        if (this.$refs.Progress) {
+          this.$refs.Progress.style.width = this.progress + '%'
+        }
       }
     },
 
@@ -58,10 +60,12 @@ export default {
       handler(newVal) {
         if (newVal) {
           this.$refs.UploadRoot.classList.add("animateIn")
-          this.$refs.UploadRoot.classList.remove("animateOut")
         } else {
-          this.$refs.UploadRoot.classList.add("animateOut")
           this.$refs.UploadRoot.classList.remove("animateIn")
+          this.$refs.UploadRoot.classList.add("animateOut")
+          setTimeout(() => {
+            this.$refs.UploadRoot.classList.remove("animateOut")
+          }, 600)
         }
       }
     },
@@ -178,7 +182,7 @@ export default {
 }
 
 .result p {
-  font-size: 1.2rem;
+  font-size: calc(1.2rem + 4px);
 }
 
 .positive {
