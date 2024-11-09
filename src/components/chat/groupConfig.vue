@@ -488,7 +488,7 @@ li p:nth-of-type(2) {
   color: var(--drawer-general-info-textcolor);
 }
 
-li .dangerItem {
+ul li .dangerItem {
   color: var(--negative);
 }
 
@@ -520,7 +520,7 @@ li .dangerItem {
     var(--drawer-dangerZone-bgcolor), 
     var(--drawer-dangerZone-bgcolor) 8px, 
     transparent 8px, 
-    transparent 24px);
+    transparent 32px);
 }
 
 .dangerZone li:hover {

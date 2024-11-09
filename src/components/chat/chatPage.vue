@@ -18,12 +18,13 @@
       </div>
       <tools @joinGroupSuccess="joinGroupSuccess" @gotoSetting="settingVisible = true"></tools>
       <el-drawer v-model="settingVisible" direction="ltr" :with-header="false" :destroy-on-close="true">
-        <setting 
+        <setting
           :uuid="uuid" 
           :username="username"
           :avatar="avatar"
           @userAvatarModified="newAvatar => avatar = newAvatar"
-          @usernameModified="newUsername => username = newUsername"></setting>
+          @usernameModified="newUsername => username = newUsername"
+          @userLayoutModified="userLayoutModified"></setting>
       </el-drawer>
     </div>
 
@@ -177,22 +178,39 @@ export default {
 
     // 读取页面布局设置
     readLayoutSettings() {
-      const groupWidth = localStorage.getItem('groupWidth')
-      const inputTop = localStorage.getItem('inputTop')
-      if (groupWidth) {
-        this.groupSplitter({ "x": groupWidth })
+      this.readSplitterSettings()
+      this.readThemeSettings()
+      this.readFontsizeSetting()
+    },
+
+    readSplitterSettings() {
+      let groupWidth = localStorage.getItem('groupWidth')
+      let inputTop = localStorage.getItem('inputTop')
+      if (!groupWidth) {
+        groupWidth = 0.2 * window.innerWidth
+        localStorage.setItem('groupWidth', groupWidth)
       }
-      if (inputTop) {
-        this.inputSplitter({ "y": inputTop })
+      if (!inputTop) {
+        inputTop = 0.8 * window.innerHeight
+        localStorage.setItem('inputTop', inputTop)
       }
+      this.groupSplitter({ x: groupWidth })
+      this.inputSplitter({ y: inputTop })
     },
 
     readThemeSettings() {
-      const currentTheme = localStorage.getItem("theme") || "theme2"
-      const mapping = { theme1, theme2 }
-      const style = document.createElement('style')
-      style.innerHTML = mapping[currentTheme]
-      document.head.appendChild(style)
+      let currentTheme = localStorage.getItem("theme")
+      if (!currentTheme) {
+        currentTheme = "theme2"
+        localStorage.setItem("theme", currentTheme)
+      }
+      this.changeTheme(currentTheme)
+    },
+
+    readFontsizeSetting() {
+      let currentFontsize = localStorage.getItem("fontsize")
+      if (!currentFontsize) { return }
+      document.documentElement.style.fontSize = currentFontsize + "px"
     },
 
     // 获取置顶群列表
@@ -215,26 +233,35 @@ export default {
       this.$refs.Root.classList.toggle("animate")
     },
 
-    // 左边群列表和右边消息区的分割线设置
-    groupSplitter(pos) {
-      const posX = pos.x
-      const rate = posX / window.innerWidth
-      if (rate > 0.125 && rate < 0.5) {
-        this.$refs.groupSplitter.$el.style.left = posX - 8 + "px"
-        this.$refs.leftSide.style.width = posX + "px"
-        localStorage.setItem('groupWidth', posX)
-      }
+    userLayoutModified(vals) {
+      const { groupWidth, inputTop, theme } = vals
+      this.groupSplitter({ x: groupWidth })
+      this.inputSplitter({ y: inputTop })
+      this.changeTheme(theme)
     },
 
-    // 上面消息区和下面输入区的分割线设置
+    // 左边群列表和右边消息区的分割线设置 宽度占比在[0.125, 0.5]之间
+    groupSplitter(pos) {
+      const posX = Math.min(Math.max(0.125 * window.innerWidth, pos.x), 0.5 * window.innerWidth)
+      this.$refs.groupSplitter.$el.style.left = posX - 8 + "px"
+      this.$refs.leftSide.style.width = posX + "px"
+      localStorage.setItem('groupWidth', posX)
+    },
+
+    // 上面消息区和下面输入区的分割线设置 高度占比在[0.5, 0.9]之间
     inputSplitter(pos) {
-      const posY = pos.y
-      const rate = posY / window.innerHeight
-      if (rate > 0.5 && rate < 0.9) {
-        this.$refs.inputSplitter.$el.style.bottom = window.innerHeight - posY - 8 + "px"
-        this.$refs.inputBox.$el.style.height = window.innerHeight - posY + "px"
-        localStorage.setItem('inputTop', posY)
-      }
+      const posY = Math.min(Math.max(0.5 * window.innerHeight, pos.y), 0.9 * window.innerHeight)
+      this.$refs.inputSplitter.$el.style.bottom = window.innerHeight - posY - 8 + "px"
+      this.$refs.inputBox.$el.style.height = window.innerHeight - posY + "px"
+      localStorage.setItem('inputTop', posY)
+    },
+
+    changeTheme(theme) {
+      localStorage.setItem('theme', theme)
+      const mapping = { theme1, theme2 }
+      const style = document.createElement('style')
+      style.innerHTML = mapping[theme] || theme2
+      document.head.appendChild(style)
     },
 
     // 群名修改后
@@ -346,7 +373,6 @@ export default {
   async mounted() {
     await this.initialization()
     this.readLayoutSettings()
-    this.readThemeSettings()
     this.getPinnedGroups()
   },
 

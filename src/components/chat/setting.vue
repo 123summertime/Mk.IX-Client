@@ -78,9 +78,31 @@
 
   <!-- 修改布局 -->
   <el-dialog title="修改布局" v-model="editLayoutVisible" width="640px">
-    <el-input v-model="groupWidth" placeholder="Please input">
-      <template #append>px</template>
-    </el-input>
+    <div class="dialogItem">
+      <p>页面左侧宽度</p>
+      <div class="dialogItemR">
+        <el-input v-model="groupWidth" placeholder="Please input"></el-input>
+        <p>px</p>
+      </div>
+    </div>
+    <div class="dialogItem">
+      <p>页面右侧聊天区域高度</p>
+      <div class="dialogItemR">
+        <el-input v-model="inputTop" placeholder="Please input"></el-input>
+        <p>px</p>
+      </div>
+    </div>
+    <div class="dialogItem">
+      <p>主题</p>
+      <div class="themeList">
+        <div :class="['theme1', theme == 'theme1' ? 'themeActive' : '']" @click="theme = 'theme1'"></div>
+        <div :class="['theme2', theme == 'theme2' ? 'themeActive' : '']" @click="theme = 'theme2'"></div>
+      </div>
+    </div>
+    <div class="dialogItem">
+      <p>字体大小</p>
+    </div>
+    
     <template #footer>
       <el-button plain type="info" @click="editLayoutVisible = false">取消</el-button>
       <el-button plain type="primary" @click="userLayoutModified">确认修改</el-button>
@@ -97,6 +119,7 @@ export default {
   emits: [
     'userAvatarModified',
     'usernameModified',
+    'userLayoutModified',
   ],
 
   props: {
@@ -126,9 +149,9 @@ export default {
   
   methods: {
     getLayoutSettings() {
-      this.groupWidth = localStorage.getItem('groupWidth') || '默认'
-      this.inputTop = localStorage.getItem('inputTop') || '默认'
-      this.theme = localStorage.getItem('theme') || 'theme2'
+      this.groupWidth = localStorage.getItem('groupWidth')
+      this.inputTop = localStorage.getItem('inputTop')
+      this.theme = localStorage.getItem('theme')
     },
 
     getSelfInfo() {
@@ -207,7 +230,45 @@ export default {
     },
 
     userLayoutModified() {
+      if (isNaN(Number(this.groupWidth)) || isNaN(Number(this.inputTop))) {
+        ElMessage({
+          message: `修改失败 必须输入数字`,
+          duration: 6000,
+          type: "error",
+        })
+        return
+      }
 
+      const widthMinThreshold = 0.125 * window.innerWidth
+      const widthMaxThreshold = 0.5 * window.innerWidth
+      if (this.groupWidth < widthMinThreshold || this.groupWidth > widthMaxThreshold) {
+        ElMessage({
+          message: `修改失败 宽度必须在[${widthMinThreshold}px, ${widthMaxThreshold}px]之间`,
+          duration: 8000,
+          type: "error",
+        })
+        return
+      }
+
+      const heightMinThreshold = 0.5 * window.innerHeight
+      const heightMaxThreshold = 0.9 * window.innerHeight
+      if (this.inputTop < heightMinThreshold || this.inputTop > heightMaxThreshold) {
+        ElMessage({
+          message: `修改失败 高度必须在[${heightMinThreshold}px, ${heightMaxThreshold}px]之间`,
+          duration: 8000,
+          type: "error",
+        })
+        return
+      }
+ 
+      localStorage.setItem('groupWidth', this.groupWidth)
+      localStorage.setItem('inputTop', this.inputTop)
+      this.$emit('userLayoutModified', { 
+        groupWidth: this.groupWidth, 
+        inputTop: this.inputTop, 
+        theme: this.theme,
+      })
+      ElMessage.success("修改成功")
     }
 
   },
@@ -316,5 +377,50 @@ li .dangerItem {
 
 .dangerZone li:hover {
   background: var(--drawer-dangerZone-hover-bgcolor);
+}
+
+.dialogItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--drawer-dialogContent-textcolor);
+  margin-bottom: 16px;
+}
+
+.dialogItemR {
+  flex: 0 0 90px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dialogItemR p {
+  flex: 0 0 auto;
+  margin-left: 8px;
+}
+
+.themeList {
+  display: flex;
+  height: 32px;
+}
+
+.themeList div {
+  width: 48px;
+  height: 100%;
+  border-radius: 6px;
+  margin-left: 16px;
+  cursor: pointer;
+}
+
+.themeActive {
+  border: 2px solid var(--drawer-setting-selected-border);
+}
+
+.theme1 {
+  background: #d59bf6;
+}
+
+.theme2 {
+  background: #9D85FA;
 }
 </style>

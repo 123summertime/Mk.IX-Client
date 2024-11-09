@@ -189,6 +189,7 @@
   --drawer-checker-svgcolor: var(--text);
   --drawer-checker-textcolor: var(--text);
   --drawer-dialogContent-textcolor: var(--text-secondary);
+  --drawer-setting-selected-border: var(--color-3);
 }
 
 /* namecard */
