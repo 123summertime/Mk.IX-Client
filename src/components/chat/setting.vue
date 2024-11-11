@@ -36,8 +36,8 @@
         <p>布局</p>
         <ArrowRight class="arrow" />
       </li>
-      <li @click="editLayoutVisible = true">
-        <p>本地数据</p>
+      <li @click="showDataVisible = true">
+        <p>数据</p>
         <ArrowRight class="arrow" />
       </li>
     </ul>
@@ -52,8 +52,14 @@
       fileType="webp"
       rate="1:1"
       @cutDown="userAvatarModified">
+      <template #choose>
+        <el-button plain type="primary">选择图片</el-button>
+      </template>
       <template #cancel>
         <el-button plain type="info" @click="editAvatarVisible = false">取消</el-button>
+      </template>
+      <template #confirm>
+        <el-button plain type="primary" style="margin-left: 8px">确定</el-button>
       </template>
     </ImgCutter>
   </el-dialog>
@@ -76,20 +82,28 @@
     </template>
   </el-dialog>
 
-  <!-- 修改布局 -->
-  <el-dialog title="修改布局" v-model="editLayoutVisible" width="640px">
+  <!-- 布局 -->
+  <el-dialog title="布局" v-model="editLayoutVisible" width="640px">
     <div class="dialogItem">
-      <p>页面左侧宽度</p>
+      <p>页面左侧宽度(仅桌面端生效)</p>
       <div class="dialogItemR">
-        <el-input v-model="groupWidth" placeholder="Please input"></el-input>
+        <el-input v-model="groupWidth"></el-input>
         <p>px</p>
       </div>
     </div>
     <div class="dialogItem">
       <p>页面右侧聊天区域高度</p>
       <div class="dialogItemR">
-        <el-input v-model="inputTop" placeholder="Please input"></el-input>
+        <el-input v-model="inputTop"></el-input>
         <p>px</p>
+      </div>
+    </div>
+    <div class="dialogItem">
+      <p>字体大小</p>
+      <div class="dialogItemR">
+        <i :class="fontSize == 12 ? 'fontSizeActive' : ''" @click="fontSize = 12">小</i>
+        <i :class="fontSize == 14 ? 'fontSizeActive' : ''" @click="fontSize = 14">中</i>
+        <i :class="fontSize == 16 ? 'fontSizeActive' : ''" @click="fontSize = 16">大</i>
       </div>
     </div>
     <div class="dialogItem">
@@ -99,21 +113,43 @@
         <div :class="['theme2', theme == 'theme2' ? 'themeActive' : '']" @click="theme = 'theme2'"></div>
       </div>
     </div>
-    <div class="dialogItem">
-      <p>字体大小</p>
-    </div>
-    
     <template #footer>
       <el-button plain type="info" @click="editLayoutVisible = false">取消</el-button>
       <el-button plain type="primary" @click="userLayoutModified">确认修改</el-button>
     </template>
   </el-dialog>
 
+  <!-- 数据 -->
+  <el-dialog title="数据" v-model="showDataVisible" width="640px">
+    <div class="dialogItem">
+      <p>设备ID</p>
+      <p>{{ getDeviceID }}</p>
+    </div>
+    <div class="dialogItem">
+      <p>存储空间占用</p>
+      <p>{{ storageSize }}</p>
+    </div>
+    <div class="dialogItem">
+      <p>导出聊天记录</p>
+      <el-button plain type="primary" @click="showGroupSelector = true">选择群</el-button>
+    </div>
+    <template #footer>
+      <el-button plain type="primary" @click="showDataVisible = false">确认</el-button>
+    </template>
+  </el-dialog>
+  <groupSelector v-if="showGroupSelector"
+    title="导出 "
+    @groupSelectorSelected="info => { exportGroupInfo = info; exportExecute(); }"
+    @groupSelectorCanceled="showGroupSelector = false"></groupSelector>
+
 </template>
 
 <script>
 import axios from 'axios'
 import ImgCutter from 'vue-img-cutter'
+import groupSelector from './groupSelector.vue'
+
+import { computeTime2 } from './../../assets/utils'
 
 export default {
   emits: [
@@ -135,16 +171,19 @@ export default {
 
       groupWidth: 0,
       inputTop: 0,
+      fontSize: 16,
       theme: '',
-      deviceID: '',
-      // 退出登录 github地址 服务器限制 （导出记录） indexedDB使用 不保存记录
+      storageSize: "仅在HTTPS下支持查看",
+      exportGroupInfo: "",
+      // 退出登录 github地址 服务器限制 #（导出记录） #indexedDB使用 不保存记录
 
       editAvatarVisible: false,
       editUsernameVisible: false,
       editBioVisible: false,
       editLayoutVisible: false,
-
-    };
+      showDataVisible: false,
+      showGroupSelector: false,
+    }
   },
   
   methods: {
@@ -152,6 +191,17 @@ export default {
       this.groupWidth = localStorage.getItem('groupWidth')
       this.inputTop = localStorage.getItem('inputTop')
       this.theme = localStorage.getItem('theme')
+      this.fontSize = localStorage.getItem('fontsize') || parseFloat(getComputedStyle(document.documentElement).fontSize)
+      this.getStorageSize()
+    },
+
+    getStorageSize() {
+      if ('storage' in navigator && 'estimate' in navigator.storage) {
+        navigator.storage.estimate().then(estimate => {
+          const usedBytes = estimate.usage
+          this.storageSize = (usedBytes / (1024 * 1024)).toFixed(2) + "MB"
+        })
+      }
     },
 
     getSelfInfo() {
@@ -268,7 +318,52 @@ export default {
         inputTop: this.inputTop, 
         theme: this.theme,
       })
+      
+      // 更改字体大小
+      document.documentElement.style.fontSize = this.fontSize + "px"
+      localStorage.setItem("fontsize", this.fontSize)
+
       ElMessage.success("修改成功")
+    },
+
+    exportExecute() {
+      const getContent = (i) => {
+        return {
+          text: i.payload.content,
+          system: i.payload.content,
+          revoke: i.payload.content,
+          image: "[图片]",
+          file: "[文件]",
+          audio: "[语音]",
+        }[i.type]
+      }
+
+      const DB = this.$store.state.groupDB[this.exportGroupInfo.groupID]
+      DB.queryRange('History', 0, 10000000, false).then(res => {
+        let output = []
+        for (let i of res) {
+          const eachMessage = {
+            time: computeTime2(i.time),
+            uuid: i.uuid,
+            type: i.type,
+            payload: getContent(i),
+          }
+          output.push(JSON.stringify(eachMessage))
+        }
+
+        const blob = new Blob([output.join("\n")], { type: "text/plain" })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `${this.exportGroupInfo.name}(${this.exportGroupInfo.groupID})的聊天记录.txt`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        ElMessage.success("已导出")
+
+        this.showGroupSelector = false
+      })
     }
 
   },
@@ -276,7 +371,12 @@ export default {
   computed: {
     getImgCutterWidth() {
       return Math.min(600, window.innerWidth - 30)
-    }
+    },
+
+    getDeviceID() {
+      return localStorage.getItem('device')
+    },
+
   },
 
   mounted() {
@@ -286,6 +386,7 @@ export default {
 
   components: {
     ImgCutter,
+    groupSelector,
   }
 
 }
@@ -399,6 +500,15 @@ li .dangerItem {
   margin-left: 8px;
 }
 
+.dialogItemR i {
+  cursor: pointer;
+}
+
+.fontSizeActive {
+  color: var(--drawer-setting-selected-color);
+  transform: scale(1.5);
+}
+
 .themeList {
   display: flex;
   height: 32px;
@@ -413,7 +523,7 @@ li .dangerItem {
 }
 
 .themeActive {
-  border: 2px solid var(--drawer-setting-selected-border);
+  border: 2px solid var(--drawer-setting-selected-color);
 }
 
 .theme1 {

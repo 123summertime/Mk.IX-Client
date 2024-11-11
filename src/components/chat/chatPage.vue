@@ -209,7 +209,7 @@ export default {
 
     readFontsizeSetting() {
       let currentFontsize = localStorage.getItem("fontsize")
-      if (!currentFontsize) { return }
+      if (!currentFontsize) { return }  // 没有设置fontsize则会依据App.vue中的css规定的fontsize
       document.documentElement.style.fontSize = currentFontsize + "px"
     },
 

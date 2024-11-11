@@ -37,6 +37,11 @@ a {
   font-size: 1rem;
 }
 
+.el-popper.is-customized, 
+.el-popper.is-customized .el-popper__arrow::before {
+  font-size: 1rem;
+}
+
 @media screen and (min-width: 768px) {
   html {
     font-size: 16px;

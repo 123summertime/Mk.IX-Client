@@ -4,7 +4,8 @@
     :title="computedTitle"
     :show-close="false"
     :close-on-click-modal="false"
-    :close-on-press-escape="false">
+    :close-on-press-escape="false"
+    width="640px">
     <div class="groups">
       <div v-for="item in groupList" :key="item.group" @click="selectGroup(item)"
         class="groupItem"
@@ -38,6 +39,7 @@ export default {
       visible: true,
       groupID: "",
       groupName: "",
+      avatar: "",
     }
   },
 
@@ -49,11 +51,16 @@ export default {
     selectGroup(item) {
       this.groupID = item.group
       this.groupName = item.name
+      this.avatar = item.avatar
     },
 
     selected() {
       if (this.groupID === '') { return }
-      this.$emit('groupSelectorSelected', this.groupID)
+      this.$emit('groupSelectorSelected', {
+        groupID: this.groupID,
+        name: this.groupName,
+        avatar: this.avatar
+      })
     },
 
     canceled() {
@@ -63,7 +70,7 @@ export default {
 
   computed: {
     computedTitle() {
-      return this.groupName ? this.title + "至 " + this.groupName : this.title
+      return this.groupName ? this.title + this.groupName : this.title
     }
   },
 

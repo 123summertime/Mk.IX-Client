@@ -68,8 +68,14 @@
       fileType="webp"
       rate="1:1"
       @cutDown="groupAvatarModified">
+      <template #choose>
+        <el-button plain type="primary">选择图片</el-button>
+      </template>
       <template #cancel>
         <el-button plain type="info" @click="editAvatarVisible = false">取消</el-button>
+      </template>
+      <template #confirm>
+        <el-button plain type="primary" style="margin-left: 8px">确定</el-button>
       </template>
     </ImgCutter>
   </el-dialog>

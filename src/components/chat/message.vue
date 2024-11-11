@@ -37,7 +37,7 @@
       @revokeMsg="revokeMsg">
     </messageMenu>
 
-    <groupSelector v-if="showGroupSelector" title="转发"
+    <groupSelector v-if="showGroupSelector" title="转发至 "
       @groupSelectorSelected="groupSelectorSelected"
       @groupSelectorCanceled="groupSelectorCanceled"></groupSelector>
 
@@ -142,7 +142,8 @@ export default {
     },
 
     // 转发消息，选择了目标群，如果转发的是file类型，消息类型改为forwardFile
-    groupSelectorSelected(groupID) {
+    groupSelectorSelected(info) {
+      const groupID = info.groupID
       const newPayload = JSON.parse(JSON.stringify(this.message.payload))
       newPayload.meta = null
 

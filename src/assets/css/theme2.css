@@ -200,7 +200,7 @@
   --drawer-checker-svgcolor: var(--text);
   --drawer-checker-textcolor: var(--text);
   --drawer-dialogContent-textcolor: var(--text);
-  --drawer-setting-selected-border: var(--color-8);
+  --drawer-setting-selected-color: var(--color-8);
 }
 
 /* namecard */
