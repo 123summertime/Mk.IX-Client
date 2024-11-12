@@ -77,8 +77,7 @@
 <script>
 import axios from 'axios'
 
-import { queryInfo } from '../../assets/queryDB.js'
-import router from '../../router/index.js'
+import { queryInfo } from '../../assets/js/queryDB.js'
 
 import tools from './tools.vue'
 import groupItem from './groupItem.vue'
@@ -356,11 +355,6 @@ export default {
           type: "error",
         })
       })
-    },
-
-    logout() {
-      localStorage.removeItem('token')
-      router.push('/login')
     },
   },
 

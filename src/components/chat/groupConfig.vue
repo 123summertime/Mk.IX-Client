@@ -50,12 +50,12 @@
 
     <ul class="dangerZone">
       <li @click="deleteHistoryVisible = true" >
-        <p class="dangerItem">删除聊天记录</p>
-        <ArrowRight class="arrow dangerItem" />
+        <p>删除聊天记录</p>
+        <ArrowRight class="arrow" />
       </li>
       <li v-if="available" @click="unsubscribeVisible = true">
-        <p class="dangerItem">{{ getRole === 'owner' ? '解散群' : '退出群' }}</p>
-        <ArrowRight class="arrow dangerItem" />
+        <p>{{ getRole === 'owner' ? '解散群' : '退出群' }}</p>
+        <ArrowRight class="arrow" />
       </li>
     </ul>
   </div>
@@ -494,10 +494,6 @@ li p:nth-of-type(2) {
   color: var(--drawer-general-info-textcolor);
 }
 
-ul li .dangerItem {
-  color: var(--negative);
-}
-
 .arrow {
   flex: 0 0 1.5rem;
   margin-left: 12px;
@@ -527,6 +523,11 @@ ul li .dangerItem {
     var(--drawer-dangerZone-bgcolor) 8px, 
     transparent 8px, 
     transparent 32px);
+}
+
+.dangerZone li p,
+.dangerZone li svg {
+  color: var(--negative);
 }
 
 .dangerZone li:hover {

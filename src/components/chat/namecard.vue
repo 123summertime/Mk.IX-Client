@@ -47,7 +47,7 @@
 <script>
 import axios from 'axios'
 
-import { computeTime } from './../../assets/utils'
+import { computeTime } from './../../assets/js/utils'
 
 export default {
   props: {

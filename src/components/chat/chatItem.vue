@@ -20,8 +20,8 @@ import Dexie from 'dexie'
 
 import message from './message.vue'
 
-import { dbCRUD } from '../../assets/dbCRUD.js'
-import { queryInfo } from '../../assets/queryDB.js'
+import { dbCRUD } from '../../assets/js/dbCRUD.js'
+import { queryInfo } from '../../assets/js/queryDB.js'
 
 export default {
   props: {

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { info } from '../db/db.js'
+import { info } from '../../db/db.js'
 import { dbCRUD } from './dbCRUD.js'
 
 const infoDB = new dbCRUD(info)

@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { computeTime } from './../../assets/utils'
+import { computeTime } from './../../assets/js/utils'
 
 import broadcast from './messageType/broadcast.vue'
 import fileMsg from './messageType/fileMsg.vue'

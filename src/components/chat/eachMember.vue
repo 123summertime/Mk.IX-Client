@@ -50,7 +50,7 @@ import axios from 'axios'
 
 import namecard from './namecard.vue'
 
-import { queryInfo } from '../../assets/queryDB.js'
+import { queryInfo } from '../../assets/js/queryDB.js'
 
 export default {
   emits: [

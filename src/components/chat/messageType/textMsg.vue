@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { queryInfo } from '../../../assets/queryDB'
+import { queryInfo } from '../../../assets/js/queryDB'
 
 export default {
   props: {

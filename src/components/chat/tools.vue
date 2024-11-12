@@ -34,7 +34,7 @@
 
   <!-- 创建群 -->
   <el-dialog v-model="makeVisible" title="创建群" width="640px">
-    <div class="buildGroup">
+    <div>
       <div class="groupOpersItem">
         <p>群名</p>
         <el-input v-model="makeGroupName"></el-input>
@@ -51,7 +51,7 @@
     <template #footer>
       <span class="buildGroupFooter">
         <el-button plain type="info" @click="makeVisible = false">取消</el-button>
-        <el-button plain type="primary" @click="makeGroup">确认</el-button>
+        <el-button plain type="primary" @click="makeGroup">创建</el-button>
       </span>
     </template>
   </el-dialog>
@@ -135,8 +135,8 @@ import namecard from './namecard.vue'
 import eachNotice from './eachNotice.vue'
 import eachRequest from './eachRequest.vue'
 
-import { queryInfo } from '../../assets/queryDB.js'
-import { dbCRUD } from '../../assets/dbCRUD.js'
+import { queryInfo } from '../../assets/js/queryDB.js'
+import { dbCRUD } from '../../assets/js/dbCRUD.js'
 
 export default {
   emits: [
@@ -438,11 +438,6 @@ export default {
 
 .mailItems::-webkit-scrollbar {
   display: none;
-}
-
-.buildGroup, 
-.buildGroupFooter {
-  padding: 0 8px;
 }
 
 .groupOpersItem {

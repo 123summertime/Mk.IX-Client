@@ -1,8 +1,8 @@
 import axios from 'axios'
 import Dexie from 'dexie'
 
-import { dbCRUD } from '../assets/dbCRUD.js'
-import { queryInfo } from '../assets/queryDB.js'
+import { dbCRUD } from '../assets/js/dbCRUD.js'
+import { queryInfo } from '../assets/js/queryDB.js'
 
 import { createStore } from 'vuex'
 

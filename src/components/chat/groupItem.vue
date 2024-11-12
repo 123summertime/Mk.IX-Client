@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { computeTime } from './../../assets/utils'
+import { computeTime } from './../../assets/js/utils'
 
 export default {
   props: {
