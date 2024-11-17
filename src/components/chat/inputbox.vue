@@ -128,7 +128,7 @@ export default {
 
     // 发送text类型消息
     sendingText() {
-      if (!this.input) { return }
+      if (!this.input && !this.atList.size) { return }
 
       const [content, encrypted] = this.encrypt(this.input)
       this.$store.state.ws.send(JSON.stringify({
@@ -151,7 +151,6 @@ export default {
     // 发送图片类型消息，以base64的形式
     sendingImage() {
       if (!this.payload.content) { return }
-      console.log(this.payload.content)
       const [content, encrypted] = this.encrypt(this.payload.content)
       this.$store.state.ws.send(JSON.stringify({
         type: this.payload.type,
@@ -255,6 +254,7 @@ export default {
     toWebpBase64(base64) {
       if (base64.includes('data:image/gif') || base64.includes('data:image/webp')) {  
         this.payload.content = base64
+        this.beforeSending()
         return
       }
 

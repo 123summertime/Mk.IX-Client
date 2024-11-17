@@ -136,6 +136,7 @@ export default createStore({
 
     getGroupAttention(state, info) {
       state.groupAttentions.set(info.group, info.type)
+      state.groupAttentions.set("random", Math.random())
     },
 
     buildGroupDB(state, info) {

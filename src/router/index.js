@@ -22,7 +22,6 @@ const router = createRouter({
       path: '/chat',
       name: 'chat',
       component: chat,
-      meta: { keepAlive: true }
     },
   ]
 })

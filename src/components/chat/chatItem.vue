@@ -300,10 +300,10 @@ export default {
   position: fixed;
   top: 96px;
   right: 0;
-  height: 48px;
-  padding: 8px 24px 8px 24px;
-  border-top-left-radius: 24px;
-  border-bottom-left-radius: 24px;
+  height: 3rem;
+  padding: 0.5rem 1.5rem;
+  border-top-left-radius: 1.5rem;
+  border-bottom-left-radius: 1.5rem;
   background: var(--chatItem-attentionButton-bgcolor);
   cursor: pointer;
 }

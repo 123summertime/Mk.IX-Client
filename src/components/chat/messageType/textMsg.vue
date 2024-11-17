@@ -1,7 +1,7 @@
 <template>
   <div class="textMsg">
     <p>
-      <i class="atItem" v-for="username in atList">
+      <i :class="['atItem', message.payload.content ? '' : 'emptyContent']" v-for="username in atList">
         {{ "@" + username }}
       </i>
       <i :class="['content', getClass ]">
@@ -61,6 +61,10 @@ export default {
   margin-right: 8px;
 }
 
+.emptyContent {
+ margin-right: 0;
+}
+
 .content {
   color: var(--message-content-textcolor);
 }
@@ -68,6 +72,7 @@ export default {
 .textMsg p i{
   font-size: 1.2rem;
   line-height: 24px;
+  word-break: break-all;
 }
 
 .encrypt { 

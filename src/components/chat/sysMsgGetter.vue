@@ -1,6 +1,8 @@
 <template></template>
 
 <script>
+import router from './../../router/index.js'
+
 export default {
   emits: [
     'newJoinRequest',
@@ -42,6 +44,16 @@ export default {
         // 通知消息
         notice: () => {
           this.$emit('notice', msg)
+        },
+        // 登出消息
+        logout: () => {
+          ElMessage({
+            message: payload,
+            duration: 15000,
+            type: "error",
+          })
+          localStorage.removeItem('token')
+          router.push('/login')
         }
       }
 

@@ -241,6 +241,7 @@ export default {
 
     // 左边群列表和右边消息区的分割线设置 宽度占比在[0.125, 0.5]之间
     groupSplitter(pos) {
+      if (this.isMobileDevice) { return }
       const posX = Math.min(Math.max(0.125 * window.innerWidth, pos.x), 0.5 * window.innerWidth)
       this.$refs.groupSplitter.$el.style.left = posX - 8 + "px"
       this.$refs.leftSide.style.width = posX + "px"
@@ -584,7 +585,7 @@ export default {
   }
 
   .userInfo p, .groupToolBar p {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 }
 </style>
