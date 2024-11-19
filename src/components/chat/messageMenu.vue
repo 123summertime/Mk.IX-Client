@@ -44,7 +44,7 @@ export default {
 
   methods: {
     async getFavoriteDB() {
-      this.DB = await this.$store.state.favoriteDB
+      this.DB = await this.$store.state.favoriteDB()
     },
 
     // 收藏图片，图片的base64加入DB
@@ -57,6 +57,8 @@ export default {
         time: Date.now(),
         payload: this.message.payload.content
       })
+
+      ElMessage.success("添加成功")
     },
 
     base64ToBlob(base64, fileType) {

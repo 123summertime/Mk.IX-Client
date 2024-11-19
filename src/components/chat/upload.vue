@@ -125,7 +125,7 @@ export default {
 }
 
 .uploadL {
-  flex: 0 0 3rem;
+  width: 3rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -133,17 +133,21 @@ export default {
 }
 
 .uploadR {
-  flex: 1;
+  width: 85%;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
 }
 
 .title {
+  width: 100%;
   height: 28px;
   line-height: 28px;
   font-size: 1.2rem;
   color: var(--upload-progress-textcolor);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .overProgress {

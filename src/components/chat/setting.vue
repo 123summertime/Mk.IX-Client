@@ -92,7 +92,7 @@
 
   <!-- 修改简介 -->
   <el-dialog title="修改简介" v-model="editBioVisible" width="640px">
-    <el-input v-model="bio" placeholder="个人简介" />
+    <el-input v-model="newBio" placeholder="个人简介" />
     <template #footer>
       <el-button plain type="info" @click="editBioVisible = false">取消</el-button>
       <el-button plain type="primary" @click="userBioModified">确认修改</el-button>
@@ -210,7 +210,8 @@ export default {
   data() {
     return {
       bio: '',
-      newUsername: '',
+      newUsername: this.username,
+      newBio: '',
       password: '',
       passwordCheck: '',
 
@@ -274,7 +275,12 @@ export default {
       }).then(res => {
         this.editAvatarVisible = false
         this.$emit('userAvatarModified', base64)
-        ElMessage.success("修改成功, 刷新页面后生效")
+        this.$store.commit('refresh', {
+          uuid: this.uuid,
+          username: this.username,
+          avatar: base64,
+        })
+        ElMessage.success("修改成功")
       }).catch(err => {
         ElMessage({
           message: `修改失败 ${err.response.data.detail}`,
@@ -299,7 +305,12 @@ export default {
       }).then(res => {
         this.editUsernameVisible = false
         this.$emit('usernameModified', this.newUsername)
-        ElMessage.success("修改成功, 刷新页面后生效")
+        this.$store.commit('refresh', {
+          uuid: this.uuid,
+          username: this.newUsername,
+          avatar: this.avatar,
+        })
+        ElMessage.success("修改成功")
       }).catch(err => {
         ElMessage({
           message: `修改失败 ${err.response.data.detail}`,
@@ -311,11 +322,12 @@ export default {
 
     userBioModified() {
       const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/bio`
-      const payload = { bio: this.bio }
+      const payload = { bio: this.newBio }
       axios.patch(URL, payload, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         this.editBioVisible = false
+        this.bio = this.newBio
         ElMessage.success("修改成功")
       }).catch(err => {
         ElMessage({
@@ -363,7 +375,7 @@ export default {
         return
       }
 
-      const widthMinThreshold = 0.125 * window.innerWidth
+      const widthMinThreshold = 0.2 * window.innerWidth
       const widthMaxThreshold = 0.5 * window.innerWidth
       if (this.groupWidth < widthMinThreshold || this.groupWidth > widthMaxThreshold) {
         ElMessage({

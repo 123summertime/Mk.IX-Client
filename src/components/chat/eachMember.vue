@@ -21,12 +21,10 @@
 
     <namecard 
       :uuid="uuid"
-      :avatar="avatar"
-      :username="username"
       :namecardTrigger="namecardTrigger">
     </namecard>
 
-    <el-dialog v-model="checkerVisible">
+    <el-dialog v-model="checkerVisible" width="640px">
       <template #header>
         <div style="height: 0;"></div>
       </template>

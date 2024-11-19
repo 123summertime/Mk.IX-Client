@@ -135,13 +135,16 @@ export default createStore({
     },
 
     getGroupAttention(state, info) {
-      state.groupAttentions.set(info.group, info.type)
-      state.groupAttentions.set("random", Math.random())
+      state["attentionsOf" + info.group] = { type: info.type, random: Math.random() }
     },
 
     buildGroupDB(state, info) {
       state.groupDB[info.group] = info.db
     },
+
+    refresh(state, info) {
+      state.refresh = info
+    }
   },
 
   state: {
@@ -149,12 +152,13 @@ export default createStore({
     username: "",
     systemMessage: "",
     groupList: [],
-    groupAttentions: new Map(),  // group: String -> type: String, 
-    favoriteDB: await favoriteDB(),
+    favoriteDB: favoriteDB,
     groupDB: {},    // group: dbCRUD实例对象
     currentAt: {},  // {uuid: String, username: String}
     // {group}: group新收到的消息
     // lastMessageOf{group}: group的最后一条消息
+    // attentionsOf{group}: group当前的需要提醒的消息 如:有人@你 {type: String, random: Number}
     // ws: websocket连接
+    // refresh: {uuid, username, avatar} 别人更新头像/昵称了，同时更新已经加载的消息的头像/昵称
   },
 })

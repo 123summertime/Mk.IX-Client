@@ -42,7 +42,7 @@ export default {
 
   methods: {
     async getFavoriteDB() {
-      this.DB = await this.$store.state.favoriteDB
+      this.DB = await this.$store.state.favoriteDB()
     },
 
     // 从DB中获取收藏的表情包

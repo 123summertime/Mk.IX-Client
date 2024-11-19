@@ -225,6 +225,10 @@ export default {
     newMessage() {
       return this.$store.state[this.group]
     },
+
+    refresh() {
+      return this.$store.state.refresh
+    }
   },
 
   watch: {
@@ -232,6 +236,20 @@ export default {
     newMessage: {
       async handler(message) {
         this.newMessageHandler(message)
+      }
+    },
+
+    // 用户更新了头像或昵称，更新所有信息的头像或昵称
+    refresh: {
+      async handler(newVal) {
+        if (newVal) {
+          for (let i = 0; i < this.messageList.length; i++) {
+            if (this.messageList[i].uuid == newVal.uuid) {
+              this.messageList[i].username = newVal.username
+              this.messageList[i].avatar = newVal.avatar
+            }
+          }
+        }
       }
     },
 

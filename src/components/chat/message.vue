@@ -43,8 +43,6 @@
 
     <namecard
       :uuid="message.uuid"
-      :avatar="message.avatar"
-      :username="message.username"
       :namecardTrigger="namecardTrigger">
     </namecard>
 
@@ -205,7 +203,7 @@ export default {
 
     isBroadcastType() {
       return this.message.type === 'revoke' || this.message.type === 'system'
-    }
+    },
   },
 
   async mounted() {

@@ -127,7 +127,7 @@ export default {
     },
 
     needAttention() {
-      return this.$store.state.groupAttentions
+      return this.$store.state[`attentionsOf${this.group}`]
     }
   },
 
@@ -168,8 +168,8 @@ export default {
     // 有人@你
     needAttention: {
       deep: true,
-      handler(attentions) {
-        if (!attentions.has(this.group) || this.active) {
+      handler(attention) {
+        if (attention === null || this.active) {
           this.showAttention = false
           return
         }
@@ -177,7 +177,7 @@ export default {
         const content = {
           at: "有人@你"
         }
-        this.attentionContent = content[attentions.get(this.group)]
+        this.attentionContent = content[attention.type]
         this.showAttention = true
       }
     }

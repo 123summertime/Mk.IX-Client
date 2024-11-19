@@ -109,10 +109,6 @@
   <!-- 搜索用户 -->
   <namecard
     :uuid="searchUserID"
-    :username="searchusername"
-    :avatar="searchUserAvatar"
-    :bio_="searchUserBio"
-    :lastSeen_="searchUserLastSeen"
     :namecardTrigger="searchUserTrigger">
   </namecard>
 
@@ -173,10 +169,6 @@ export default {
       byRequsetVisible: false,
       searchUserTrigger: false,
       searchUserID: "",
-      searchusername: "",
-      searchUserAvatar: "",
-      searchUserBio: "",
-      searchUserLastSeen: "",
     }
   },
 
@@ -233,11 +225,6 @@ export default {
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(async res => {
-        const info = await queryInfo("Account", res.data.lastUpdate, this.searchUserID)
-        this.searchusername = info.username
-        this.searchUserAvatar = info.avatar
-        this.searchUserBio = res.data.bio
-        this.searchUserLastSeen = res.data.lastSeen
         this.searchUserTrigger = !this.searchUserTrigger
       }).catch(err => {
         ElMessage({

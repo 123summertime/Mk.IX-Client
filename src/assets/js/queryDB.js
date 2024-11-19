@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import { info } from '../../db/db.js'
 import { dbCRUD } from './dbCRUD.js'
+import store from './../../store'
 
 const infoDB = new dbCRUD(info)
 
@@ -28,7 +29,12 @@ export const queryInfo = async function (table, lastUpdate, uuid) {
         username: data.username,
         avatar: data.avatar,
       })
-      
+
+      store.commit('refresh', {
+        uuid: uuid,
+        username: data.username,
+        avatar: data.avatar
+      })
       data.uuid = uuid
       return data
     }

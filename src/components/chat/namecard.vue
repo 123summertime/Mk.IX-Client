@@ -24,7 +24,7 @@
       <div class="middle">
         <p>{{ "“" + bio + "”" }}</p>
       </div>
-      <div class="addFriend" v-if="!messageFrom()">
+      <div class="addFriend" >
         <el-button plain type="primary" @click="friendRequestVisible = true">发送好友申请</el-button>
       </div>
 
@@ -48,14 +48,11 @@
 import axios from 'axios'
 
 import { computeTime } from './../../assets/js/utils'
+import { queryInfo } from './../../assets/js/queryDB'
 
 export default {
   props: {
     uuid: String,
-    username: String,
-    avatar: String,
-    bio_: String,       // 可选 如果传入了就不执行showProfile() 下同
-    lastSeen_: String,  // 可选
     namecardTrigger: Boolean,
   },
 
@@ -63,6 +60,8 @@ export default {
     return {
       namecardVisible: false,
       friendRequestVisible: false,
+      avatar: "",
+      username: "",
       bio: "",
       lastSeen: "",
       reason: "",
@@ -77,10 +76,13 @@ export default {
     // 获取用户详细信息(个人简介，最后登录等)
     getProfileInfo() {
       const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/current`
-      axios.get(URL).then(res => {
+      axios.get(URL).then(async res => {
         const data = res.data
         this.bio = data.bio
         this.lastSeen = data.lastSeen
+        const res2 = await queryInfo("Account", data.lastUpdate, this.uuid)
+        this.username = res2.username
+        this.avatar = res2.avatar
       }).catch(err => {
         ElMessage({
           message: `获取详细信息失败 ${err.response.data.detail}`,
@@ -113,14 +115,8 @@ export default {
     // 当namecardTrigger改变时，就说明要显示namecard了，跟它的值没有关系
     namecardTrigger: {
       handler() {
+        this.getProfileInfo()
         this.namecardVisible = true
-        // 如果已经传入了就避免不必要的请求
-        if (this.bio_ && this.lastSeen_) {
-          this.bio = this.bio_
-          this.lastSeen = this.lastSeen_
-        } else {
-          this.getProfileInfo()
-        } 
       }
     }
   },

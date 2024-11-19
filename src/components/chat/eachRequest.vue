@@ -1,6 +1,6 @@
 <template>
   <div class="request" ref="Request">
-    <div class="image">
+    <div class="image" @click="namecardTrigger = !namecardTrigger">
       <img :src="msg.senderAvatar" />
     </div>
     <div class="content">
@@ -18,16 +18,28 @@
       <p :class="[msg.state.includes('同意') ? 'accept' : 'reject']">{{ msg.state }}</p>
     </div>
   </div>
+
+  <namecard
+    :uuid="msg.senderID"
+    :namecardTrigger="namecardTrigger">
+  </namecard>
 </template>
   
 <script>
 import axios from 'axios'
+import namecard from './namecard.vue'
 
 import { computeTime } from './../../assets/js/utils'
 
 export default {
   props: {
     msg: Object,
+  },
+
+  data() {
+    return {
+      namecardTrigger: false,
+    }
   },
 
   methods: {
@@ -83,6 +95,10 @@ export default {
     },
   },
 
+  components: {
+    namecard,
+  },
+
   mounted() {
     this.getOrder()
   }
@@ -108,6 +124,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
 .image img {
@@ -140,7 +157,7 @@ export default {
 
 .time {
   flex: 0 0 auto;
-  margin-right: 16px;
+  margin-right: 12px;
   color: var(--eachRequest-itemRightSide-textcolor);
 }
 
@@ -150,10 +167,14 @@ export default {
 }
 
 .requestResponse {
-  flex: 0 0 4rem;
+  flex: 0 0 5rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   white-space: nowrap;
+}
+
+.requestOpers {
+  justify-content: space-between;
 }
 
 .requestOpers svg:nth-child(1):hover {

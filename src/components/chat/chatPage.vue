@@ -239,10 +239,10 @@ export default {
       this.changeTheme(theme)
     },
 
-    // 左边群列表和右边消息区的分割线设置 宽度占比在[0.125, 0.5]之间
+    // 左边群列表和右边消息区的分割线设置 宽度占比在[0.2, 0.5]之间
     groupSplitter(pos) {
       if (this.isMobileDevice) { return }
-      const posX = Math.min(Math.max(0.125 * window.innerWidth, pos.x), 0.5 * window.innerWidth)
+      const posX = Math.min(Math.max(0.2 * window.innerWidth, pos.x), 0.5 * window.innerWidth)
       this.$refs.groupSplitter.$el.style.left = posX - 8 + "px"
       this.$refs.leftSide.style.width = posX + "px"
       localStorage.setItem('groupWidth', posX)
@@ -317,7 +317,6 @@ export default {
 
     // 加入某群后
     async joinGroupSuccess(info) {
-      console.log(info)
       const res = await this.getAdminsInfo(info.group)
       const groupInfo = await queryInfo('Group', info.targetKey, info.group)
       const owner = { [res.owner.uuid]: res.owner.lastUpdate }
@@ -329,6 +328,7 @@ export default {
         this.groupList.splice(idx, 1)
       }
       this.groupList.push(element)
+      this.$store.dispatch('updateGroupInfo', element)
       if (this.currGroupID === info.group) {
         this.currGroupAvailable = true
       }
@@ -488,6 +488,7 @@ export default {
 
 :deep(.el-drawer) {
   max-width: 600px;
+  min-width: min(450px, 90%);
   background: var(--chatPage-drawer-bgcolor);
 }
 
@@ -597,11 +598,13 @@ chatPage
   ├─ groupItem
   ├─ splitter
   ├─ setting
+  │     └─ groupSelector
   ├─ tools
   │     ├─ namecard
   │     ├─ sysMsgGetter
   │     ├─ eachNotice  
   │     └─ eachRequest
+  │           └─ namecard
   ├─ groupConfig
   │     └─ eachMember
   │           └─ namecard

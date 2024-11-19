@@ -218,7 +218,7 @@
   color: var(--text);
 }
 
-.el-input__inner {
+.el-input__inner, .el-textarea__inner {
   color: var(--text);
 }
 

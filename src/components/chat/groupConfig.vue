@@ -32,13 +32,18 @@
         <p>入群问题</p>
         <ArrowRight class="arrow" />
       </li>
+
+      <li v-if="available" @click="() => { this.getAnnouncement(); editAnnouncementVisible = true }">
+        <p>群公告</p>
+        <ArrowRight class="arrow" />
+      </li>
     </ul>
 
     <span class="title">
       <p>个人设置</p>
     </span>
     <ul class="general">
-      <li @click="cryptoVisible = true">
+      <li v-if="available" @click="cryptoVisible = true">
         <p>加密</p>
         <ArrowRight class="arrow" />
       </li>
@@ -105,6 +110,17 @@
     </template>
   </el-dialog>
 
+  <!-- 群公告 -->
+  <el-dialog title="群公告" v-model="editAnnouncementVisible" width="640px">
+    <div class="dialogContent">
+      <el-input type='textarea' v-model="announcement" placeholder="群公告" :autosize="true" :readonly="!checkPermissions" resize="none" />
+    </div>
+    <template #footer v-if="checkPermissions">
+      <el-button plain type="info" @click="editAnnouncementVisible = false">取消</el-button>
+      <el-button plain type="primary" @click="groupAnnouncementModified">确认修改</el-button>
+    </template>
+  </el-dialog>
+
   <!-- 加密 -->
   <el-dialog title="加密" v-model="cryptoVisible" :close-on-click-modal="false" width="640px">
     <div class="dialogContent">
@@ -149,7 +165,7 @@
       <Warning></Warning>
       <p>{{ getRole === 'owner' ? '确认解散群?' : '确认退出群?' }}</p>
     </div>
-    <template #footer class="di">
+    <template #footer>
       <el-checkbox class="checkbox" v-model="unsubscribeAndDeleteHistory" label="同时删除本地聊天记录" />
       <el-button plain type="info" @click="unsubscribeVisible = false">取消</el-button>
       <el-button plain type="danger" @click="unsubscribe">{{ getRole === 'owner' ? '确认解散' : '确认退出' }}</el-button>
@@ -225,6 +241,7 @@ export default {
       newGroupQ: "",
       newGroupA: "",
       cryptoKey: "",
+      announcement: "",
       editAvatarVisible: false,
       editGroupNameVisible: false,
       membersVisible: false,
@@ -232,6 +249,7 @@ export default {
       unsubscribeAndDeleteHistory: false,
       deleteHistoryVisible: false,
       editGroupQAVisible: false,
+      editAnnouncementVisible: false,
       cryptoVisible: false,
       currPinned: this.isPinned,
       membersCount: 0,
@@ -291,6 +309,37 @@ export default {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
         this.editGroupQAVisible = false
+        ElMessage.success("修改成功")
+      }).catch(err => {
+        ElMessage({
+          message: `修改失败 ${err.response.data.detail}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+
+    getAnnouncement() {
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/announcement`
+      axios.get(URL, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        this.announcement = res.data.announcement
+      }).catch(err => {
+        ElMessage({
+          message: `获取群公告失败 ${err.response.data.detail}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+
+    groupAnnouncementModified() {
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/announcement`
+      axios.patch(URL, { announcement: this.announcement }, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        this.editAnnouncementVisible = false
         ElMessage.success("修改成功")
       }).catch(err => {
         ElMessage({
