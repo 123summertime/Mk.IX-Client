@@ -54,7 +54,8 @@ export default {
           })
           localStorage.removeItem('token')
           router.push('/login')
-        }
+        },
+        echo: () => { console.log(payload) }
       }
 
       mapping[type]()

@@ -24,7 +24,7 @@
       <div class="middle">
         <p>{{ "“" + bio + "”" }}</p>
       </div>
-      <div class="addFriend" >
+      <div class="addFriend" v-if="!messageFrom()">
         <el-button plain type="primary" @click="friendRequestVisible = true">发送好友申请</el-button>
       </div>
 

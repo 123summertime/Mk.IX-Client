@@ -135,8 +135,6 @@ export default {
         type: "text",
         group: this.group,
         payload: {
-          name: null,
-          size: null,
           content: content,
           meta: {
             at: Array.from(this.atList).map(i => JSON.parse(i).uuid),
@@ -156,8 +154,6 @@ export default {
         type: this.payload.type,
         group: this.group,
         payload: {
-          name: this.payload.name,
-          size: this.payload.size,
           content: content,
           meta: {
             at: [],
@@ -189,8 +185,8 @@ export default {
       this.uploadProgress = 0
       this.uploadFailed = false
       this.uploading = true
-      this.showUploadBox = true
-
+      if (this.payload.type === 'file') { this.showUploadBox = true }
+      
       axios.post(URL, FD, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         onUploadProgress: event => {
@@ -229,7 +225,6 @@ export default {
     // 用户选择了要上传的文件，如果是图片，改为webp再发送
     fileUpload(event) {
       const file = event.target.files[0]
-
       if (file) {
         this.payload.name = file.name
         const reader = new FileReader()
@@ -459,7 +454,7 @@ export default {
   align-items: center;
   width: 100%;
   height: 3rem;
-  padding: 0 24px;
+  padding: 0 1.5rem;
   background: var(--inputBox-bar-bgcolor);
 }
 

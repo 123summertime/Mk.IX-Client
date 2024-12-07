@@ -174,7 +174,7 @@ export default {
 }
 
 .requestOpers {
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .requestOpers svg:nth-child(1):hover {

@@ -3,7 +3,7 @@
 
     <div class="leftSide" ref="leftSide">
       <div class="userInfo">
-        <img :src=avatar alt="avatar">
+        <img :src=avatar alt="avatar" @click="namecardTrigger = !namecardTrigger">
         <p>{{ username }}</p>
       </div>
       <div class="groupList">
@@ -27,6 +27,11 @@
           @userLayoutModified="userLayoutModified"></setting>
       </el-drawer>
     </div>
+
+    <namecard
+      :uuid="uuid"
+      :namecardTrigger="namecardTrigger">
+    </namecard>
 
     <splitter @splitter="groupSplitter" class="groupSplitter" ref="groupSplitter"></splitter>
 
@@ -86,6 +91,7 @@ import inputBox from './inputbox.vue'
 import splitter from './splitter.vue'
 import groupConfig from './groupConfig.vue'
 import setting from './setting.vue'
+import namecard from './namecard.vue'
 
 import theme1 from './../../assets/css/theme1.css?inline'
 import theme2 from './../../assets/css/theme2.css?inline'
@@ -105,6 +111,8 @@ export default {
       visible: false,
       drawer: false,
       settingVisible: false,
+      namecardTrigger: false,
+
       pinned: {},
       groupList: [], // [{group:String, avatar:String, name:String, admins: Object, available: Boolean}]
     }
@@ -239,10 +247,10 @@ export default {
       this.changeTheme(theme)
     },
 
-    // 左边群列表和右边消息区的分割线设置 宽度占比在[0.2, 0.5]之间
+    // 左边群列表和右边消息区的分割线设置 宽度占比在[0.15, 0.5]之间
     groupSplitter(pos) {
       if (this.isMobileDevice) { return }
-      const posX = Math.min(Math.max(0.2 * window.innerWidth, pos.x), 0.5 * window.innerWidth)
+      const posX = Math.min(Math.max(0.15 * window.innerWidth, pos.x), 0.5 * window.innerWidth)
       this.$refs.groupSplitter.$el.style.left = posX - 8 + "px"
       this.$refs.leftSide.style.width = posX + "px"
       localStorage.setItem('groupWidth', posX)
@@ -379,6 +387,7 @@ export default {
     splitter,
     groupConfig,
     setting,
+    namecard,
   }
 }
 </script>
@@ -418,6 +427,7 @@ export default {
   width: 48px;
   height: 48px;
   border-radius: 50%;
+  cursor: pointer;
 }
 
 .userInfo p {
@@ -465,7 +475,7 @@ export default {
   justify-content: space-between;
   width: 100%;
   height: 100%;
-  padding: 0 24px;
+  padding: 0 1.5rem;
   color: var(--chatPage-groupName-textcolor);
 }
 
@@ -597,6 +607,7 @@ export default {
 chatPage
   ├─ groupItem
   ├─ splitter
+  ├─ namecard
   ├─ setting
   │     └─ groupSelector
   ├─ tools

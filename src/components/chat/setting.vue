@@ -375,7 +375,7 @@ export default {
         return
       }
 
-      const widthMinThreshold = 0.2 * window.innerWidth
+      const widthMinThreshold = 0.15 * window.innerWidth
       const widthMaxThreshold = 0.5 * window.innerWidth
       if (this.groupWidth < widthMinThreshold || this.groupWidth > widthMaxThreshold) {
         ElMessage({
@@ -487,7 +487,7 @@ export default {
     },
 
     getColor() {
-      return localStorage.getItem('theme') == 'theme1' ? '#24292f' : '#fff'
+      return this.theme == 'theme1' ? '#24292f' : '#fff'
     }
 
   },
