@@ -3,7 +3,7 @@
     <div title="设置" @click="gotoSetting">
       <Tools></Tools>
     </div>
-    <div title="收件箱" @click="() => { mailVisible = true; unreadMailCount = 0 }">
+    <div title="收件箱" @click="openMailBox">
       <el-badge :value="unreadMailCount" color="var(--negative)" :show-zero="false">
         <Bell></Bell>
       </el-badge>
@@ -189,7 +189,7 @@ export default {
         this.makeGroupName = ""
         this.makeGroupQ = ""
         this.makeGroupA = ""
-        this.$emit('joinGroupSuccess', { group: res.data.groupID, name: this.makeGroupName }, true)
+        this.$emit('joinGroupSuccess', { group: res.data.groupID, name: this.makeGroupName, type: "group" }, true)
       }).catch(err => {
         ElMessage({
           message: `创建失败 ${err.response.data.detail}`,
@@ -344,17 +344,16 @@ export default {
 
     async loadNoticeHistory() {
       const history = await this.DB.queryRange('notice', this.page * this.step, this.step, true)
-      for (const msg of history) {
-        this.noticeList.push(msg)
-      }
+      this.noticeList = this.noticeList.concat(history.filter(msg => msg.account === localStorage.getItem("account")))
       this.page += 1
     },
 
     newNotice(noticeMsg) {
       this.noticeList.unshift(noticeMsg)
       this.DB.add("notice", {
-        time: noticeMsg.time, 
-        type: noticeMsg.type, 
+        time: noticeMsg.time,
+        account: this.$store.state.account, 
+        type: noticeMsg.type,
         subType: noticeMsg.subType, 
         payload: noticeMsg.payload,
       })
@@ -368,6 +367,11 @@ export default {
       this.noticeList.splice(idx, 1)
       this.DB.delete("notice", "time", time)
       ElMessage.success("删除成功")
+    },
+
+    openMailBox() {
+      this.mailVisible = true
+      this.unreadMailCount = 0
     },
 
     async onScroll() {

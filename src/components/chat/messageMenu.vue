@@ -78,6 +78,7 @@ export default {
     option() {
       const displayMapping = {
         text: { favorite: false, copy: true, delete: true, forward: true, revoke: this.checkPermissions },
+        system: { favorite: false, copy: false, delete: true, forward: false, revoke: false },
         image: { favorite: true, copy: true, delete: true, forward: true, revoke: this.checkPermissions },
         file: { favorite: false, copy: false, delete: true, forward: true, revoke: this.checkPermissions },
         revoke: { favorite: false, copy: false, delete: true, forward: false, revoke: false },

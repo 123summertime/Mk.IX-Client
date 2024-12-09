@@ -32,14 +32,14 @@ export default {
         // 你已加入了新群
         joined: () => {
           ElMessage.success(`你已成功加入 ${payload}`)
-          this.$emit('joined', { group: target, lastUpdate: targetKey})
+          this.$emit('joined', { group: target, lastUpdate: targetKey, type: "group"})
         },
         // 新的好友申请
         friend: () => { this.$emit('newFriendRequest', msg) },
         // 好友申请通过
         friended: () => {
-          ElMessage.success(`你已成功加入 ${payload}`)
-          this.$emit('joined', { group: target, lastUpdate: targetKey})
+          ElMessage.success(`已通过好友申请`)
+          this.$emit('joined', { group: target, lastUpdate: targetKey, type: "friend"})
         },
         // 通知消息
         notice: () => {
@@ -55,7 +55,7 @@ export default {
           localStorage.removeItem('token')
           router.push('/login')
         },
-        echo: () => { console.log(payload) }
+        echo: () => { },
       }
 
       mapping[type]()

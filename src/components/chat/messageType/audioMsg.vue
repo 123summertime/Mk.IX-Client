@@ -30,6 +30,7 @@ import axios from 'axios'
 export default {
   props: {
     group: String,
+    type: String,
     message: Object
   },
 
@@ -62,7 +63,9 @@ export default {
     // 下载该语音
     downloading() {
       this.currentState = "downloading"
-      const url = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/download/${this.message.payload.content}`
+      const url = this.type === 'group' 
+      ? `http://${localStorage.getItem('adress')}/v1/group/${this.group}/download/${this.message.payload.content}`
+      : `http://${localStorage.getItem('adress')}/v1/user/${this.group}/download/${this.message.payload.content}`
       axios.get(url, {
         responseType: 'blob',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },

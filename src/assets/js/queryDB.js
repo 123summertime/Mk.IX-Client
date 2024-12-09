@@ -8,6 +8,8 @@ const infoDB = new dbCRUD(info)
 
 export const queryInfo = async function (table, lastUpdate, uuid) {
   try {
+    if (!uuid) { return null }
+
     const queryConditions = {
       Account: { uuid: uuid },
       Group: { group: uuid }

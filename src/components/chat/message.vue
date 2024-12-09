@@ -22,8 +22,8 @@
         <div class="lower" @contextmenu.prevent="onRightClick">
           <textMsg class="payload" v-if="message.type == 'text'" :group="group" :message="message"></textMsg>
           <imageMsg class="payload" v-else-if="message.type == 'image'" :group="group" :message="message"></imageMsg>
-          <audioMsg class="payload" v-else-if="message.type == 'audio'" :group="group" :message="message"></audioMsg>
-          <fileMsg class="payload" v-else :group="group" :message="message"></fileMsg>
+          <audioMsg class="payload" v-else-if="message.type == 'audio'" :group="group" :type="type" :message="message"></audioMsg>
+          <fileMsg class="payload" v-else :group="group" :type="type" :message="message"></fileMsg>
           <p class="time">{{ formatedTime }}</p>
         </div>
       </div>
@@ -64,6 +64,7 @@ import namecard from './namecard.vue'
 export default {
   props: {
     group: String,
+    type: String,
     message: Object,
     admins: Object,
   },
@@ -148,6 +149,7 @@ export default {
       this.$store.state.ws.send(JSON.stringify({
         type: this.message.type === "file" ? "forwardFile" : this.message.type,
         group: groupID,
+        groupType: this.type,
         payload: newPayload,
       }))
       this.showGroupSelector = false

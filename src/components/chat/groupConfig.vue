@@ -1,39 +1,39 @@
 <template>
   <div class="groupConfigRoot">
     <span class="title">
-      <p>群聊信息</p>
+      <p>{{ isGroupType ? "群聊信息" : "好友信息"}}</p>
     </span>
     <ul class="general">
       <li class="avatar">
-        <p>群头像</p>
+        <p>{{ isGroupType ? "群头像" : "好友头像" }}</p>
         <img :src="info.avatar" title="点击修改头像" @click="beforeModifyAvatar" />
         <ArrowRight class="arrow hiddenArrow" />
       </li>
 
       <li @click="copyGroupID">
-        <p>群ID</p>
+        <p>{{isGroupType ? "群ID" : "好友ID"}}</p>
         <p>{{ info.group }}</p>
         <ArrowRight class="arrow hiddenArrow" />
       </li>
 
       <li @click="checkPermissions ? editGroupNameVisible = true : ''">
-        <p>群名称</p>
+        <p>{{isGroupType ? "群名称" : "好友名称"}}</p>
         <p>{{ this.info.name }}</p>
         <ArrowRight :class="['arrow', checkPermissions ? '' : 'hiddenArrow']" />
       </li>
 
-      <li v-if="available" @click="membersVisible = true">
+      <li v-if="available && isGroupType" @click="membersVisible = true">
         <p>群成员</p>
         <p>{{ membersCount + "人" }}</p>
         <ArrowRight class="arrow" />
       </li>
 
-      <li v-if="available && checkPermissions" @click="editGroupQAVisible = true">
+      <li v-if="available && checkPermissions && isGroupType" @click="editGroupQAVisible = true">
         <p>入群问题</p>
         <ArrowRight class="arrow" />
       </li>
 
-      <li v-if="available" @click="() => { this.getAnnouncement(); editAnnouncementVisible = true }">
+      <li v-if="available && isGroupType" @click="() => { this.getAnnouncement(); editAnnouncementVisible = true }">
         <p>群公告</p>
         <ArrowRight class="arrow" />
       </li>
@@ -59,7 +59,7 @@
         <ArrowRight class="arrow" />
       </li>
       <li v-if="available" @click="unsubscribeVisible = true">
-        <p>{{ getRole === 'owner' ? '解散群' : '退出群' }}</p>
+        <p>{{ isGroupType ? (getRole === 'owner' ? '解散群' : '退出群') : '删除好友' }}</p>
         <ArrowRight class="arrow" />
       </li>
     </ul>
@@ -163,12 +163,12 @@
     </template>
     <div class="checker">
       <Warning></Warning>
-      <p>{{ getRole === 'owner' ? '确认解散群?' : '确认退出群?' }}</p>
+      <p>{{ isGroupType ? (getRole === 'owner' ? '确认解散群?' : '确认退出群?') : '确认删除好友?' }}</p>
     </div>
     <template #footer>
       <el-checkbox class="checkbox" v-model="unsubscribeAndDeleteHistory" label="同时删除本地聊天记录" />
       <el-button plain type="info" @click="unsubscribeVisible = false">取消</el-button>
-      <el-button plain type="danger" @click="unsubscribe">{{ getRole === 'owner' ? '确认解散' : '确认退出' }}</el-button>
+      <el-button plain type="danger" @click="unsubscribe">{{ isGroupType ? (getRole === 'owner' ? '确认解散' : '确认退出') : '确认删除' }}</el-button>
     </template>
   </el-dialog>
 
@@ -230,7 +230,7 @@ export default {
   ],
 
   props: {
-    info: Object, // {time, group, name, avatar, admins: {owner: {}, admin: {}}}
+    info: Object, // {time, group, name, avatar, type, admins: {owner: {}, admin: {}}}
     isPinned: Boolean,
     available: Boolean,
   },
@@ -279,7 +279,7 @@ export default {
 
     // 群头像修改前验证权限
     beforeModifyAvatar() {
-      if (this.checkPermissions) {
+      if (this.checkPermissions && this.isGroupType) {
         this.editAvatarVisible = true
       }
     },
@@ -405,16 +405,17 @@ export default {
       this.deleteHistoryVisible = false
     },
 
-    // 处理退出/解散群
+    // 处理(退出/解散)群/删除好友
     unsubscribe() {
-      const URL = this.getRole === 'owner'
+      let URL = this.getRole === 'owner'
         ? `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}`
         : `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/members/me`
+      if (!this.isGroupType) URL = `http://${localStorage.getItem('adress')}/v1/user/${this.info.group}`
 
       axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
-        ElMessage.success("退出成功")
+        ElMessage.success(this.isGroupType ? "退出成功" : "删除成功")
         this.unsubscribeVisible = false
         if (this.unsubscribeAndDeleteHistory) {
           setTimeout(() => {
@@ -477,12 +478,16 @@ export default {
 
     getImgCutterWidth() {
       return Math.min(600, window.innerWidth - 30)
+    },
+
+    isGroupType() {
+      return this.info.type === "group"
     }
   },
 
   mounted() {
     this.getCryptoKey()
-    if (this.available) {
+    if (this.available && this.isGroupType) {
       this.getMembersInfo()
     }
   },

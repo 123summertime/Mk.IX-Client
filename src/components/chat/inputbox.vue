@@ -82,6 +82,7 @@ import audioMsg from './messageType/audioMsg.vue'
 export default {
   props: {
     group: String,
+    type: String,
     available: Boolean,
   },
 
@@ -134,6 +135,7 @@ export default {
       this.$store.state.ws.send(JSON.stringify({
         type: "text",
         group: this.group,
+        groupType: this.type,
         payload: {
           content: content,
           meta: {
@@ -153,6 +155,7 @@ export default {
       this.$store.state.ws.send(JSON.stringify({
         type: this.payload.type,
         group: this.group,
+        groupType: this.type,
         payload: {
           content: content,
           meta: {
@@ -177,8 +180,11 @@ export default {
       const FD = new FormData()
       FD.append('file', this.payload.content)
       FD.append('fileType', this.payload.type)
+      FD.append('groupType', this.type)
 
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/upload`
+      const URL = this.type === 'group' 
+        ? `http://${localStorage.getItem('adress')}/v1/group/${this.group}/upload`
+        : `http://${localStorage.getItem('adress')}/v1/user/${this.group}/upload`
 
       let lastLoaded = 0
       let lastTimestamp = Date.now()

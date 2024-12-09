@@ -3,6 +3,7 @@
     <div>
       <message v-for="msg in messageList" :key="msg.time" ref='MessageList'
         :group="group"
+        :type="type"
         :message="msg"
         :admins="admins"
         @deleteMsg="deleteMsg"
@@ -31,6 +32,7 @@ export default {
     admins: Object,
     active: Boolean,
     available: Boolean,
+    type: String,
     delete: Object,
   },
 
@@ -48,7 +50,7 @@ export default {
 
   methods: {
     buildOrGetDB() {
-      const db = new Dexie(this.$store.state.account + '-' + this.group)
+      const db = new Dexie(this.$store.state.account + '-' + this.group + '-' + this.type)
       db.version(1).stores({
         History: "&time",
       })
@@ -103,6 +105,7 @@ export default {
       this.$store.state.ws.send(JSON.stringify({
         type: 'revokeRequest',
         group: this.group,
+        groupType: this.type,
         payload: {
           name: null,
           size: null,

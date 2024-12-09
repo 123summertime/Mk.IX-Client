@@ -31,6 +31,7 @@ export default {
     group: String,
     name: String,
     active: Boolean,
+    type: String,   // group | friend
     isPinned: Boolean,
   },
 
@@ -56,7 +57,7 @@ export default {
 
     getSummary(message) {
       const type = message.type
-      const prefix = message.username + ": "
+      const prefix = this.type == "group" ? message.username + ": " : ""
       const mapping = {
         text: prefix + message.payload.content,
         revoke: message.payload.content,

@@ -12,8 +12,9 @@
           :group="item.group"
           :name="item.name"
           :active="item.group === currGroupID"
+          :type="item.type"
           :isPinned="pinned[item.group] === true"
-          @click="currGroupChange(item.group, item.name, item.available)"
+          @click="currGroupChange(item.group, item.name, item.available, item.type)"
           class="groupItem"></groupItem>
       </div>
       <tools @joinGroupSuccess="joinGroupSuccess" @gotoSetting="settingVisible = true"></tools>
@@ -63,6 +64,7 @@
             :group="item.group"
             :name="item.name"
             :available="item.available"
+            :type="item.type"
             :active="item.group === currGroupID"
             :delete="currDeleteHistory"
             v-show="currGroupID === item.group"
@@ -70,7 +72,8 @@
         </div>
         <splitter @splitter="inputSplitter" class="inputSplitter" ref="inputSplitter"></splitter>
         <inputBox class="inputBox" ref="inputBox"
-          :group="currGroupID" 
+          :group="currGroupID"
+          :type="currGroupType"
           :available="currGroupAvailable">
         </inputBox>
       </div>
@@ -105,6 +108,7 @@ export default {
 
       currGroupID: "",
       currGroupName: "",
+      currGroupType: "",
       currDeleteHistory: {},
       currGroupAvailable: true,
 
@@ -114,7 +118,7 @@ export default {
       namecardTrigger: false,
 
       pinned: {},
-      groupList: [], // [{group:String, avatar:String, name:String, admins: Object, available: Boolean}]
+      groupList: [], // [{group:String, avatar:String, name:String, admins: Object, available: Boolean, type: String}]
     }
   },
 
@@ -142,10 +146,14 @@ export default {
         const localGroups = await this.getLocalGroups(this.uuid)
         for (const group of data.groups) {
           localGroups.delete(group.group)
-          this.getGroupInfo(group, true)
+          this.getGroupInfo(group, "group", true)
         }
-        for (const group of localGroups) {
-          this.getGroupInfo({group}, false)
+        for (const friend of data.friends) {
+          localGroups.delete(friend.uuid)
+          this.getGroupInfo(friend, "friend", true)
+        }
+        for (const [k, v] of localGroups) {
+          this.getGroupInfo({id: k}, v, false)
         }
       }).catch(err => {
         ElMessage({
@@ -156,20 +164,33 @@ export default {
       })
     },
 
-    // 获取每个群的信息(群名，群主，管理员，是否可用)
-    async getGroupInfo(group, available) {
-      const groupInfo = await queryInfo("Group", group.lastUpdate, group.group)
+    // 获取每个群/好友的信息(群名，群主，管理员，是否可用) type为"group"|"friend"
+    async getGroupInfo(id, type, available) {
+      let groupInfo = null
+      if (type == "group") {
+        groupInfo = await queryInfo("Group", id.lastUpdate, id.group || id.id)
+      } else {
+        groupInfo = await queryInfo("Account", id.lastUpdate, id.uuid || id.id)
+        groupInfo.group = groupInfo.uuid
+        groupInfo.name = groupInfo.username
+      }
+      groupInfo.type = type
+
       if (!available) {
         const element = { ...groupInfo, admins: { owner: {}, admin: {} }, available }
         this.groupList.push(element)
         return
       }
-
-      const owner = { [group.owner.uuid]: group.owner.lastUpdate }
-      const admin = {}
-      group.admin.forEach(i => { admin[i.uuid] = i.lastUpdate })
-
-      const element = { ...groupInfo, admins: { owner, admin }, available }
+      
+      let element = {}
+      if (groupInfo.type == "group") {
+        const owner = { [id.owner.uuid]: id.owner.lastUpdate }
+        const admin = {}
+        id.admin.forEach(i => { admin[i.uuid] = i.lastUpdate })
+        element = { ...groupInfo, admins: { owner, admin }, available }
+      } else {
+        element = {...groupInfo, admins: { owner: {}, admin: {} }, available }
+      }
       this.groupList.push(element)
       this.$store.dispatch('updateGroupInfo', element)
     },
@@ -177,10 +198,10 @@ export default {
     // 获取本地群聊(如已退出的群或被踢出的群)
     async getLocalGroups(uuid) {
       const databases = await indexedDB.databases();
-      return new Set(databases
+      return new Map(databases
         .map(db => db.name)
         .filter(name => name.split("-")[0] === uuid)
-        .map(name => name.split("-")[1]))
+        .map(name => [name.split("-")[1], name.split("-")[2]]));
     },
 
     // 读取页面布局设置
@@ -227,10 +248,11 @@ export default {
     },
 
     // 当前在看的群改变了
-    currGroupChange(id, name, available) {
+    currGroupChange(id, name, available, type) {
       this.currGroupID = id
       this.currGroupName = name
       this.currGroupAvailable = available
+      this.currGroupType = type
       if (this.isMobileDevice) {
         this.mobileSwitchSide()
       }
@@ -325,13 +347,24 @@ export default {
 
     // 加入某群后
     async joinGroupSuccess(info) {
-      const res = await this.getAdminsInfo(info.group)
-      const groupInfo = await queryInfo('Group', info.targetKey, info.group)
-      const owner = { [res.owner.uuid]: res.owner.lastUpdate }
-      const admin = {}
-      res.admin.forEach(i => { admin[i.uuid] = i.lastUpdate })
-      const element = { ...groupInfo, admins: { owner, admin }, available: true }
-      const idx = this.groupList.findIndex(i => i.group === info.group)
+      let element = null
+      if (info.type === "group") {
+        const res = await this.getAdminsInfo(info.group)
+        const groupInfo = await queryInfo('Group', info.targetKey, info.group)
+        const owner = { [res.owner.uuid]: res.owner.lastUpdate }
+        const admin = {}
+        res.admin.forEach(i => { admin[i.uuid] = i.lastUpdate })
+        groupInfo.type = info.type
+        element = { ...groupInfo, admins: { owner, admin }, available: true }
+      } else {
+        const groupInfo = await queryInfo("Account", info.targetKey, info.group)
+        groupInfo.group = groupInfo.uuid
+        groupInfo.name = groupInfo.username
+        groupInfo.type = info.type
+        element = { ...groupInfo, admins: { owner: {}, admin: {}}, available: true }
+      }
+      
+      const idx = this.groupList.findIndex(i => i.group === element.group)
       if (idx != -1) {
         this.groupList.splice(idx, 1)
       }
