@@ -25,6 +25,14 @@ export default {
             type: "error",
           })
         },
+        // 被禁言时
+        ban: () => {
+          ElMessage({
+            message: "您已被禁言至" + new Date(parseInt(payload)).toLocaleString(),
+            duration: 6000,
+            type: "error",
+          })
+        },
         // 成功，无需多言
         success: () => { ElMessage.success(payload) },
         // 有新的入群申请

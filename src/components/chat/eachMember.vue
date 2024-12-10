@@ -7,6 +7,9 @@
       <p class="name">{{ username }}</p>
     </div>
     <div class="oper">
+      <div v-if="getBanPermission" @click="banDialogOpen" title="设置禁言">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="warnSVG"><path fill="currentColor" d="M 18.646484 0.64648438 L 0.64648438 18.646484 L 1.3535156 19.353516 L 19.353516 1.3535156 L 18.646484 0.64648438 z M 0 3 L 0 14 L 2 14 L 2 15.878906 L 3 14.878906 L 3 13 L 1 13 L 1 4 L 13.878906 4 L 14.878906 3 L 0 3 z M 19.121094 3 L 18.121094 4 L 19 4 L 19 13 L 9.1210938 13 L 8.1210938 14 L 20 14 L 20 3 L 19.121094 3 z M 3 6 L 3 7 L 10.878906 7 L 11.878906 6 L 3 6 z M 3 8 L 3 9 L 8.8789062 9 L 9.8789062 8 L 3 8 z M 3 10 L 3 11 L 6.8789062 11 L 7.8789062 10 L 3 10 z M 12.121094 10 L 11.121094 11 L 16 11 L 16 10 L 12.121094 10 z "/></svg>  <!-- From www.svgrepo.com -->
+      </div>
       <div v-if="getManagePermission" @click="beforeRequestCheck(adminModify, modifyAdminCheckerText)" :title="role === 'user' ? '添加管理员' : '移除管理员'">
         <CirclePlus v-if="role === 'user'"></CirclePlus>
         <Remove v-else-if="role === 'admin'" class="warnSVG"></Remove>
@@ -14,7 +17,7 @@
       <div v-if="getRemovePermission" @click="beforeRequestCheck(userRemoved, modifyMemberCheckerText)" title="移除群聊">
         <Close class="warnSVG"></Close>
       </div>
-      <div v-if="showAt" @click="newAt">
+      <div v-if="showAt" @click="newAt" title="@">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><path fill="currentColor" d="M67.565714 514.139429c0 282.422857 191.140571 453.851429 454.290286 453.851428 70.710857 0 138.861714-9.856 180.845714-23.570286 29.586286-9.417143 39.003429-24.850286 39.003429-40.704s-12.434286-27.867429-28.708572-27.867428c-4.717714 0-11.574857 0.859429-20.132571 2.998857-52.297143 12.873143-96.859429 21.430857-157.293714 21.430857-234.861714 0-394.294857-141.421714-394.294857-383.561143 0-231.862857 150.857143-393.435429 378.002285-393.435428 201.014857 0 369.005714 123.867429 369.005715 346.294857 0 129.846857-44.141714 217.289143-114.432 217.289143-47.140571 0-74.130286-27.428571-74.130286-74.148572v-290.56c0-23.149714-12.854857-37.302857-34.285714-37.302857-21.430857 0-35.145143 14.153143-35.145143 37.302857v48.841143h-3.858286c-21.869714-52.717714-75.428571-86.125714-138.861714-86.125714-110.994286 0-189.001143 94.701714-189.001143 230.546286 0 137.142857 77.568 232.722286 190.72 232.722285 66.011429 0 117.430857-36.004571 142.281143-96.859428h3.84c8.594286 60.434286 59.154286 97.28 127.305143 97.28 119.570286 0 193.718857-117.412571 193.718857-281.984 0-249.014857-183.442286-410.569143-436.297143-410.569143-266.130286 0-452.571429 182.125714-452.571429 458.130286z m433.298286 166.290285c-77.165714 0-125.586286-63.853714-125.586286-165.430857 0-99.84 48.859429-163.712 126.006857-163.712 78.427429 0 128.146286 62.573714 128.146286 162.011429 0 101.558857-50.578286 167.131429-128.566857 167.131428z"></path></svg>
       </div>
     </div>
@@ -25,9 +28,6 @@
     </namecard>
 
     <el-dialog v-model="checkerVisible" width="640px">
-      <template #header>
-        <div style="height: 0;"></div>
-      </template>
       <div class="checker">
         <Warning></Warning>
         <p>{{ checkerText }}</p>
@@ -36,6 +36,26 @@
         <span>
           <el-button plain type="info" @click="checkerVisible = false">取消</el-button>
           <el-button plain type="danger" @click="checked()">确认</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="banVisible" title="设置禁言" width="640px">
+      <div class="dialogItem">
+        <p>用户当前状态</p>
+        <p>{{ banState }}</p>
+      </div>
+      <div class="dialogItem">
+        <p>设置禁言时长</p>
+        <div>
+          <el-input v-model="banDuration"></el-input>
+          <p>分钟</p>
+        </div>
+      </div>
+      <template #footer>
+        <span>
+          <el-button plain type="info" @click="banVisible = false">取消</el-button>
+          <el-button plain type="primary" @click="setBan()">确认</el-button>
         </span>
       </template>
     </el-dialog>
@@ -70,6 +90,9 @@ export default {
       username: "",
       namecardTrigger : false,
       checkerVisible: false,
+      banVisible: false,
+      banState: "",
+      banDuration: 10,
       invokeFunc: null, // Function
       checkerText: "",
     }
@@ -138,10 +161,60 @@ export default {
         uuid: this.uuid,
         username: this.username,
       })
-    }
+    },
+
+    banDialogOpen() {
+      this.banVisible = true
+
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}/ban`
+      axios.get(URL, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        this.banState = res.data.ban ? `禁言至 ${new Date(parseInt(res.data.time)).toLocaleString()}` : `未被禁言`
+      }).catch(err => {
+        ElMessage({
+          message: `获取禁言状态失败 ${err.response.data.detail}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+
+    // 设置禁言
+    setBan() {
+      if (!/^[1-9]\d*$/.test(this.banDuration) && this.banDuration != "0") {
+        ElMessage({
+          message: "必须输入一个非负整数",
+          duration: 6000,
+          type: "error",
+        })
+        return
+      }
+
+      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}/ban`
+      axios.post(URL, { duration: this.banDuration }, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      }).then(res => {
+        ElMessage.success(this.banDuration != "0" ? `已设置禁言` : `已取消禁言`)
+        this.banVisible = false
+      }).catch(err => {
+        ElMessage({
+          message: `设置禁言失败 ${err.response.data.detail}`,
+          duration: 6000,
+          type: "error",
+        })
+      })
+    },
+
   },
 
   computed: {
+    // 确认是否有禁言权限
+    getBanPermission() {
+      return (this.currentUserPermission === 'owner' && this.role != 'owner') ||
+      (this.currentUserPermission === 'admin' && this.role === 'user')
+    },
+
     // 确认是否有增删管理员的权限
     getManagePermission() {
       return this.currentUserPermission === 'owner' && this.role != 'owner'
@@ -282,5 +355,25 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.dialogItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--eachMember-checker-textcolor);
+  margin-bottom: 16px;
+}
+
+.dialogItem div {
+  width: 108px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dialogItem div p {
+  flex: 0 0 auto;
+  margin-left: 8px;
 }
 </style>
