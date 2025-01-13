@@ -253,7 +253,7 @@ export default {
     },
 
     getSelfInfo() {
-      let URL =`http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/current`
+      let URL =`${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/current`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(async res => {
@@ -269,7 +269,7 @@ export default {
 
     userAvatarModified(info) {
       const base64 = info.dataURL
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/avatar`
+      const URL = `${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/avatar`
       axios.patch(URL, { avatar: base64 }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -298,7 +298,7 @@ export default {
     },
 
     usernameModified() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/username`
+      const URL = `${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/username`
       const payload = { name: this.newUsername }
       axios.patch(URL, payload, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -321,7 +321,7 @@ export default {
     },
 
     userBioModified() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/bio`
+      const URL = `${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/bio`
       const payload = { bio: this.newBio }
       axios.patch(URL, payload, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -349,7 +349,7 @@ export default {
       }
 
       const hashed = CryptoJS.MD5(this.password).toString()
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/password`
+      const URL = `${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/password`
       const payload = { password: hashed }
       axios.patch(URL, payload, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -459,7 +459,7 @@ export default {
     },
 
     getServerLimits() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/limits`
+      const URL = `${localStorage.getItem('adress')}/v1/user/limits`
       axios.get(URL).then(res => {
         this.serverLimits = res.data
       }).catch(err => {

@@ -183,8 +183,8 @@ export default {
       FD.append('groupType', this.type)
 
       const URL = this.type === 'group' 
-        ? `http://${localStorage.getItem('adress')}/v1/group/${this.group}/upload`
-        : `http://${localStorage.getItem('adress')}/v1/user/${this.group}/upload`
+        ? `${localStorage.getItem('adress')}/v1/group/${this.group}/upload`
+        : `${localStorage.getItem('adress')}/v1/user/${this.group}/upload`
 
       let lastLoaded = 0
       let lastTimestamp = Date.now()

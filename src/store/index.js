@@ -30,18 +30,18 @@ export default createStore({
         connectCount += 1
 
         // 首先获取wsToken，用于ws连接验证
-        const wsTokenURL = `http://${adress}/v1/user/wsToken?device=${device ? device : ""}`
+        const wsTokenURL = `${adress}/v1/user/wsToken?device=${device ? device : ""}`
         const res = await axios.get(wsTokenURL, { headers: { 'Authorization': `Bearer ${token}` } })
         localStorage.setItem('device', res.data.device)
 
         // 建立websocket连接，带上wsToken
-        const wsURL = `ws://${adress}/websocket/connect`
+        const wsURL = `${adress.replace("http", "ws")}/websocket/connect`
         const ws = new WebSocket(wsURL, [res.data.token])
         context.commit('websocketConnection', { ws })
 
         ws.onopen = async function () {
           // 获取好友申请
-          const friendURL = `http://${adress}/v1/user/${info.account}/verify/request`
+          const friendURL = `${adress}/v1/user/${info.account}/verify/request`
           axios.get(friendURL, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
           }).then(res => {
@@ -52,7 +52,7 @@ export default createStore({
 
           // 获取群申请
           for (const groupInfo of info.groups) {
-            const requestURL = `http://${adress}/v1/group/${groupInfo.group}/verify/request`
+            const requestURL = `${adress}/v1/group/${groupInfo.group}/verify/request`
             axios.get(requestURL, {
               headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             }).then(res => {

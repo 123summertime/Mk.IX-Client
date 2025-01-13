@@ -64,7 +64,7 @@ export default {
   methods: {
     async login() {
       this.adress = this.adress.replace("：", ":").trim()
-      const URL = `http://${this.adress}/v1/user/token?isBot=${this.asBot}`
+      const URL = `${this.adress}/v1/user/token?isBot=${this.asBot}`
       const hashed = CryptoJS.MD5(this.password).toString()
       const formData = `grant_type=password&username=${this.accountORusername}&password=${hashed}`
 
@@ -92,7 +92,7 @@ export default {
     async register() {
       this.adress = this.adress.replace("：", ":").trim()
       const register = {name: this.accountORusername, password: CryptoJS.MD5(this.password).toString()}
-      const URL = `http://${this.adress}/v1/user/register`
+      const URL = `${this.adress}/v1/user/register`
       axios.post(URL, register).then(res => {
         this.registerSuccessVisible = true
         this.accountORusername = res.data.uuid

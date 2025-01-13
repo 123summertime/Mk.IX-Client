@@ -260,7 +260,7 @@ export default {
   methods: {
     // 群名修改后
     groupNameModified() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/name`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/name`
       const payload = { name: this.groupName }
       axios.patch(URL, payload, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -287,7 +287,7 @@ export default {
     // 群头像修改后
     groupAvatarModified(info) {
       const base64 = info.dataURL
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/avatar`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.info.group}/info/avatar`
       axios.patch(URL, { avatar: base64 }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -304,7 +304,7 @@ export default {
     },
 
     groupQAModified() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/verify/question`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.info.group}/verify/question`
       axios.patch(URL, { Q: this.newGroupQ, A: this.newGroupA }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -320,7 +320,7 @@ export default {
     },
 
     getAnnouncement() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/announcement`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.info.group}/announcement`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -335,7 +335,7 @@ export default {
     },
 
     groupAnnouncementModified() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/announcement`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.info.group}/announcement`
       axios.patch(URL, { announcement: this.announcement }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -353,7 +353,7 @@ export default {
     // 获取群员信息
     // 以{uuid: lastUpdate}的形式存储在this.membersInfo中
     getMembersInfo() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/members`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.info.group}/members`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -408,9 +408,9 @@ export default {
     // 处理(退出/解散)群/删除好友
     unsubscribe() {
       let URL = this.getRole === 'owner'
-        ? `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}`
-        : `http://${localStorage.getItem('adress')}/v1/group/${this.info.group}/members/me`
-      if (!this.isGroupType) URL = `http://${localStorage.getItem('adress')}/v1/user/${this.info.group}`
+        ? `${localStorage.getItem('adress')}/v1/group/${this.info.group}`
+        : `${localStorage.getItem('adress')}/v1/group/${this.info.group}/members/me`
+      if (!this.isGroupType) URL = `${localStorage.getItem('adress')}/v1/user/${this.info.group}`
 
       axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }

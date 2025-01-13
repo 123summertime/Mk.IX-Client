@@ -75,7 +75,7 @@ export default {
 
     // 获取用户详细信息(个人简介，最后登录等)
     getProfileInfo() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/current`
+      const URL = `${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/current`
       axios.get(URL).then(async res => {
         const data = res.data
         this.bio = data.bio
@@ -94,7 +94,7 @@ export default {
 
     friendRequest() {
       const reason = { reason: this.reason }
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.uuid}/verify/request`
+      const URL = `${localStorage.getItem('adress')}/v1/user/${this.uuid}/verify/request`
       axios.post(URL, reason, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {

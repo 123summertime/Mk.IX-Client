@@ -122,7 +122,7 @@ export default {
       const isAdd = this.role === 'user'
       this.checkerText = `确认将 ${this.username} ${isAdd ? '添加为' : '移除'}管理员?`
 
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/admin/${this.uuid}`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.group}/members/admin/${this.uuid}`
       const headers = { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }
       const method = isAdd ? axios.post(URL, {}, headers) : axios.delete(URL, headers)
       method.then(res => {
@@ -139,7 +139,7 @@ export default {
 
     // 移除了群员
     userRemoved() { 
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}`
       axios.delete(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -166,7 +166,7 @@ export default {
     banDialogOpen() {
       this.banVisible = true
 
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}/ban`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}/ban`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -191,7 +191,7 @@ export default {
         return
       }
 
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}/ban`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.group}/members/${this.uuid}/ban`
       axios.post(URL, { duration: this.banDuration }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {

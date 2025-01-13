@@ -46,8 +46,8 @@ export default {
     requestResponse(type, group, time, verdict) {
       const uuid = this.$store.state.account
       const URLmapping = {
-        join: `http://${localStorage.getItem('adress')}/v1/group/${group}/verify/request/${time}`,
-        friend: `http://${localStorage.getItem('adress')}/v1/user/${uuid}/verify/request/${time}`,
+        join: `${localStorage.getItem('adress')}/v1/group/${group}/verify/request/${time}`,
+        friend: `${localStorage.getItem('adress')}/v1/user/${uuid}/verify/request/${time}`,
       }
       const url = URLmapping[type]
       const headers = { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }

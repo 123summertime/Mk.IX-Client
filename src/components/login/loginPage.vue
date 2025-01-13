@@ -29,7 +29,7 @@ export default {
       const token = localStorage.getItem("token") ?? ""
       if (!adress || !token) { return }
 
-      const URL = `http://${adress}/v1/user/check`
+      const URL = `${adress}/v1/user/check`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${token}` }
       }).then(res => {

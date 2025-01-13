@@ -125,7 +125,7 @@ export default {
   methods: {
     // 初始化，获取用户/群基本信息，建立websocket连接
     async initialization() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/profile/me`
+      const URL = `${localStorage.getItem('adress')}/v1/user/profile/me`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(async res => {
@@ -331,7 +331,7 @@ export default {
 
     // 获取该群管理员信息
     async getAdminsInfo(groupID) {
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${groupID}/members/admin`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${groupID}/members/admin`
       try {
         const res = await axios.get(URL, {headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }})
         return res.data

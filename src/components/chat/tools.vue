@@ -180,7 +180,7 @@ export default {
     // 创建一个群聊
     makeGroup() {
       const QA = { name: this.makeGroupName, Q: this.makeGroupQ, A: this.makeGroupA }
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/register`
+      const URL = `${localStorage.getItem('adress')}/v1/group/register`
       axios.post(URL, QA, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -201,7 +201,7 @@ export default {
 
     // 搜索群聊 获取群名/入群问题/群人数
     searchGroup() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/question`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/question`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(async res => {
@@ -221,7 +221,7 @@ export default {
     },
 
     searchUser() {
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.searchUserID}/profile/current`
+      const URL = `${localStorage.getItem('adress')}/v1/user/${this.searchUserID}/profile/current`
       axios.get(URL, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(async res => {
@@ -238,7 +238,7 @@ export default {
     // 通过正确回答入群问题进入新群
     joinGroupByQA() {
       const A = { A: this.searchGroupA }
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/answer`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/answer`
       axios.post(URL, A, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -260,7 +260,7 @@ export default {
     // 发送入群申请
     joinGroupByRequest() {
       const reason = { reason: this.searchGroupA }
-      const URL = `http://${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/request`
+      const URL = `${localStorage.getItem('adress')}/v1/group/${this.searchGroupID}/verify/request`
       axios.post(URL, reason, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
@@ -282,7 +282,7 @@ export default {
 
     makeFriendByRequest() {
       const reason = { reason: this.searchGroupA }
-      const URL = `http://${localStorage.getItem('adress')}/v1/user/${this.searchUserID}/friend`
+      const URL = `${localStorage.getItem('adress')}/v1/user/${this.searchUserID}/friend`
       axios.post(URL, reason, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       }).then(res => {
