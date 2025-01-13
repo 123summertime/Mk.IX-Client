@@ -659,12 +659,13 @@ chatPage
   │     └─ audioMsg
   └─ chatItem
         └─ message
-              ├─ broadcast
+              ├─ groupSelector
               ├─ fileMsg
               ├─ imageMsg
               ├─ textMsg
               ├─ audioMsg
               ├─ messageMenu
               ├─ namecard
-              └─ groupSelector 
+              └─ broadcast
+                   └─ namecard
  -->

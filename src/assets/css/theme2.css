@@ -122,6 +122,7 @@
   --message-time-textcolor: var(--text-tertiary);
   --message-username-textcolor: var(--text-secondary);
   --message-nameplate-textcolor: var(--text-opposite);
+  --message-broadcastHighlight-textcolor: var(--color-8);
 }
 
 /* atBar */

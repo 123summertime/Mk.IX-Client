@@ -1,15 +1,69 @@
 <template>
   <div class="broadcast">
-    <p>{{ message.payload.content }}</p>
+    <div class="content">
+      <i v-for="(part, i) in parts" :key="i">
+        <template v-if="part.match">
+          <i class="highlight" @click="showNamecard">{{ part.text }}</i>
+        </template>
+        <template v-else>
+          {{ part.text }}
+        </template>
+      </i>
+    </div>
+
+    <namecard
+      :uuid="uuid"
+      :namecardTrigger="namecardTrigger">
+    </namecard>
   </div>
 </template>
 
 <script>
+import namecard from './../namecard.vue'
+
 export default {
   props: {
     group: String,
     message: Object
-  }
+  },
+
+  data() {
+    return {
+      namecardTrigger: false,
+    }
+  },
+
+  computed: {
+    parts() {
+      if (!this.message.payload.meta.var) {
+        return [this.message.payload.content]
+      }
+      const name = this.message.payload.meta.var.name
+      let part = this.message.payload.content.split(name).map(i => ({
+        text: i,
+        match: false,
+      }))
+      part.splice(1, 0, {text: name, match: true})
+      return part
+    },
+
+    uuid() {
+      if (!this.message.payload.meta.var) {
+        return ""
+      }
+      return this.message.payload.meta.var.id
+    }
+  },
+
+  methods: {
+    showNamecard() {
+      this.namecardTrigger = !this.namecardTrigger
+    }
+  },
+
+  components: {
+    namecard,
+  },
 }
 </script>
 
@@ -20,12 +74,26 @@ export default {
   background: var(--message-common-bgcolor);
 }
 
-.broadcast p {
+.content {
+  display: flex;
+  justify-content: center;
+}
+
+.content i {
   height: 100%;
   text-align: center;
   color: var(--message-content-textcolor);
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.content .highlight {
+  cursor: pointer;
+  color: var(--message-broadcastHighlight-textcolor);
+}
+
+.highlight:hover {
+  text-decoration: underline;
 }
 </style>

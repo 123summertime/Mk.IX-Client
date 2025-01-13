@@ -111,6 +111,7 @@
   --message-time-textcolor: var(--text);
   --message-username-textcolor: var(--text);
   --message-nameplate-textcolor: var(--text);
+  --message-broadcastHighlight-textcolor: var(--text-opposite);
 }
 
 /* atBar */
