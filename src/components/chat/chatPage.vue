@@ -7,7 +7,7 @@
         <p>{{ username }}</p>
       </div>
       <div class="groupList">
-        <groupItem v-for="item in groupList"
+        <groupItem v-for="item in groupList" :key="item.group"
           :avatar="item.avatar"
           :group="item.group"
           :name="item.name"
@@ -67,6 +67,7 @@
             :type="item.type"
             :active="item.group === currGroupID"
             :delete="currDeleteHistory"
+            :key="item.group"
             v-show="currGroupID === item.group"
             class="conversation"></chatItem>
         </div>

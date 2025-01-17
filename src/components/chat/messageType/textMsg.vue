@@ -1,7 +1,9 @@
 <template>
   <div class="textMsg">
     <p>
-      <i :class="['atItem', message.payload.content ? '' : 'emptyContent']" v-for="username in atList">
+      <i :class="['atItem', message.payload.content ? '' : 'emptyContent']" 
+        v-for="(username, index) in atList"
+        :key="index">
         {{ "@" + username }}
       </i>
       <i :class="['content', getClass ]">

@@ -175,7 +175,7 @@
   <!-- 服务器限制 -->
   <el-dialog title="服务器限制" v-model="showServerLimits" width="640px">
     <div class="dialogContent">
-      <div v-for="(v, k) in serverLimits" class="eachLimit">
+      <div v-for="(v, k) in serverLimits" :key="k" class="eachLimit">
         <p>{{ k }}</p>
         <p style="color: var(--drawer-general-info-textcolor)">{{ v }}</p>
       </div>

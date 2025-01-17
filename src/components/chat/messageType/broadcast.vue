@@ -1,7 +1,7 @@
 <template>
   <div class="broadcast">
     <div class="content">
-      <i v-for="(part, i) in parts" :key="i">
+      <i v-for="(part, index) in parts" :key="index">
         <template v-if="part.match">
           <i class="highlight" @click="showNamecard">{{ part.text }}</i>
         </template>

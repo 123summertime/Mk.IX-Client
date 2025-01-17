@@ -11,7 +11,7 @@
         @ended="audioEnd"></audio>
       <div class="progressWrapper" ref="ProgressWrapper" @click="changeProgress">
         <ul class="volumes">
-          <li class="volume" v-for="vol in message.payload.meta.volume" :style="`height: ${volumeHeight(vol)};`"></li>
+          <li class="volume" v-for="(vol, index) in message.payload.meta.volume" :key="index" :style="`height: ${volumeHeight(vol)};`"></li>
         </ul>
         <div class="progress" ref="Progress">
           <div class="progressLine" v-show="progress != 0"></div>
