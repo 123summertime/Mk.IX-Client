@@ -356,6 +356,7 @@ export default {
         type: noticeMsg.type,
         subType: noticeMsg.subType, 
         payload: noticeMsg.payload,
+        meta: JSON.parse(JSON.stringify(noticeMsg.meta)),
       })
       if (!this.mailVisible) {
         this.unreadMailCount += 1

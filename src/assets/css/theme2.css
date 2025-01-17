@@ -46,6 +46,7 @@
   --positive: var(--color-3);
   --neutral: var(--neutral-3);
   --negative: var(--color-2);
+  --highlight: var(--color-8);
 
   /* 主题色 */
   --theme: var(--theme-4);
@@ -122,7 +123,6 @@
   --message-time-textcolor: var(--text-tertiary);
   --message-username-textcolor: var(--text-secondary);
   --message-nameplate-textcolor: var(--text-opposite);
-  --message-broadcastHighlight-textcolor: var(--color-8);
 }
 
 /* atBar */

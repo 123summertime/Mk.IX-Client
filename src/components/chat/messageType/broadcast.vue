@@ -15,6 +15,7 @@
       :uuid="uuid"
       :namecardTrigger="namecardTrigger">
     </namecard>
+    
   </div>
 </template>
 
@@ -36,7 +37,7 @@ export default {
   computed: {
     parts() {
       if (!this.message.payload.meta.var) {
-        return [this.message.payload.content]
+        return [{text: this.message.payload.content, match: false}]
       }
       const name = this.message.payload.meta.var.name
       let part = this.message.payload.content.split(name).map(i => ({
@@ -48,7 +49,7 @@ export default {
     },
 
     uuid() {
-      if (!this.message.payload.meta.var) {
+      if (!this.message.payload.meta.var || !this.message.payload.meta.var.id) {
         return ""
       }
       return this.message.payload.meta.var.id
@@ -90,7 +91,7 @@ export default {
 
 .content .highlight {
   cursor: pointer;
-  color: var(--message-broadcastHighlight-textcolor);
+  color: var(--highlight);
 }
 
 .highlight:hover {

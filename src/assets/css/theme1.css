@@ -9,6 +9,7 @@
   --color-1: #3eede7;
   --color-2: #f85149;
   --color-3: #00bc12;
+  --color-4: #1976d2;
 
   --neutral-0: #fffefb;
   --neutral-1: #f5f4f1;
@@ -35,6 +36,7 @@
   --positive: var(--color-3);
   --neutral: var(--neutral-3);
   --negative: var(--color-2);
+  --highlight: var(--color-4);
 
   /* 主题色 */
   --theme: var(--theme-4);
@@ -111,7 +113,6 @@
   --message-time-textcolor: var(--text);
   --message-username-textcolor: var(--text);
   --message-nameplate-textcolor: var(--text);
-  --message-broadcastHighlight-textcolor: var(--text-opposite);
 }
 
 /* atBar */
@@ -198,7 +199,7 @@
   --namecard-username-textcolor: var(--text);
   --namecard-uid-textcolor: var(--text-tertiary);
   --namecard-state-textcolor: var(--text-tertiary);
-  --namecard-middle-border: var(--theme);
+  --namecard-middle-border: linear-gradient(90deg, var(--theme), var(--theme));
   --namecard-bio-textcolor: var(--text);
 }
 

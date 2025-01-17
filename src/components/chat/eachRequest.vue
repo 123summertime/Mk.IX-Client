@@ -1,10 +1,19 @@
 <template>
   <div class="request" ref="Request">
-    <div class="image" @click="namecardTrigger = !namecardTrigger">
+    <div class="image">
       <img :src="msg.senderAvatar" />
     </div>
     <div class="content">
-      <p :title="groupMailText">{{ groupMailText }}</p>
+      <p :title="groupMailTextString">
+        <i v-for="(part, index) in groupMailTextArray" :key="index">
+          <template v-if="part.match">
+            <i class="highlight" @click="namecardTrigger = !namecardTrigger">{{ part.text }}</i>
+          </template>
+          <template v-else>
+            {{ part.text }}
+          </template>
+        </i>
+      </p>
       <p class="reason" :title="groupMailReason">{{ groupMailReason }}</p>
     </div>
     <div class="time">
@@ -80,14 +89,19 @@ export default {
   },
 
   computed: {
-    groupMailText() {
+    groupMailTextArray() {
       const { type, username, groupName } = this.msg
+      const content = [{text: username, match: true}]
       const mapping = {
-        join: `${username} 申请加入 ${groupName}`,
-        friend: `${username} 申请加你为好友`,
+        join: ` 申请加入 ${groupName}`,
+        friend: ` 申请加你为好友`,
       }
+      content.push({text: mapping[type], match: false})
+      return content
+    },
 
-      return mapping[type]
+    groupMailTextString() {
+      return this.groupMailTextArray.map(i => i.text).join('')
     },
 
     groupMailReason() {
@@ -124,13 +138,21 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
 }
 
 .image img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
+}
+
+.highlight {
+  cursor: pointer;
+  color: var(--highlight);
+}
+
+.highlight:hover {
+  text-decoration: underline;
 }
 
 .content {

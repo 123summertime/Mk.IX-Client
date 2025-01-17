@@ -1,7 +1,7 @@
 <template>
   <div class="chatItemRoot" @scroll="onScroll" ref="messageView">
     <div>
-      <message v-for="msg in messageList" :key="msg.time" ref='MessageList'
+      <message v-for="msg in sorted" :key="msg.time" ref='MessageList'
         :group="group"
         :type="type"
         :message="msg"
@@ -116,16 +116,21 @@ export default {
 
     // 其他用户撤回了一条消息，修改历史记录
     async newRevokeHandler(message) {
-      const target = message.payload.meta.time
+      const target = message.payload.meta.var.time
       const revokeMsg = await this.DB.query('History', { time: target })
       if (revokeMsg) {
         const storage = {
           time: target,
           uuid: revokeMsg.uuid,
           type: "revoke",
-          payload: { content: message.payload.content }
+          payload: {
+            content: message.payload.content,
+            meta: JSON.parse(JSON.stringify(message.payload.meta)),
+          }
         }
         await this.DB.update('History', storage)
+
+        message.time = target
         const idx = this.messageList.findIndex(i => i.time === target)
         if (idx != -1) { this.messageList[idx] = message }
         return true
@@ -225,6 +230,10 @@ export default {
   },
 
   computed: {
+    sorted() {
+      return this.messageList.slice().sort((a, b) => a.time > b.time ? 1 : -1);
+    },
+
     newMessage() {
       return this.$store.state[this.group]
     },

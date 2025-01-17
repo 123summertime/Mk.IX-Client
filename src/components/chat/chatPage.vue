@@ -647,6 +647,7 @@ chatPage
   │     ├─ namecard
   │     ├─ sysMsgGetter
   │     ├─ eachNotice  
+  │     │     └─ namecard
   │     └─ eachRequest
   │           └─ namecard
   ├─ groupConfig
@@ -668,4 +669,4 @@ chatPage
               ├─ namecard
               └─ broadcast
                    └─ namecard
- -->
+-->
