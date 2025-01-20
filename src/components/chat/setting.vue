@@ -186,7 +186,7 @@
 
 <script>
 import axios from 'axios'
-import CryptoJS from "crypto-js"
+import forge from 'node-forge';
 import ImgCutter from 'vue-img-cutter'
 import groupSelector from './groupSelector.vue'
 
@@ -348,7 +348,8 @@ export default {
         return
       }
 
-      const hashed = CryptoJS.MD5(this.password).toString()
+      const md = forge.md.md5.create().update(this.password)
+      const hashed = md.digest().toHex()
       const URL = `${localStorage.getItem('adress')}/v1/user/${this.uuid}/profile/password`
       const payload = { password: hashed }
       axios.patch(URL, payload, {

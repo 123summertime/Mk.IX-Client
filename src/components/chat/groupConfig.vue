@@ -129,7 +129,7 @@
       <p>加密只对<strong>文本及图片</strong>类型消息有效。空密钥即为关闭加密功能。</p>
       <p>为确保消息正常显示，双方必须使用<strong>相同的</strong>密钥。</p>
       <div class="inputLine">
-        <el-input v-model="cryptoKey" :maxlength="128" placeholder="密钥" />
+        <el-input v-model="cryptoKey" :maxlength="32" placeholder="密钥" />
         <el-button plain type="primary" @click="generateCryptoKey">生成</el-button>
       </div>
     </div>
@@ -447,6 +447,15 @@ export default {
     },
 
     setCryptoKey() {
+      if (this.cryptoKey.length !== 32 && this.cryptoKey.length !== 0) {
+        ElMessage({
+          message: "密钥长度必须为32位或为空",
+          duration: 6000,
+          type: "error",
+        })
+        return
+      }
+
       const account = this.$store.state.account
       const keys = JSON.parse(localStorage.getItem(`${account}-cryptoKey`) || "{}")
       keys[this.info.group] = this.cryptoKey

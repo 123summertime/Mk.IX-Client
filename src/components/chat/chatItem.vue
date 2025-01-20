@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import CryptoJS from "crypto-js"
+import forge from 'node-forge';
 import Dexie from 'dexie'
 
 import message from './message.vue'
@@ -163,14 +163,18 @@ export default {
       const key = this.getCryptoKey()
 
       try {
-        const bytes = CryptoJS.AES.decrypt(message.payload.content, key)
-        const decrypted = bytes.toString(CryptoJS.enc.Utf8)
-        if (decrypted) {
+        const decipher = forge.cipher.createDecipher('AES-CBC', key)
+        decipher.start({ iv: forge.util.hexToBytes(message.payload.meta.iv) })
+        decipher.update(forge.util.createBuffer(forge.util.decode64(message.payload.content)))
+        const finish = decipher.finish()
+        if (finish) {
           message.payload.meta.encrypt = false
-          message.payload.content = decrypted
+          message.payload.content = forge.util.decodeUtf8(decipher.output.data)
           return
         }
-      } catch {}
+      } catch (error) {
+        console.log("Decrypt Error")
+      }
       message.type = "text"
       message.payload.content = "加密信息"
     },

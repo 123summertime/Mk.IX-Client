@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import CryptoJS from "crypto-js"
+import forge from 'node-forge';
 import axios from 'axios'
 
 import router from './../../router/index.js'
@@ -65,7 +65,8 @@ export default {
     async login() {
       this.adress = this.adress.replace("：", ":").trim()
       const URL = `${this.adress}/v1/user/token?isBot=${this.asBot}`
-      const hashed = CryptoJS.MD5(this.password).toString()
+      const md = forge.md.md5.create().update(this.password)
+      const hashed = md.digest().toHex()
       const formData = `grant_type=password&username=${this.accountORusername}&password=${hashed}`
 
       axios.post(URL, formData, {
@@ -91,7 +92,9 @@ export default {
 
     async register() {
       this.adress = this.adress.replace("：", ":").trim()
-      const register = {name: this.accountORusername, password: CryptoJS.MD5(this.password).toString()}
+      const md = forge.md.md5.create().update(this.password)
+      const hashed = md.digest().toHex()
+      const register = { name: this.accountORusername, password: hashed }
       const URL = `${this.adress}/v1/user/register`
       axios.post(URL, register).then(res => {
         this.registerSuccessVisible = true

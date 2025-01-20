@@ -24,6 +24,7 @@
 
 <script>
 import { computeTime } from './../../assets/js/utils'
+import { queryInfo } from './../../assets/js/queryDB'
 
 export default {
   props: {
@@ -55,9 +56,24 @@ export default {
       return formatedTime
     },
 
-    getSummary(message) {
+    async getAtNames(message) {
+      if (!message.payload.meta) { return [] }
+      let atList = message.payload.meta.at || []
+      atList = await Promise.all(atList.map(async uuid => {
+        const info = await queryInfo("Account", null, uuid)
+        return info.username
+      }))
+      return atList
+    },
+
+    async getSummary(message) {
+      const atList = await this.getAtNames(message)
       const type = message.type
-      const prefix = this.type == "group" ? message.username + ": " : ""
+      let prefix = this.type == "group" ? message.username + ": " : ""
+      for (const x of atList) {
+        prefix += "@" + x + " "
+      }
+
       const mapping = {
         text: prefix + message.payload.content,
         revoke: message.payload.content,
@@ -85,7 +101,9 @@ export default {
         // 对于非置顶群(order值都>0) INT32_MAX-时间戳实现按最后消息的时间排序
         this.$refs.groupInfoRoot.style.order = 2147483647 - lastMessageTime
       }
-      this.lastMessage = this.getSummary(message)
+      this.getSummary(message).then(res => {
+        this.lastMessage = res
+      })
       this.lastMessageTime = this.computeLastMessageTime(lastMessageTime)
     },
 

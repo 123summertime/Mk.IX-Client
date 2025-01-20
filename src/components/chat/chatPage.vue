@@ -664,10 +664,11 @@ chatPage
               ├─ groupSelector
               ├─ fileMsg
               ├─ imageMsg
-              ├─ textMsg
               ├─ audioMsg
               ├─ messageMenu
               ├─ namecard
+              ├─ textMsg
+              │    └─ namecard
               └─ broadcast
                    └─ namecard
 -->

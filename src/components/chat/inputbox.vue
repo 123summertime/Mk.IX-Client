@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import CryptoJS from "crypto-js"
+import forge from 'node-forge';
 import axios from 'axios'
 
 import atBar from './atBar.vue'
@@ -122,16 +122,30 @@ export default {
     encrypt(s) {
       const key = this.getCryptoKey()
       if (!key) {
-        return [s, false]
+        return {
+          content: s,
+          encrypted: false,
+          iv: null,
+        }
       }
-      return [CryptoJS.AES.encrypt(s, key).toString(), true]
+      const iv = forge.random.getBytesSync(16)
+      const cipher = forge.cipher.createCipher('AES-CBC', key)
+      cipher.start({ iv: iv })
+      cipher.update(forge.util.createBuffer(s))
+      cipher.finish()
+      const encryptedText = forge.util.encode64(cipher.output.getBytes())      
+      return {
+        content: encryptedText,
+        encrypted: true,
+        iv: forge.util.bytesToHex(iv),
+      }
     },
 
     // 发送text类型消息
     sendingText() {
       if (!this.input && !this.atList.size) { return }
 
-      const [content, encrypted] = this.encrypt(this.input)
+      const { content, encrypted, iv } = this.encrypt(this.input)
       this.$store.state.ws.send(JSON.stringify({
         type: "text",
         group: this.group,
@@ -141,6 +155,7 @@ export default {
           meta: {
             at: Array.from(this.atList).map(i => JSON.parse(i).uuid),
             encrypt: encrypted,
+            iv: iv,
           }
         }
       }))
@@ -151,7 +166,7 @@ export default {
     // 发送图片类型消息，以base64的形式
     sendingImage() {
       if (!this.payload.content) { return }
-      const [content, encrypted] = this.encrypt(this.payload.content)
+      const { content, encrypted, iv } = this.encrypt(this.payload.content)
       this.$store.state.ws.send(JSON.stringify({
         type: this.payload.type,
         group: this.group,
@@ -161,6 +176,7 @@ export default {
           meta: {
             at: [],
             encrypt: encrypted,
+            iv: iv,
           }
         }
       }))

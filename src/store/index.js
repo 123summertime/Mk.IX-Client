@@ -41,7 +41,8 @@ export default createStore({
 
         ws.onopen = async function () {
           // 获取好友申请
-          const friendURL = `${adress}/v1/user/${info.account}/verify/request`
+          const device = localStorage.getItem('device')
+          const friendURL = `${adress}/v1/user/${info.account}/verify/request?device=${device}`
           axios.get(friendURL, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
           }).then(res => {
@@ -52,7 +53,7 @@ export default createStore({
 
           // 获取群申请
           for (const groupInfo of info.groups) {
-            const requestURL = `${adress}/v1/group/${groupInfo.group}/verify/request`
+            const requestURL = `${adress}/v1/group/${groupInfo.group}/verify/request?device=${device}`
             axios.get(requestURL, {
               headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             }).then(res => {
