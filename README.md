@@ -1,7 +1,7 @@
 # Mk.IX-Client
 
 ## 介绍
-`Mk.IX-Client`是基于`Vue3`构建的IM前端。在支持传统IM的基本功能外，还支持E2E加密等功能。
+`Mk.IX-Client` 是基于 `Vue3` 构建的即时通讯 (IM) 前端，支持传统功能和 E2E 加密。
 
 后端[Mk.IX-Server](https://github.com/123summertime/Mk.IX-Server)
 
@@ -17,12 +17,10 @@
 
 <details>
     <summary>移动端</summary>
-    <div style="display: flex; justify-content: space-between;">
-        <img src="./photos/mobile_left_dark.png" style="width: 22.5%;">
-        <img src="./photos/mobile_right_dark.png" style="width: 22.5%;">
-        <img src="./photos/mobile_left_bright.png" style="width: 22.5%;">
-        <img src="./photos/mobile_right_bright.png" style="width: 22.5%;">
-    </div>
+    <img src="./photos/mobile_left_dark.png" style="width: 24%;">
+    <img src="./photos/mobile_right_dark.png" style="width: 24%;">
+    <img src="./photos/mobile_left_bright.png" style="width: 24%;">
+    <img src="./photos/mobile_right_bright.png" style="width: 24%;">
 </details>
 
 
@@ -30,18 +28,17 @@
 
 > 保证后端[Mk.IX-Server](https://github.com/123summertime/Mk.IX-Server)正在运行
 
-### 本地预览
+#### 本地预览
 
-下载最新的[Release](https://github.com/123summertime/Mk.IX-Client/releases)
+#### 本地预览
+1. 下载最新的 [Release](https://github.com/123summertime/Mk.IX-Client/releases)。
+2. 启动本地服务器：
+   ```bash
+   cd dist
+   python -m http.server 8080
+   ```
 
-在`dist`文件夹中运行以下命令启动本地服务器
-
-> python -m http.server 8080
-
-访问[http://localhost:8080](http://localhost:8080)
-
-
-### 生产环境
+#### 生产环境
 
 下载最新的[Release](https://github.com/123summertime/Mk.IX-Client/releases)
 
@@ -70,8 +67,6 @@
         `-- uwsgi_params
 
     编辑conf.d/default.conf
-
-    ```
     # https
     server {
         listen       443 ssl;
@@ -110,23 +105,25 @@
             root   /usr/share/nginx/html;
         }
     }
-    ```
 </details>
 
-### 开发环境
+#### 开发环境
 
-克隆仓库
+``` bash
 
-> git clone https://github.com/123summertime/Mk.IX-Client.git
+# 克隆仓库
+git clone https://github.com/123summertime/Mk.IX-Client.git
 
-进入项目目录
+# 进入项目目录
+cd Mk.IX-Client
 
-> cd Mk.IX-Client
+# 安装依赖
+npm install
 
-安装依赖
+# 启动
+npm run dev
+```
 
-> npm install
+## 许可
 
-启动
-
-> npm run dev
+本项目基于 [MIT License](LICENSE) 进行许可。
