@@ -1,4 +1,4 @@
-# Mk.IX-Client
+![Mk.IX-Client](https://socialify.git.ci/123summertime/Mk.IX-Client/image?&name=1&owner=1&pattern=Plus&theme=Dark)
 
 ## 介绍
 `Mk.IX-Client` 是基于 `Vue3` 构建的即时通讯 (IM) 前端，支持传统功能和 E2E 加密。
@@ -28,9 +28,7 @@
 
 > 保证后端[Mk.IX-Server](https://github.com/123summertime/Mk.IX-Server)正在运行
 
-#### 本地预览
-
-#### 本地预览
+### 本地预览
 1. 下载最新的 [Release](https://github.com/123summertime/Mk.IX-Client/releases)。
 2. 启动本地服务器：
    ```bash
@@ -38,7 +36,7 @@
    python -m http.server 8080
    ```
 
-#### 生产环境
+### 生产环境
 
 下载最新的[Release](https://github.com/123summertime/Mk.IX-Client/releases)
 
@@ -107,7 +105,7 @@
     }
 </details>
 
-#### 开发环境
+### 开发环境
 
 ``` bash
 
