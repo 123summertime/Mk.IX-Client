@@ -1,7 +1,7 @@
 ![Mk.IX-Client](https://socialify.git.ci/123summertime/Mk.IX-Client/image?&name=1&owner=1&pattern=Plus&theme=Dark)
 
 ## 介绍
-`Mk.IX-Client` 是基于 `Vue3` 构建的即时通讯 (IM) 前端，支持传统功能和 E2E 加密。
+`Mk.IX-Client` 是基于 `Vue3` 构建的即时通讯 (IM) 前端，支持传统功能和 E2E 加密等功能。
 
 后端[Mk.IX-Server](https://github.com/123summertime/Mk.IX-Server)
 
@@ -30,7 +30,7 @@
 
 ### 本地预览
 1. 下载最新的 [Release](https://github.com/123summertime/Mk.IX-Client/releases)。
-2. 启动本地服务器：
+2. 启动本地服务器(需要python环境)：
    ```bash
    cd dist
    python -m http.server 8080
@@ -38,53 +38,23 @@
 
 ### 生产环境
 
+通过`docker` + `nginx`部署
+
 下载最新的[Release](https://github.com/123summertime/Mk.IX-Client/releases)
 
-通过`nginx`部署
+```
+文件夹结构
+|-- default.conf (创建)
+|-- dist
+|   |-- assets
+|   |   |-- index-34d94241.js
+|   |   `-- index-c5e85733.css
+|   |-- favicon.ico
+|   `-- index.html
+```
 
 <details>
-    <summary>nginx配置参考</summary>
-
-    文件夹结构
-    /etc/nginx
-        |-- conf.d
-        |   `-- default.conf
-        |-- dist
-        |   |-- assets
-        |   |   |-- index-34d94241.js
-        |   |   `-- index-c5e85733.css
-        |   |-- favicon.ico
-        |   `-- index.html
-        |-- fastcgi_params
-        |-- mime.types
-        |-- modules -> /usr/lib/nginx/modules
-        |-- nginx.conf
-        |-- scgi_params
-        |-- selfsigned.crt (https所需的证书)
-        |-- selfsigned.key (https所需的证书)
-        `-- uwsgi_params
-
-    编辑conf.d/default.conf
-    # https
-    server {
-        listen       443 ssl;
-        listen  [::]:443 ssl;
-        server_name  localhost;
-
-        ssl_certificate /etc/nginx/selfsigned.crt;
-        ssl_certificate_key /etc/nginx/selfsigned.key;
-
-        location / {
-            root   /etc/nginx/dist;
-            try_files $uri /index.html
-            index  index.html index.htm;
-        }
-
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root   /usr/share/nginx/html;
-        }
-    }
+    <summary>nginx(default.conf)配置参考</summary>
 
     # http
     server {
@@ -104,6 +74,23 @@
         }
     }
 </details>
+
+拉取镜像
+``` bash
+docker pull nginx
+```
+
+启动
+``` bash
+docker run -d \
+--name nginx1 \
+-p 80:80 \
+-v $(pwd)/default.conf:/etc/nginx/conf.d/default.conf \
+-v $(pwd)/dist:/etc/nginx/dist \
+nginx
+```
+
+访问`127.0.0.1`或`公网IP`就能看到页面
 
 ### 开发环境
 
