@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <messageMenu class="contextMenu" ref="ContextMenu"
+    <messageMenu class="contextMenu" v-if="menu" ref="ContextMenu"
       :message="message"
       :admins="admins"
       @deleteMsg="deleteMsg"
@@ -67,6 +67,7 @@ export default {
     type: String,
     message: Object,
     admins: Object,
+    groupType: String,
   },
 
   data() {
@@ -77,6 +78,7 @@ export default {
       showGroupSelector: false,
       isLongPress: false,
       longPressTimer: null,
+      menu: false,
     }
   },
 
@@ -88,29 +90,31 @@ export default {
 
     // 右键消息，打开菜单栏
     onRightClick(event) {
-      const rect = this.$refs.MessageRoot.getBoundingClientRect()
-      const ref = this.$refs.ContextMenu.$el.style
+      this.menu = true
 
-      const x = event.pageX - rect.left
-      const y = event.pageY - rect.top
+      this.$nextTick(() => {
+        const rect = this.$refs.MessageRoot.getBoundingClientRect()
+        const ref = this.$refs.ContextMenu.$el.style
+        const x = event.pageX - rect.left
+        const y = event.pageY - rect.top
+        ref.left = x + 'px'
+        ref.top = y + 'px'
+        ref.display = 'flex'
 
-      ref.left = x + 'px'
-      ref.top = y + 'px'
-      ref.display = 'flex'
+        // 右键菜单会超出屏幕则向左挪144px 144px是右键菜单的宽度
+        if (event.pageX + 144 > window.innerWidth) {
+          ref.left = x - 144 + 'px'
+        }
 
-      // 右键菜单会超出屏幕则向左挪144px 144px是右键菜单的宽度
-      if (event.pageX + 144 > window.innerWidth) {
-        ref.left = x - 144 + 'px'
-      }
-
-      event.preventDefault()
-      if (!this.rightClicked) {
-        this.rightClicked = true
-        setTimeout(() => {
-          window.addEventListener('click', this.globalClick)  // 点击其它地方，关闭右键菜单
-          window.addEventListener('contextmenu', this.globalClick)
-        }, 100)
-      }
+        event.preventDefault()
+        if (!this.rightClicked) {
+          this.rightClicked = true
+          setTimeout(() => {
+            window.addEventListener('click', this.globalClick)  // 点击其它地方，关闭右键菜单
+            window.addEventListener('contextmenu', this.globalClick)
+          }, 100)
+        }
+      })
     },
 
     // 打开菜单栏后，在非菜单栏区域点击(无论左键还是右键)时，关闭菜单栏
@@ -167,7 +171,7 @@ export default {
     // 长按头像@别人
     longPressNewAt() {
       this.isLongPress = false
-      if (this.messageFrom()) { return }
+      if (this.messageFrom() || this.groupType === "friend") { return }
 
       const activeDelay = 400
       this.longPressTimer = setTimeout(() => {
@@ -183,6 +187,7 @@ export default {
     },
 
     dispatchNewAt() {
+      if (this.messageFrom() || this.groupType === "friend") { return }
       this.$store.dispatch("getNewAt", {
         uuid: this.message.uuid,
         username: this.message.username,

@@ -67,6 +67,7 @@
             :type="item.type"
             :active="item.group === currGroupID"
             :delete="currDeleteHistory"
+            :groupType="currGroupType"
             :key="item.group"
             v-show="currGroupID === item.group"
             class="conversation"></chatItem>

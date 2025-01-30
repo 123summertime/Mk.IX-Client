@@ -1,11 +1,12 @@
 <template>
   <div class="chatItemRoot" @scroll="onScroll" ref="messageView">
     <div>
-      <message v-for="msg in sorted" :key="msg.time" ref='MessageList'
+      <message v-for="msg in messageList" :key="msg.time" ref='MessageList'
         :group="group"
         :type="type"
         :message="msg"
         :admins="admins"
+        :groupType="groupType"
         @deleteMsg="deleteMsg"
         @revokeMsg="revokeMsg"></message>
     </div>
@@ -34,17 +35,23 @@ export default {
     available: Boolean,
     type: String,
     delete: Object,
+    groupType: String,
   },
 
   data() {
     return {
       lock: false,  // 防止onScroll同一时间反复触发getHistory
       page: 0,
-      step: 20,
+      step: 15,
       messageList: [],
+      messageBatch: [],
+      messageBatchTimer: null,
       attentionVisible: false,
       attentionTarget: "",
       attentionContent: "",
+
+      MAX_TIME: 100,   // 100ms内的消息合并
+      MAX_MESSAGE: 50, // 50条消息合并
     }
   },
 
@@ -62,6 +69,7 @@ export default {
     },
 
     async getHistory() {
+      const nextPage = []
       const history = await this.DB.queryRange('History', this.page * this.step, this.step, true)
       for (const msg of history) {
         const info = await queryInfo("Account", null, msg.uuid)
@@ -73,18 +81,28 @@ export default {
           avatar: info.avatar,
           username: info.username,
         }
-        this.messageList.unshift(message)
+        nextPage.push(message)
       }
-      this.lock = false
-      this.page += 1
+      nextPage.reverse()
+
+      // 锁定滚动，避免滚动条跳动
+      this.$refs.messageView.style.overflow = "hidden"
+      const beforeScroll = this.$refs.messageView.scrollHeight
+      this.messageList.unshift(...nextPage)
+      this.$nextTick(() => {
+        this.lock = false
+        this.page += 1
+        this.$refs.messageView.style.overflow = "scroll"
+        this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight - beforeScroll
+      })
     },
 
     // 快滚动到顶时，获取更早的历史记录
     async onScroll() {
-      const threshold = 50
+      const threshold = 150
       if (this.$refs.messageView.scrollTop <= threshold && !this.lock) {
         this.lock = true
-        await this.getHistory()
+        this.getHistory().then()
       }
     },
 
@@ -201,6 +219,44 @@ export default {
       }, 2000)
     },
 
+    flushMessageList() {
+      if (this.messageBatch.length === 0) { return }
+      this.messageBatch.sort((a, b) => a.time - b.time ? 1 : -1)
+      this.messageList.push(...this.messageBatch)
+      this.messageBatch = []
+      if (this.messageBatchTimer) {
+        clearTimeout(this.messageBatchTimer)
+        this.messageBatchTimer = null
+      }
+    },
+
+    newMessageInsert(message) {
+      if (this.messageList.length === 0 || message.time > this.messageList.slice(-1)[0].time) {
+        this.messageBatch.push(message)
+        if (this.messageBatch.length === 1) {
+          this.messageBatchTimer = setTimeout(() => {
+            this.flushMessageList()
+          }, this.MAX_TIME)
+        }
+        if (this.messageBatch.length >= this.MAX_MESSAGE) {
+          this.flushMessageList()
+        }
+        return
+      }
+      let l = 0, r = this.messageList.length - 1
+      let ans = r
+      while (l <= r) {
+        const mid = Math.floor((l + r) / 2)
+        if (this.messageList[mid].time < message.time) {
+          l = mid + 1
+        } else {
+          r = mid - 1
+          ans = mid
+        }
+      }
+      this.messageList.splice(ans, 0, message)
+    },
+
     async newMessageHandler(message) {
       if (!message) { return }
       if (message.type === 'revoke') {
@@ -218,26 +274,20 @@ export default {
         payload: JSON.parse(JSON.stringify(message.payload))
       }
 
-      this.messageList.push(message)
       this.putHistory(storage)
+      this.newMessageInsert(message)
 
       // 如果是自己发的或已经滚动到底，加入新消息后自动滚动到底
       if (message.uuid === this.$store.state.account || atBottom) {
-        this.$nextTick(() => {
-          requestAnimationFrame(() => {
-            this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
-          })
-        })
+        setTimeout(() => {
+          this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+        }, this.MAX_TIME + 20)
       }
     }
 
   },
 
   computed: {
-    sorted() {
-      return this.messageList.slice().sort((a, b) => a.time > b.time ? 1 : -1);
-    },
-
     newMessage() {
       return this.$store.state[this.group]
     },
@@ -282,12 +332,17 @@ export default {
 
     // 切换群后，自动滚动到最底部
     active: {
-      handler() {
-        this.$nextTick(() => {
-          requestAnimationFrame(() => {
-            this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+      handler(newVal) {
+        if (newVal) {
+          this.$nextTick(() => {
+            requestAnimationFrame(() => {
+              this.$refs.messageView.scrollTop = this.$refs.messageView.scrollHeight
+            })
           })
-        })
+        } else {
+          this.messageList = this.messageList.slice(-20)
+          this.page = 1
+        }
       }
     },
 
