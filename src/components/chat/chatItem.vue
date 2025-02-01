@@ -71,6 +71,8 @@ export default {
     async getHistory() {
       const nextPage = []
       const history = await this.DB.queryRange('History', this.page * this.step, this.step, true)
+      if (history.length === 0) return
+
       for (const msg of history) {
         const info = await queryInfo("Account", null, msg.uuid)
         const message = {
@@ -246,7 +248,7 @@ export default {
       let l = 0, r = this.messageList.length - 1
       let ans = r
       while (l <= r) {
-        const mid = Math.floor((l + r) / 2)
+        const mid = (l + r) >> 1
         if (this.messageList[mid].time < message.time) {
           l = mid + 1
         } else {
@@ -266,7 +268,8 @@ export default {
       this.newAttentionHandler(message)
       this.decryptHandler(message)
 
-      const atBottom = this.$refs.messageView.scrollTop + this.$refs.messageView.clientHeight >= this.$refs.messageView.scrollHeight
+      const threshold = 50
+      const atBottom = this.$refs.messageView.scrollTop + this.$refs.messageView.clientHeight + threshold >= this.$refs.messageView.scrollHeight
       const storage = {
         time: message.time,
         type: message.type,
@@ -340,7 +343,7 @@ export default {
             })
           })
         } else {
-          this.messageList = this.messageList.slice(-20)
+          this.messageList.splice(0, Math.max(this.messageList.length - 20, 0))
           this.page = 1
         }
       }

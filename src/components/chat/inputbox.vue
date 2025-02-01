@@ -23,7 +23,7 @@
           </template>
         </el-popover>
       </div>
-      <div :class="['barItem', (input || atList.size) ? '' : 'barItemDisabled']" title="发送(Shift+Enter)" @click="sendingText()">
+      <div :class="['barItem', (input || atList.size) ? '' : 'barItemDisabled']" title="发送(Enter)" @click="sendingText()">
         <Promotion class='icon' />
       </div>
     </div>
@@ -36,6 +36,7 @@
       <textarea v-model=input 
         :disabled="!available" 
         :style="{ color: favoriteVisible ? 'transparent' : '' }"
+        placeholder="输入消息 (Shift+Enter 换行)"
         v-on:paste="pasteImg" 
         @keydown="onKeyDown"></textarea>
       <favorite class="favorite" v-if="favoriteVisible" @sendFavoriteImg="sendFavoriteImg"></favorite>
@@ -236,9 +237,9 @@ export default {
       })
     },
 
-    // shift + enter也可以发送
+    // Enter也可以发送
     onKeyDown(event) {
-      if (event.shiftKey && event.key === 'Enter') {
+      if (!event.shiftKey && event.key === 'Enter') {
         event.preventDefault()
         this.sendingText()
       }
@@ -545,6 +546,10 @@ textarea {
   outline: none;
   background: var(--inputBox-textarea-bgcolor);
   color: var(--inputBox-textarea-textcolor);
+}
+
+textarea::placeholder {
+  color: var(--neutral);
 }
 
 textarea::-webkit-scrollbar {
