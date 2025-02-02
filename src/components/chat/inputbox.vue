@@ -7,7 +7,7 @@
         </label>
         <input type="file" id="fileUpload" @change="fileUpload">
       </div>
-      <div class="barItem" title="图片" @click="favoriteVisible = !favoriteVisible">
+      <div class="barItem" title="图片" @click="this.favoriteVisible = !this.favoriteVisible">
         <Picture class="icon"></Picture>
       </div>
       <div class="barItem" title="语音">
@@ -36,7 +36,7 @@
       <textarea v-model=input 
         :disabled="!available" 
         :style="{ color: favoriteVisible ? 'transparent' : '' }"
-        :placeholder="isMobileDevice ? '输入消息 (Enter 换行)' : '输入消息 (Shift+Enter 换行)'"
+        :placeholder="getPlaceholder"
         v-on:paste="pasteImg" 
         @keydown="onKeyDown"></textarea>
       <favorite class="favorite" v-if="favoriteVisible" @sendFavoriteImg="sendFavoriteImg"></favorite>
@@ -424,7 +424,6 @@ export default {
     deleteAt(target) {
       this.atList.delete(target)
     },
-
   },
 
   computed: {
@@ -442,6 +441,11 @@ export default {
 
     isMobileDevice() {
       return window.innerWidth <= 768
+    },
+
+    getPlaceholder() {
+      if (this.favoriteVisible) return " " 
+      return this.isMobileDevice ? '输入消息 (Enter 换行)' : '输入消息 (Shift+Enter 换行)'
     },
     
     getNewAt() {
