@@ -36,7 +36,7 @@
       <textarea v-model=input 
         :disabled="!available" 
         :style="{ color: favoriteVisible ? 'transparent' : '' }"
-        placeholder="输入消息 (Shift+Enter 换行)"
+        :placeholder="isMobileDevice ? '输入消息 (Enter 换行)' : '输入消息 (Shift+Enter 换行)'"
         v-on:paste="pasteImg" 
         @keydown="onKeyDown"></textarea>
       <favorite class="favorite" v-if="favoriteVisible" @sendFavoriteImg="sendFavoriteImg"></favorite>
@@ -237,9 +237,9 @@ export default {
       })
     },
 
-    // Enter也可以发送
+    // 桌面端Enter发送
     onKeyDown(event) {
-      if (!event.shiftKey && event.key === 'Enter') {
+      if (!event.shiftKey && event.key === 'Enter' && !this.isMobileDevice) {
         event.preventDefault()
         this.sendingText()
       }
@@ -438,6 +438,10 @@ export default {
           }
         }
       }
+    },
+
+    isMobileDevice() {
+      return window.innerWidth <= 768
     },
     
     getNewAt() {
