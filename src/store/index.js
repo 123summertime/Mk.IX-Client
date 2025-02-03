@@ -159,6 +159,16 @@ export default createStore({
 
     updateGroupInfo(state, info) {
       state.groupList.push(info)
+      const seen = new Set()
+      const result = []
+      for (const item of state.groupList) {
+        let key = item.uuid ? `user-${item.uuid}` : `group-${item.group}`
+        if (!seen.has(key)) {
+          seen.add(key)
+          result.push(item)
+        }
+      }
+      state.groupList = result
     },
 
     getNewAt(state, info) {

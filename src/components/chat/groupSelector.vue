@@ -38,6 +38,7 @@ export default {
     return {
       visible: true,
       groupID: "",
+      groupType: "",
       groupName: "",
       avatar: "",
     }
@@ -50,6 +51,7 @@ export default {
 
     selectGroup(item) {
       this.groupID = item.group
+      this.groupType = item.type
       this.groupName = item.name
       this.avatar = item.avatar
     },
@@ -58,6 +60,7 @@ export default {
       if (this.groupID === '') { return }
       this.$emit('groupSelectorSelected', {
         groupID: this.groupID,
+        groupType: this.groupType,
         name: this.groupName,
         avatar: this.avatar
       })

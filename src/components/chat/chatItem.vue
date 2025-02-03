@@ -193,7 +193,7 @@ export default {
           return
         }
       } catch (error) {
-        console.log("Decrypt Error")
+        console.log("Decrypt Error", error)
       }
       message.type = "text"
       message.payload.content = "加密信息"

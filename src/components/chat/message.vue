@@ -146,14 +146,14 @@ export default {
 
     // 转发消息，选择了目标群，如果转发的是file类型，消息类型改为forwardFile
     groupSelectorSelected(info) {
-      const groupID = info.groupID
+      const { groupID, groupType } = info
       const newPayload = JSON.parse(JSON.stringify(this.message.payload))
       newPayload.meta = null
 
       this.$store.state.ws.send(JSON.stringify({
         type: this.message.type === "file" ? "forwardFile" : this.message.type,
         group: groupID,
-        groupType: this.type,
+        groupType: groupType,
         payload: newPayload,
       }))
       this.showGroupSelector = false

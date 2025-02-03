@@ -58,6 +58,7 @@ export default {
 
   methods: {
     showNamecard() {
+      if (this.message.payload.meta.operation === "group_create") return
       this.namecardTrigger = !this.namecardTrigger
     }
   },

@@ -133,7 +133,7 @@ export default {
       const iv = forge.random.getBytesSync(16)
       const cipher = forge.cipher.createCipher('AES-CBC', key)
       cipher.start({ iv: iv })
-      cipher.update(forge.util.createBuffer(s))
+      cipher.update(forge.util.createBuffer(forge.util.encodeUtf8(s)))
       cipher.finish()
       const encryptedText = forge.util.encode64(cipher.output.getBytes())      
       return {
