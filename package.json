@@ -20,10 +20,10 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.4.0",
-    "@vitejs/plugin-vue-jsx": "^3.0.2",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue-jsx": "^4.1.1",
     "unplugin-auto-import": "^0.16.7",
     "unplugin-vue-components": "^0.25.2",
-    "vite": "^4.5.6"
+    "vite": "^6.2.1"
   }
 }
